@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up — Aglaea</title>
+    <meta name="description" content="Create your free Aglaea account and never miss another special moment.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/signup.css">
+</head>
+<body>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-content">
+            <a href="index.html" class="logo">AGLAEA</a>
+            <nav class="nav">
+                <a href="index.html">← Back to Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Signup Section -->
+    <section class="signup-section">
+        <div class="container">
+            <div class="signup-container">
+                
+                <!-- Progress Indicator -->
+                <div class="progress-bar">
+                    <div class="progress-step active" data-step="1">
+                        <div class="progress-circle">1</div>
+                        <span>Your Details</span>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step" data-step="2">
+                        <div class="progress-circle">2</div>
+                        <span>Add Reminders</span>
+                    </div>
+                </div>
+
+                <!-- Step 1: Account Details -->
+                <div class="signup-step" id="step1">
+                    <h1 class="signup-title">Create Your Account</h1>
+                    <p class="signup-subtitle">Start remembering the moments that matter</p>
+                    
+                    <form id="accountForm" class="signup-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">First Name</label>
+                                <input type="text" id="firstName" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="lastName">Last Name</label>
+                                <input type="text" id="lastName" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" required>
+                            <span class="form-helper">We'll send your reminder notifications here</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" required minlength="6">
+                            <span class="form-helper">Minimum 6 characters</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone Number (Optional)</label>
+                            <input type="tel" id="phone" placeholder="+44 7XXX XXXXXX">
+                            <span class="form-helper">For SMS reminders (Essential plan only)</span>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-full">Next: Add Reminders</button>
+                    </form>
+                </div>
+
+                <!-- Step 2: Add Reminders -->
+                <div class="signup-step hidden" id="step2">
+                    <h1 class="signup-title">Add Your First Reminders</h1>
+                    <p class="signup-subtitle">Set up 1-5 free reminders to get started</p>
+                    
+                    <form id="remindersForm" class="signup-form">
+                        
+                        <div id="remindersContainer">
+                            <!-- Reminder 1 (Required) -->
+                            <div class="reminder-input" data-reminder="1">
+                                <div class="reminder-header">
+                                    <h3>Reminder 1 <span class="required-badge">Required</span></h3>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="name1">Person's Name</label>
+                                    <input type="text" id="name1" placeholder="e.g. Mum, Sarah, Best Friend" required>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="occasion1">Occasion</label>
+                                        <select id="occasion1" required>
+                                            <option value="">Select occasion</option>
+                                            <option value="birthday">Birthday</option>
+                                            <option value="anniversary">Anniversary</option>
+                                            <option value="valentines">Valentine's Day</option>
+                                            <option value="mothers-day">Mother's Day</option>
+                                            <option value="fathers-day">Father's Day</option>
+                                            <option value="christmas">Christmas</option>
+                                            <option value="other">Other (type your own)</option>
+                                        </select>
+                                        <input type="text" id="customOccasion1" class="custom-occasion hidden" placeholder="Enter occasion name">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="date1">Date</label>
+                                        <input type="date" id="date1" required>
+                                    </div>
+                                </div>
+                                
+                                <p class="date-helper">💡 Enter the actual date of the occasion (we'll remind you 10 days before)</p>
+                            </div>
+                        </div>
+                        
+                        <button type="button" id="addReminderBtn" class="btn btn-outline btn-full add-reminder-btn">
+                            + Add Another Reminder <span class="reminder-count">(1/5)</span>
+                        </button>
+                        
+                        <div class="form-actions">
+                            <button type="button" id="backBtn" class="btn btn-secondary">← Back</button>
+                            <button type="submit" class="btn btn-primary">Create My Account</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Success Message (hidden initially) -->
+                <div class="signup-step hidden" id="successStep">
+                    <div class="success-message">
+                        <div class="success-icon">✓</div>
+                        <h1 class="signup-title">Welcome to Aglaea!</h1>
+                        <p class="signup-subtitle">Your account has been created successfully</p>
+                        <p style="margin-bottom: 2rem;">Check your email for a welcome message and your first reminder confirmations.</p>
+                        <a href="dashboard.html" class="btn btn-primary btn-large">Go to Dashboard</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Firebase Config & Signup Logic -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/signup.js"></script>
+
+</body>
+</html>
