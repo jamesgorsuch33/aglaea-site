@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Gifts — Aglaea</title>
+    <meta name="description" content="Discover curated luxury gifts from premium UK brands. Perfect for birthdays, anniversaries, and special occasions.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/products.css">
+</head>
+<body>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-content">
+            <a href="index.html" class="logo">AGLAEA</a>
+            <nav class="nav">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="products.html">Gifts</a>
+                <a href="upgrade.html">Upgrade</a>
+                <a href="signin.html">Sign In</a>
+                <a href="signup.html" class="btn-nav">Get Started</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Products Section -->
+    <section class="products-section">
+        <div class="container">
+            
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1>Browse Luxury Gifts</h1>
+                <p>Curated from premium UK brands for life's special moments</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <label for="occasionFilter">Filter by Occasion:</label>
+                    <select id="occasionFilter">
+                        <option value="all">All Occasions</option>
+                        <option value="birthday">Birthday</option>
+                        <option value="anniversary">Anniversary</option>
+                        <option value="mothers-day">Mother's Day</option>
+                        <option value="fathers-day">Father's Day</option>
+                        <option value="valentines">Valentine's Day</option>
+                        <option value="christmas">Christmas</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="sortFilter">Sort by:</label>
+                    <select id="sortFilter">
+                        <option value="recommended">Recommended</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="name">Brand Name</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div id="productsGrid" class="products-grid">
+                <!-- Products will be rendered here by JavaScript -->
+            </div>
+
+            <!-- Premium Waitlist Section -->
+            <div class="premium-section">
+                <h2>Premium Tier Coming Soon</h2>
+                <p>Exclusive access to top luxury brands launching later this year</p>
+                
+                <div class="premium-features">
+                    <div class="premium-feature">
+                        <span class="feature-icon">🏛️</span>
+                        <h3>Exclusive Luxury Brands</h3>
+                        <p>Access prestigious heritage brands and VIP-only collections</p>
+                    </div>
+                    
+                    <div class="premium-feature">
+                        <span class="feature-icon">🎁</span>
+                        <h3>Personal Shopper Service</h3>
+                        <p>Dedicated gift curator for bespoke recommendations</p>
+                    </div>
+                    
+                    <div class="premium-feature">
+                        <span class="feature-icon">🤖</span>
+                        <h3>AI Gift Suggestions</h3>
+                        <p>Smart recommendations based on recipient preferences</p>
+                    </div>
+                </div>
+                
+                <div class="waitlist-box">
+                    <h3>Join the Premium Waitlist</h3>
+                    <p>Be the first to know when Premium launches. No commitment required.</p>
+                    
+                    <div id="waitlistMessage" class="waitlist-message hidden"></div>
+                    
+                    <form id="premiumWaitlistForm" class="waitlist-form">
+                        <button type="submit" class="btn btn-primary btn-large" id="joinWaitlistBtn">
+                            Join Waitlist
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Firebase SDKs (for checking if user is logged in) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Firebase Config -->
+    <script src="js/firebase-config.js"></script>
+    
+    <!-- Products Logic -->
+    <script src="js/products.js"></script>
+
+</body>
+</html>
