@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Gifts — Aglaea</title>
+    <meta name="description" content="Discover curated luxury gifts from premium UK brands. Perfect for birthdays, anniversaries, and special occasions.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/products.css">
+</head>
+<body>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-content">
+            <a href="index.html" class="logo">AGLAEA</a>
+            <nav class="nav">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="products.html">Gifts</a>
+                <a href="upgrade.html">Upgrade</a>
+                <a href="signin.html">Sign In</a>
+                <a href="signup.html" class="btn-nav">Get Started</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Products Section -->
+    <section class="products-section">
+        <div class="container">
+            
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1>Browse Luxury Gifts</h1>
+                <p>Curated from premium UK brands for life's special moments</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <label for="occasionFilter">Filter by Occasion:</label>
+                    <select id="occasionFilter">
+                        <option value="all">All Occasions</option>
+                        <option value="birthday">Birthday</option>
+                        <option value="anniversary">Anniversary</option>
+                        <option value="mothers-day">Mother's Day</option>
+                        <option value="fathers-day">Father's Day</option>
+                        <option value="valentines">Valentine's Day</option>
+                        <option value="christmas">Christmas</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="sortFilter">Sort by:</label>
+                    <select id="sortFilter">
+                        <option value="recommended">Recommended</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="name">Brand Name</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div id="productsGrid" class="products-grid">
+                <!-- Products will be rendered here by JavaScript -->
+            </div>
+
+            <!-- Premium Brands Section -->
+            <div class="premium-section">
+                <h2>Premium Brands</h2>
+                <p>Unlock exclusive access to VIP brands with Essential or Premium</p>
+                
+                <div class="premium-grid">
+                    <div class="brand-card premium-card">
+                        <div class="brand-icon">🏛️</div>
+                        <h3>Fortnum & Mason</h3>
+                        <p class="price-range">From £50</p>
+                        <div class="occasion-tags">
+                            <span>Hampers</span>
+                            <span>Food & Drink</span>
+                        </div>
+                        <button class="btn btn-outline" disabled>Premium Only</button>
+                    </div>
+                    
+                    <div class="brand-card premium-card">
+                        <div class="brand-icon">✒️</div>
+                        <h3>Smythson</h3>
+                        <p class="price-range">From £200</p>
+                        <div class="occasion-tags">
+                            <span>Leather Goods</span>
+                            <span>Stationery</span>
+                        </div>
+                        <button class="btn btn-outline" disabled>Premium Only</button>
+                    </div>
+                    
+                    <div class="brand-card premium-card">
+                        <div class="brand-icon">👜</div>
+                        <h3>Anya Hindmarch</h3>
+                        <p class="price-range">From £300</p>
+                        <div class="occasion-tags">
+                            <span>Bags</span>
+                            <span>Accessories</span>
+                        </div>
+                        <button class="btn btn-outline" disabled>Premium Only</button>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 2rem;">
+                    <a href="upgrade.html" class="btn btn-primary">Upgrade for Premium Access</a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Firebase SDKs (for checking if user is logged in) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    
+    <!-- Firebase Config -->
+    <script src="js/firebase-config.js"></script>
+    
+    <!-- Products Logic -->
+    <script src="js/products.js"></script>
+
+</body>
+</html>
