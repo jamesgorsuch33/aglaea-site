@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In — Aglaea</title>
+    <meta name="description" content="Sign in to your Aglaea account and manage your gift reminders.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/signup.css">
+</head>
+<body>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-content">
+            <a href="index.html" class="logo">AGLAEA</a>
+            <nav class="nav">
+                <a href="signup.html">Sign Up</a>
+                <a href="index.html">← Back to Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Sign In Section -->
+    <section class="signup-section">
+        <div class="container">
+            <div class="signup-container" style="max-width: 500px;">
+                
+                <h1 class="signup-title">Welcome Back</h1>
+                <p class="signup-subtitle">Sign in to manage your reminders</p>
+                
+                <!-- Error Message -->
+                <div id="errorMessage" class="error-message hidden"></div>
+                
+                <!-- Sign In Form -->
+                <form id="signinForm" class="signup-form">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" required autofocus>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" required minlength="6">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-full" id="signinBtn">Sign In</button>
+                    
+                    <div style="text-align: center; margin-top: 1rem;">
+                        <a href="#" id="forgotPasswordLink" style="color: var(--gold); font-size: 0.875rem;">Forgot password?</a>
+                    </div>
+                </form>
+
+                <!-- Toggle to Sign Up -->
+                <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--stone);">
+                    <p style="color: var(--slate); font-size: 0.938rem;">
+                        Don't have an account? <a href="signup.html" style="color: var(--gold); font-weight: 500;">Sign Up</a>
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    
+    <!-- Firebase Config -->
+    <script src="js/firebase-config.js"></script>
+    
+    <!-- Sign In Logic -->
+    <script>
+        const signinForm = document.getElementById('signinForm');
+        const errorMessage = document.getElementById('errorMessage');
+        const signinBtn = document.getElementById('signinBtn');
+        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+
+        // Handle Sign In
+        signinForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Disable button while processing
+            signinBtn.disabled = true;
+            signinBtn.textContent = 'Signing in...';
+            hideError();
+            
+            try {
+                // Sign in with Firebase
+                await firebase.auth().signInWithEmailAndPassword(email, password);
+                
+                // Redirect to dashboard
+                window.location.href = 'dashboard.html';
+                
+            } catch (error) {
+                console.error('Sign in error:', error);
+                showError(getErrorMessage(error.code));
+                
+                // Re-enable button
+                signinBtn.disabled = false;
+                signinBtn.textContent = 'Sign In';
+            }
+        });
+
+        // Handle Forgot Password
+        forgotPasswordLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            
+            if (!email) {
+                showError('Please enter your email address first');
+                return;
+            }
+            
+            try {
+                await firebase.auth().sendPasswordResetEmail(email);
+                alert('Password reset email sent! Check your inbox.');
+            } catch (error) {
+                showError('Failed to send reset email. Please check your email address.');
+            }
+        });
+
+        // Show/Hide Error
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+        }
+
+        function hideError() {
+            errorMessage.classList.add('hidden');
+        }
+
+        // Error Messages
+        function getErrorMessage(code) {
+            switch (code) {
+                case 'auth/user-not-found':
+                    return 'No account found with this email. Please sign up first.';
+                case 'auth/wrong-password':
+                    return 'Incorrect password. Please try again.';
+                case 'auth/invalid-email':
+                    return 'Please enter a valid email address.';
+                case 'auth/too-many-requests':
+                    return 'Too many failed attempts. Please try again later.';
+                default:
+                    return 'Sign in failed. Please try again.';
+            }
+        }
+
+        // Check if already logged in
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                // Already logged in, redirect to dashboard
+                window.location.href = 'dashboard.html';
+            }
+        });
+    </script>
+
+</body>
+</html>

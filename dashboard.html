@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Aglaea</title>
+    <meta name="description" content="Manage your gift reminders and never miss another special moment.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-content">
+            <a href="index.html" class="logo">AGLAEA</a>
+            <nav class="nav">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="products.html">Gifts</a>
+                <a href="upgrade.html">Upgrade</a>
+                <span id="userEmail" style="margin-left: auto;"></span>
+                <button class="btn-nav" id="logoutBtn">Sign Out</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <section class="dashboard-section">
+        <div class="container">
+            
+            <!-- Welcome Header -->
+            <div class="welcome-header">
+                <h1>Welcome back, <span id="userName">there</span>!</h1>
+                <p>Your reminders are ready</p>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="stats-card">
+                <div class="stat">
+                    <span class="stat-number" id="reminderCount">0/5</span>
+                    <span class="stat-label">Reminders Used</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number" id="nextReminder">-</span>
+                    <span class="stat-label">Next Reminder</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number" id="planType">Free</span>
+                    <span class="stat-label">Current Plan</span>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="dashboard-grid">
+                
+                <!-- Your Reminders -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h2>Your Reminders</h2>
+                        <button class="btn btn-primary" id="addReminderBtn" style="padding: 0.625rem 1.25rem; font-size: 0.875rem;">+ Add Reminder</button>
+                    </div>
+                    
+                    <div id="remindersList" class="reminders-list">
+                        <div class="loading">Loading your reminders...</div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="dashboard-card">
+                    <h2>Quick Actions</h2>
+                    
+                    <div class="quick-actions">
+                        <a href="products.html" class="action-card">
+                            <span class="action-icon">🎁</span>
+                            <div>
+                                <h3>Browse Gifts</h3>
+                                <p>Explore curated luxury gifts</p>
+                            </div>
+                        </a>
+                        
+                        <a href="upgrade.html" class="action-card">
+                            <span class="action-icon">⭐</span>
+                            <div>
+                                <h3>Upgrade to Essential</h3>
+                                <p>Unlimited reminders + SMS alerts</p>
+                            </div>
+                        </a>
+                        
+                        <a href="#" id="addPhoneAction" class="action-card">
+                            <span class="action-icon">📱</span>
+                            <div>
+                                <h3>Add Phone Number</h3>
+                                <p>Get SMS reminders</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Upgrade Banner (shows when at limit) -->
+            <div id="upgradeBanner" class="upgrade-banner hidden">
+                <h2>You've reached the free limit</h2>
+                <p>Upgrade to Essential for unlimited reminders + SMS alerts for just £4.99/month</p>
+                <a href="upgrade.html" class="btn btn-primary btn-large">Upgrade to Essential</a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Add Reminder Modal -->
+    <div id="addReminderModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Reminder</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            
+            <form id="newReminderForm">
+                <div class="form-group">
+                    <label for="newName">Person's Name</label>
+                    <input type="text" id="newName" placeholder="e.g. Mum, Sarah, Best Friend" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="newOccasion">Occasion</label>
+                    <select id="newOccasion" required>
+                        <option value="">Select occasion</option>
+                        <option value="birthday">Birthday</option>
+                        <option value="anniversary">Anniversary</option>
+                        <option value="valentines">Valentine's Day</option>
+                        <option value="mothers-day">Mother's Day</option>
+                        <option value="fathers-day">Father's Day</option>
+                        <option value="christmas">Christmas</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <input type="text" id="newCustomOccasion" class="custom-occasion hidden" placeholder="Enter occasion name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="newDate">Date</label>
+                    <input type="date" id="newDate" required>
+                    <span class="form-helper">💡 Enter the actual date of the occasion</span>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-close">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Reminder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Firebase Config -->
+    <script src="js/firebase-config.js"></script>
+    
+    <!-- Dashboard Logic -->
+    <script src="js/dashboard.js"></script>
+
+</body>
+</html>
