@@ -4,13 +4,13 @@
 
 // Stripe Publishable Key (safe to expose in client-side code)
 // TODO: Replace with your actual Stripe Publishable Key
-const STRIPE_PUBLISHABLE_KEY = 'pk_test_REPLACE_WITH_YOUR_KEY';
+const STRIPE_PUBLISHABLE_KEY = 'pk_test_51TOYGgR1KZpwXwShJWiAldqS1lviLdZt24pZLzkspDYONgr1M8jyTu0QneUBHYpDYnAI7xPsN3RT7ec86YbMFpqg00zpFIdihG';
 const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
 
 // TODO: Replace with your Stripe Price IDs (from Stripe Dashboard → Products)
 const STRIPE_PRICES = {
-    monthly: 'price_MONTHLY_ID',  // Essential Monthly: £4.99/month
-    annual: 'price_ANNUAL_ID'     // Essential Annual: £49.99/year
+    monthly: 'price_1TOYP9R1KZpwXwSh4PB0pQy6',  // Essential Monthly: £4.99/month
+    annual: 'price_1TOYTcR1KZpwXwShbmzcvLF9'     // Essential Annual: £49.99/year
 };
 
 // State
