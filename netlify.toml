@@ -1,0 +1,7 @@
+# Netlify configuration
+[build]
+  publish = "/"
+  
+[build.environment]
+  # Disable secrets scanning for Firebase config (these are meant to be public)
+  SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES = "AIza"
