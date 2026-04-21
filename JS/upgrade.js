@@ -8,8 +8,8 @@ const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
 
 // TODO: Replace with your Stripe Price IDs (create these in Stripe Dashboard)
 const STRIPE_PRICES = {
-    monthly: 'prod_UNJ1u7eFcrrVe2',
-    annual: 'prod_UNJ5IKa0nxYZ5O'
+    monthly: 'price_1TOYP9R1KZpwXwSh4PB0pQy6',
+    annual: 'price_1TOYTcR1KZpwXwShbmzcvLF9'
 };
 
 // State
