@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upgrade — Aglaea</title>
+    <meta name="description" content="Upgrade to Aglaea Essential for unlimited reminders and SMS alerts. Premium tier coming soon.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/upgrade.css">
+</head>
+<body>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-content">
+            <a href="index.html" class="logo">AGLAEA</a>
+            <nav class="nav">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="products.html">Gifts</a>
+                <a href="upgrade.html">Upgrade</a>
+                <a href="signin.html">Sign In</a>
+                <a href="signup.html" class="btn-nav">Get Started</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Upgrade Section -->
+    <section class="upgrade-section">
+        <div class="container">
+            
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1>Choose Your Plan</h1>
+                <p>Start free, upgrade when you're ready for more</p>
+            </div>
+
+            <!-- Billing Toggle -->
+            <div class="billing-toggle">
+                <span class="toggle-label">Monthly</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="billingToggle">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-label">Annual <span class="save-badge">Save £10</span></span>
+            </div>
+
+            <!-- Pricing Grid -->
+            <div class="pricing-grid">
+                
+                <!-- Free Tier -->
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h2>Remind</h2>
+                        <div class="pricing-price">
+                            <span class="price-amount">Free</span>
+                            <span class="price-period">forever</span>
+                        </div>
+                    </div>
+                    
+                    <ul class="pricing-features">
+                        <li>5 reminders maximum</li>
+                        <li>Email notifications</li>
+                        <li>Browse luxury gifts</li>
+                        <li>Purchase via affiliate links</li>
+                        <li>Basic support</li>
+                    </ul>
+                    
+                    <button class="btn btn-outline" disabled>Current Plan</button>
+                </div>
+
+                <!-- Essential Tier -->
+                <div class="pricing-card pricing-card-featured">
+                    <div class="pricing-badge">Most Popular</div>
+                    <div class="pricing-header">
+                        <h2>Essential</h2>
+                        <div class="pricing-price">
+                            <span class="price-amount" id="essentialPrice">£4.99</span>
+                            <span class="price-period" id="essentialPeriod">/month</span>
+                        </div>
+                        <p class="pricing-annual" id="essentialAnnual"></p>
+                    </div>
+                    
+                    <ul class="pricing-features">
+                        <li>Unlimited reminders</li>
+                        <li>Email + SMS notifications</li>
+                        <li>Full gift catalogue</li>
+                        <li>Priority support</li>
+                        <li>Export reminders</li>
+                    </ul>
+                    
+                    <button class="btn btn-primary" id="upgradeToEssential">Upgrade to Essential</button>
+                    <p class="pricing-note">No credit card required to start</p>
+                </div>
+
+                <!-- Premium Tier -->
+                <div class="pricing-card pricing-card-premium">
+                    <div class="pricing-badge premium-badge">Coming Soon</div>
+                    <div class="pricing-header">
+                        <h2>Premium</h2>
+                        <div class="pricing-price">
+                            <span class="price-amount">Launching Soon</span>
+                        </div>
+                    </div>
+                    
+                    <ul class="pricing-features">
+                        <li>Everything in Essential</li>
+                        <li>VIP exclusive brands</li>
+                        <li>AI gift suggestions</li>
+                        <li>Personal shopper service</li>
+                        <li>Auto-scheduled gifts</li>
+                        <li>Multi-user access</li>
+                    </ul>
+                    
+                    <button class="btn btn-outline" id="premiumWaitlistBtn">Join Waitlist</button>
+                </div>
+
+            </div>
+
+            <!-- Comparison Table -->
+            <div class="comparison-section">
+                <h2>Compare Plans</h2>
+                
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Features</th>
+                                <th>Free</th>
+                                <th>Essential</th>
+                                <th>Premium</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Reminders</td>
+                                <td>5 max</td>
+                                <td>Unlimited</td>
+                                <td>Unlimited</td>
+                            </tr>
+                            <tr>
+                                <td>Email notifications</td>
+                                <td>✓</td>
+                                <td>✓</td>
+                                <td>✓</td>
+                            </tr>
+                            <tr>
+                                <td>SMS notifications</td>
+                                <td>—</td>
+                                <td>✓</td>
+                                <td>✓</td>
+                            </tr>
+                            <tr>
+                                <td>Gift catalogue</td>
+                                <td>Standard</td>
+                                <td>Full</td>
+                                <td>Full + VIP</td>
+                            </tr>
+                            <tr>
+                                <td>AI suggestions</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>✓</td>
+                            </tr>
+                            <tr>
+                                <td>Personal shopper</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>✓</td>
+                            </tr>
+                            <tr>
+                                <td>Auto-scheduled gifts</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>✓</td>
+                            </tr>
+                            <tr>
+                                <td>Support</td>
+                                <td>Basic</td>
+                                <td>Priority</td>
+                                <td>VIP</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="faq-section">
+                <h2>Frequently Asked Questions</h2>
+                
+                <div class="faq-grid">
+                    <div class="faq-item">
+                        <h3>Can I cancel anytime?</h3>
+                        <p>Yes, you can cancel your Essential subscription at any time. No questions asked.</p>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <h3>What payment methods do you accept?</h3>
+                        <p>We accept all major credit and debit cards via Stripe secure payment processing.</p>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <h3>When will Premium launch?</h3>
+                        <p>Premium tier is launching later this year. Join the waitlist to be notified first.</p>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <h3>Can I upgrade from Essential to Premium later?</h3>
+                        <p>Yes! When Premium launches, Essential members can upgrade seamlessly.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Premium Waitlist Modal -->
+    <div id="premiumWaitlistModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Join Premium Waitlist</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            
+            <p style="margin-bottom: 1.5rem; color: var(--slate);">Be the first to know when Premium launches with exclusive luxury brands and VIP features.</p>
+            
+            <div id="waitlistModalMessage" class="waitlist-message hidden"></div>
+            
+            <form id="premiumWaitlistFormModal">
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-close">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="joinWaitlistModalBtn">Join Waitlist</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
+    
+    <!-- Firebase Config -->
+    <script src="js/firebase-config.js"></script>
+    
+    <!-- Upgrade Logic -->
+    <script src="js/upgrade.js"></script>
+
+</body>
+</html>
