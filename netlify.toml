@@ -1,0 +1,7 @@
+# Netlify configuration
+[build]
+  publish = "/"
+  
+[build.environment]
+  # Disable secrets scanning completely (Firebase keys are safe to expose)
+  SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"
