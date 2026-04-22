@@ -26,7 +26,7 @@ const brands = [
         priceRange: 'From £45',
         priceMin: 45,
         link: AFFILIATE_LINKS.nicchiaLuxury,
-        occasions: ['birthday', 'anniversary', 'mothers-day', 'valentines', 'christmas', 'all']
+        occasions: ['birthday', 'anniversary', 'mothers-day', 'valentines', 'christmas', 'just-because', 'all']
     },
     {
         id: 'jo-loves',
@@ -36,7 +36,7 @@ const brands = [
         priceRange: 'From £28',
         priceMin: 28,
         link: AFFILIATE_LINKS.joLoves,
-        occasions: ['birthday', 'mothers-day', 'valentines', 'anniversary', 'christmas', 'all']
+        occasions: ['birthday', 'mothers-day', 'valentines', 'anniversary', 'christmas', 'just-because', 'all']
     },
     {
         id: 'vilebrequin',
@@ -46,7 +46,7 @@ const brands = [
         priceRange: 'From £50',
         priceMin: 50,
         link: AFFILIATE_LINKS.vilebrequin,
-        occasions: ['birthday', 'fathers-day', 'anniversary', 'all']
+        occasions: ['birthday', 'fathers-day', 'anniversary', 'just-because', 'all']
     },
     {
         id: 'mappin-webb',
@@ -56,7 +56,7 @@ const brands = [
         priceRange: 'From £100',
         priceMin: 100,
         link: AFFILIATE_LINKS.mappinWebb,
-        occasions: ['anniversary', 'birthday', 'valentines', 'mothers-day', 'all']
+        occasions: ['anniversary', 'birthday', 'valentines', 'mothers-day', 'just-because', 'all']
     },
     {
         id: 'purely-diamonds',
@@ -66,7 +66,7 @@ const brands = [
         priceRange: 'From £150',
         priceMin: 150,
         link: AFFILIATE_LINKS.purelyDiamonds,
-        occasions: ['anniversary', 'valentines', 'birthday', 'all']
+        occasions: ['anniversary', 'valentines', 'birthday', 'just-because', 'all']
     },
     {
         id: 'norman-walsh',
@@ -76,7 +76,7 @@ const brands = [
         priceRange: 'From £85',
         priceMin: 85,
         link: AFFILIATE_LINKS.normanWalsh,
-        occasions: ['birthday', 'fathers-day', 'christmas', 'all']
+        occasions: ['birthday', 'fathers-day', 'christmas', 'just-because', 'all']
     },
     {
         id: 'dean-morris',
@@ -86,7 +86,7 @@ const brands = [
         priceRange: 'From £3',
         priceMin: 3,
         link: AFFILIATE_LINKS.deanMorrisCards,
-        occasions: ['birthday', 'anniversary', 'mothers-day', 'fathers-day', 'valentines', 'christmas', 'all']
+        occasions: ['birthday', 'anniversary', 'mothers-day', 'fathers-day', 'valentines', 'christmas', 'just-because', 'all']
     },
     {
         id: 'scribbler',
@@ -96,7 +96,7 @@ const brands = [
         priceRange: 'From £3',
         priceMin: 3,
         link: AFFILIATE_LINKS.scribbler,
-        occasions: ['birthday', 'anniversary', 'mothers-day', 'fathers-day', 'valentines', 'christmas', 'all']
+        occasions: ['birthday', 'anniversary', 'mothers-day', 'fathers-day', 'valentines', 'christmas', 'just-because', 'all']
     }
 ];
 
@@ -217,6 +217,7 @@ function formatOccasion(occasion) {
         'fathers-day': "Father's Day",
         'valentines': "Valentine's",
         'christmas': 'Christmas'
+        'just-because': 'Just Because'
     };
     return formatted[occasion] || occasion;
 }
