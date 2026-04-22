@@ -1,8 +1,0 @@
-{
-  "name": "aglaea-functions",
-  "version": "1.0.0",
-  "description": "Netlify Functions for Aglaea",
-  "dependencies": {
-    "stripe": "^14.0.0"
-  }
-}
