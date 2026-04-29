@@ -1,0 +1,438 @@
+/* Blog Styles for Aglaea */
+
+/* Blog Hero */
+.blog-hero {
+    background: linear-gradient(135deg, var(--cream) 0%, var(--stone) 100%);
+    padding: 4rem 0 3rem;
+    text-align: center;
+    border-bottom: 1px solid var(--stone);
+}
+
+.blog-hero h1 {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    font-weight: 400;
+    margin-bottom: 0.75rem;
+    color: var(--charcoal);
+}
+
+.hero-subtitle {
+    font-size: 1.125rem;
+    color: var(--slate);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Featured Post */
+.featured-post {
+    padding: 4rem 0;
+    background: white;
+}
+
+.post-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: var(--transition);
+    border: 1px solid var(--stone);
+}
+
+.post-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+}
+
+.post-card.featured {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+.post-image {
+    background: linear-gradient(135deg, var(--gold) 0%, #B8935A 100%);
+    min-height: 300px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.post-card.featured .post-image {
+    min-height: 400px;
+}
+
+.featured-badge {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    background: white;
+    color: var(--gold);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.813rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.post-content {
+    padding: 2rem;
+}
+
+.post-card.featured .post-content {
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Post Meta */
+.post-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.post-category {
+    color: var(--gold);
+    font-size: 0.813rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.post-date,
+.post-read-time {
+    color: var(--soft-gray);
+    font-size: 0.813rem;
+}
+
+.post-date::before {
+    content: "•";
+    margin-right: 1rem;
+}
+
+.post-read-time::before {
+    content: "•";
+    margin-right: 1rem;
+}
+
+/* Post Titles */
+.post-card h2,
+.post-card h3 {
+    font-family: var(--font-display);
+    margin-bottom: 1rem;
+    line-height: 1.3;
+}
+
+.post-card.featured h2 {
+    font-size: 2.25rem;
+    font-weight: 400;
+}
+
+.post-card h3 {
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+
+.post-card h2 a,
+.post-card h3 a {
+    color: var(--charcoal);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.post-card h2 a:hover,
+.post-card h3 a:hover {
+    color: var(--gold);
+}
+
+/* Post Excerpt */
+.post-excerpt {
+    color: var(--slate);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+}
+
+.post-card.featured .post-excerpt {
+    font-size: 1.125rem;
+}
+
+/* Read More Link */
+.read-more {
+    color: var(--gold);
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: var(--transition);
+}
+
+.read-more:hover {
+    gap: 0.5rem;
+}
+
+/* Blog Posts Grid */
+.blog-posts {
+    padding: 4rem 0;
+    background: var(--cream);
+}
+
+.section-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 400;
+    text-align: center;
+    margin-bottom: 3rem;
+    color: var(--charcoal);
+}
+
+.posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+}
+
+.posts-grid .post-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.posts-grid .post-image {
+    min-height: 200px;
+}
+
+/* Blog CTA */
+.blog-cta {
+    background: linear-gradient(135deg, var(--gold) 0%, #B8935A 100%);
+    padding: 5rem 0;
+    text-align: center;
+    color: white;
+}
+
+.cta-content h2 {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 400;
+    margin-bottom: 1rem;
+}
+
+.cta-content p {
+    font-size: 1.125rem;
+    margin-bottom: 2rem;
+    opacity: 0.95;
+}
+
+.cta-note {
+    font-size: 0.875rem;
+    margin-top: 1rem;
+    opacity: 0.85;
+}
+
+/* Article Page Styles */
+.article-hero {
+    background: linear-gradient(135deg, var(--cream) 0%, var(--stone) 100%);
+    padding: 5rem 0 3rem;
+    text-align: center;
+    border-bottom: 1px solid var(--stone);
+}
+
+.article-category {
+    color: var(--gold);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.article-title {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    color: var(--charcoal);
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.article-meta {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    color: var(--slate);
+    font-size: 0.938rem;
+}
+
+.article-content {
+    max-width: 740px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem;
+}
+
+.article-content p {
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    color: var(--slate);
+    font-size: 1.063rem;
+}
+
+.article-content h2 {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 500;
+    margin: 3rem 0 1.5rem;
+    color: var(--charcoal);
+}
+
+.article-content h3 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin: 2.5rem 0 1rem;
+    color: var(--charcoal);
+}
+
+.article-content ul,
+.article-content ol {
+    margin-bottom: 1.5rem;
+    padding-left: 2rem;
+}
+
+.article-content li {
+    line-height: 1.8;
+    margin-bottom: 0.75rem;
+    color: var(--slate);
+    font-size: 1.063rem;
+}
+
+.article-content a {
+    color: var(--gold);
+    text-decoration: underline;
+    transition: var(--transition);
+}
+
+.article-content a:hover {
+    color: var(--charcoal);
+}
+
+.article-content blockquote {
+    border-left: 4px solid var(--gold);
+    padding-left: 1.5rem;
+    margin: 2rem 0;
+    font-style: italic;
+    color: var(--slate);
+}
+
+/* Product Recommendation Box */
+.product-rec {
+    background: var(--cream);
+    border: 1px solid var(--stone);
+    border-radius: var(--radius-md);
+    padding: 2rem;
+    margin: 2.5rem 0;
+}
+
+.product-rec h4 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: var(--charcoal);
+}
+
+.product-rec p {
+    margin-bottom: 1rem;
+}
+
+.product-rec .btn {
+    margin-top: 0.5rem;
+}
+
+/* Article CTA */
+.article-cta {
+    background: linear-gradient(135deg, var(--gold) 0%, #B8935A 100%);
+    padding: 3rem;
+    border-radius: var(--radius-lg);
+    text-align: center;
+    color: white;
+    margin: 3rem 0;
+}
+
+.article-cta h3 {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 400;
+    margin-bottom: 1rem;
+}
+
+.article-cta p {
+    font-size: 1.063rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.95;
+}
+
+/* Related Posts */
+.related-posts {
+    padding: 4rem 0;
+    background: var(--cream);
+}
+
+.related-posts h3 {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 400;
+    text-align: center;
+    margin-bottom: 2.5rem;
+    color: var(--charcoal);
+}
+
+.related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .blog-hero h1 {
+        font-size: 2.25rem;
+    }
+
+    .post-card.featured {
+        grid-template-columns: 1fr;
+    }
+
+    .post-card.featured .post-image {
+        min-height: 250px;
+    }
+
+    .post-card.featured h2 {
+        font-size: 1.75rem;
+    }
+
+    .post-card.featured .post-content {
+        padding: 2rem;
+    }
+
+    .posts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .article-title {
+        font-size: 2rem;
+    }
+
+    .article-content {
+        padding: 3rem 1.5rem;
+    }
+
+    .cta-content h2 {
+        font-size: 2rem;
+    }
+}
