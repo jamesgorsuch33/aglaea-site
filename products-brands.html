@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxury Gift Partners | Aglaea</title>
+    <meta name="description" content="Discover curated luxury British brands for every occasion. From artisan fragrances to handcrafted footwear, find the perfect gift from our trusted partners.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/products-brands.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-content">
+            <a href="index.html" class="logo">AGLAEA</a>
+            <nav class="nav">
+                <a href="products.html">Gifts</a>
+                <a href="blog.html">Inspiration</a>
+                <a href="upgrade.html">Pricing</a>
+                <a href="signin.html">Sign In</a>
+                <a href="signup.html" class="btn-nav">Get Started</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="products-hero">
+        <div class="container">
+            <h1>Our Luxury Partners</h1>
+            <p class="hero-subtitle">Thoughtfully curated British brands for every special moment</p>
+        </div>
+    </section>
+
+    <!-- Main Products Section -->
+    <section class="products-main">
+        <div class="container">
+            <div class="products-layout">
+                
+                <!-- Sidebar Filters (Desktop) -->
+                <aside class="filters-sidebar">
+                    <div class="filters-header">
+                        <h3>Filters</h3>
+                        <button class="filters-clear" onclick="clearAllFilters()">Clear All</button>
+                    </div>
+
+                    <!-- Occasion Filter -->
+                    <div class="filter-group">
+                        <h4>Shop by Occasion</h4>
+                        <div class="filter-options">
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="birthday" onchange="filterProducts()">
+                                <span>Birthday</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="anniversary" onchange="filterProducts()">
+                                <span>Anniversary</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="wedding" onchange="filterProducts()">
+                                <span>Wedding</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="mothers-day" onchange="filterProducts()">
+                                <span>Mother's Day</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="fathers-day" onchange="filterProducts()">
+                                <span>Father's Day</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="just-because" onchange="filterProducts()">
+                                <span>Just Because</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Brand Filter -->
+                    <div class="filter-group">
+                        <h4>Shop by Brand</h4>
+                        <div class="filter-options">
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="jo-loves" onchange="filterProducts()">
+                                <span>Jo Loves</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="mappin-webb" onchange="filterProducts()">
+                                <span>Mappin & Webb</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="nicchia-luxury" onchange="filterProducts()">
+                                <span>Nicchia Luxury</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="vilebrequin" onchange="filterProducts()">
+                                <span>Vilebrequin</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="purely-diamonds" onchange="filterProducts()">
+                                <span>Purely Diamonds</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="norman-walsh" onchange="filterProducts()">
+                                <span>Norman Walsh</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="dean-morris" onchange="filterProducts()">
+                                <span>Dean Morris Cards</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="scribbler" onchange="filterProducts()">
+                                <span>Scribbler</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="trufflehunter" onchange="filterProducts()">
+                                <span>TruffleHunter</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="ctrne" onchange="filterProducts()">
+                                <span>Ctrne</span>
+                            </label>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Products Content Area -->
+                <div class="products-content">
+                    
+                    <!-- Mobile Filters Toggle -->
+                    <button class="mobile-filters-toggle" onclick="toggleMobileFilters()">
+                        <span>Filters</span>
+                        <span class="filter-icon">⚙</span>
+                    </button>
+
+                    <!-- Toolbar -->
+                    <div class="products-toolbar">
+                        <p class="results-count"><span id="product-count">10</span> brands</p>
+                        <div class="sort-controls">
+                            <label for="sort-select">Sort by:</label>
+                            <select id="sort-select" onchange="sortProducts()">
+                                <option value="default">Featured</option>
+                                <option value="name-asc">Name (A-Z)</option>
+                                <option value="name-desc">Name (Z-A)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Brand Cards Grid -->
+                    <div class="brands-grid" id="brands-grid">
+                        
+                        <!-- BRAND 1: JO LOVES -->
+                        <a href="https://www.awin1.com/cread.php?awinmid=100597&awinaffid=2799680&clickref=Bestsellers&ued=https%3A%2F%2Fwww.joloves.com%2Fcollections%2Fbestsellers" class="brand-card" data-brand="jo-loves" data-occasions="birthday,anniversary,mothers-day,just-because">
+                            <div class="brand-image">
+                                <div class="https://www.joloves.com/?_gl=1*19cx6o9*_up*MQ..*_gs*MQ..&gclid=CjwKCAjwzevPBhBaEiwAplAxvozZRrL2jz5Egd8Cu-7jjrXpi8xvui-T-k6aL9qsgJrjCYjiNiAxwRoCoq4QAvD_BwE&gbraid=0AAAAADsyv9l-o_XR_6QpO2nA47DUIYung">
+                                    <span class="brand-placeholder-text">Jo Loves</span>
+                                </div>
+                            </div>
+                            <div class="brand-info">
+                                <h3 class="brand-name">Jo Loves</h3>
+                                <p class="brand-category">Artisan Fragrances & Candles</p>
+                                <p class="brand-description">British perfumery at its finest. Distinctive scents and luxury candles from Jo Malone's independent brand.</p>
+                            </div>
+                        </a>
+
+                        <!-- BRAND 2: MAPPIN & WEBB -->
+                        <a href="https://www.awin1.com/cread.php?awinmid=11017&awinaffid=2799680&clickref=All+Jewellery&ued=https%3A%2F%2Fwww.mappinandwebb.com%2Fc%2FJewellery%2FAll" class="brand-card" data-brand="mappin-webb" data-occasions="birthday,anniversary,wedding,mothers-day,fathers-day">
+                            <div class="brand-image">
+                                <div class="https://content.thewosgroup.com/mappin-webb/logo/mappin-webb-logo-primary.svg">
+                                    <span class="brand-placeholder-text">Mappin & Webb</span>
+                                </div>
+                            </div>
+                            <div class="brand-info">
+                                <h3 class="brand-name">Mappin & Webb</h3>
+                                <p class="brand-category">Heritage British Jewelry</p>
+                                <p class="brand-description">Royal jewelers since 1775. Timeless pieces crafted with centuries of British expertise.</p>
+                            </div>
+                        </a>
+
+                        <!-- BRAND 3: NICCHIA LUXURY -->
+                        <a href="https://www.awin1.com/cread.php?awinmid=123544&awinaffid=2799680&clickref=Bestsellers&ued=https%3A%2F%2Fwww.nicchialuxury.com%2Fen-gb%2Fcollections%2Fbest-selling-niche-perfumes" class="brand-card" data-brand="nicchia-luxury" data-occasions="birthday,anniversary,just-because">
+                            <div class="brand-image">
+                                <div class="https://www.nicchialuxury.com/cdn/shop/files/NICCHIA_LUXURY_NERO.svg?v=1758208404&width=500">
+                                    <span class="brand-placeholder-text">Nicchia Luxury</span>
+                                </div>
+                            </div>
+                            <div class="brand-info">
+                                <h3 class="brand-name">Nicchia Luxury</h3>
+                                <p class="brand-category">Niche Fragrances</p>
+                                <p class="brand-description">Exclusive artisan perfumes for those who appreciate olfactory artistry beyond mainstream offerings.</p>
+                            </div>
+                        </a>
+
+                        <!-- BRAND 4: VILEBREQUIN -->
+                        <a href="https://www.awin1.com/cread.php?awinmid=70917&awinaffid=2799680&clickref=Discover&ued=https%3A%2F%2Fwww.vilebrequin.com%2Feu%2Fen%2Fhome" class="brand-card" data-brand="vilebrequin" data-occasions="birthday,fathers-day,just-because">
+                            <div class="brand-image">
+                                <div class="https://www.awin1.com/cshow.php?s=3535411&v=70917&q=480087&r=2799680" border="0">
+                                    <span class="brand-placeholder-text">Vilebrequin</span>
+                                </div>
+                            </div>
+                            <div class="brand-info">
+                                <h3 class="brand-name">Vilebrequin</h3>
+                                <p class="brand-category">Luxury Swimwear</p>
+                                <p class="brand-description">St. Tropez heritage meets contemporary design. Premium resort wear since 1971.</p>
+                            </div>
+                        </a>
+
+                        <!-- BRAND 5: PURELY DIAMONDS -->
+                        <a href="https://www.awin1.com/cread.php?awinmid=1992&awinaffid=2799680&clickref=Homepage&ued=https%3A%2F%2Fwww.purelydiamonds.co.uk" class="brand-card" data-brand="purely-diamonds" data-occasions="birthday,anniversary,wedding,mothers-day">
+                            <div class="brand-image">
+                                <div class="https://www.purelydiamonds.co.uk/static/cms/media/logo-(2).svg">
+                                    <span class="brand-placeholder-text">Purely Diamonds</span>
+                                </div>
+                            </div>
+                            <div class="brand-info">
+                                <h3 class="brand-name">Purely Diamonds</h3>
+                                <p class="brand-category">Diamond Jewelry</p>
+                                <p class="brand-description">Exceptional diamonds and fine jewelry. Timeless pieces for life's most precious moments.</p>
+                            </div>
+                        </a>
+
+                        <!-- BRAND 6: NORMAN WALSH -->
+                        <a href="https://www.awin1.com/cread.php?awinmid=115943&awinaffid=2799680&clickref=Bestsellers&ued=https%3A%2F%2Fnormanwalsh.com%2Fcollections%2Fshop" class="brand-card" data-brand="norman-walsh" data-occasions="birthday,fathers-day,just-because">
+                            <div class="brand-image">
+                                <div class="https://normanwalsh.com/cdn/shop/files/96df70ffe1a51890e8d48bc5452addd0.png?v=1763622156&width=220">
+                                    <span class="brand-placeholder-text">Norman Walsh</span>
+                                </div>
+                            </div>
+                            <div class="brand-info">
+                                <h3 class="brand-name">Norman Walsh</h3>
+                                <p class="brand-category">Handcrafted British Footwear</p>
+                                <p class="brand-description">Hand-stitched running shoes and trainers made in Bolton since 1961. Quality that lasts.</p>
+                            </div>
+                        </a>
+
+                        <!-- BRAND 7: DEAN MORRIS CARDS -->
+                        <a href="https://www.awin1.com/cread.php?awinmid=28517&awinaffid=2799680&clickref=Bestsellers&ued=https%3A%2F%2Fdeanmorriscards.co.uk%2Fcollections%2Fbest-selling-cards" class="brand-card" data-brand="dean-morris" data-occasions="birthday,anniversary,mothers-day,fathers-day,just-because">
+                            <div class="brand-image">
+                                <div class="https://deanmorriscards.co.uk/cdn/shop/files/Website_Logo_Round_240x.png?v=1647961736">
+                                    <span class="brand-placeholder-text">Dean Morris Cards</span>
+                                </div>
+                            </div>
+                            <div class="brand-info">
+                                <h3 class="brand-name">Dean Morris Cards</h3>
+                                <p class="brand-category">Premium Greeting Cards</p>
+                                <p class="brand-description">Beautifully designed cards that blend British wit with heartfelt sentiment.</p>
+                            </div>
+                        </a>
+
+                        <!-- BRAND 8: SCRIBBLER -->
+                        <a href="https://www.awin1.com/cread.php?awinmid=3965&awinaffid=2799680&clickref=Bestsellers&ued=https%3A%2F%2Fwww.scribbler.com%2Fcollections%2Fbestselling-birthday-cards" class="brand-card" data-brand="scribbler" data-occasions="birthday,anniversary,mothers-day,fathers-day,just-because">
+                            <div class="brand-image">
+                                <div class="https://www.scribbler.com/cdn/shop/t/10/assets/scribbler-logo.svg?v=97716078956029492051732741636">
+                                    <span class="brand-placeholder-text">Scribbler</span>
+                                </div>
+                            </div>
+                            <div class="brand-info">
+                                <h3 class="brand-name">Scribbler</h3>
+                                <p class="brand-category">Cards & Gifts</p>
+                                <p class="brand-description">Fun, original cards and unique gifts that make people smile.</p>
+                            </div>
+                        </a>
+
+                        <!-- BRAND 9: TRUFFLEHUNTER -->
+                        <a href="https://www.awin1.com/cread.php?awinmid=18159&awinaffid=2799680&clickref=All+products&ued=https%3A%2F%2Fwww.trufflehunter.co.uk%2Fcollections%2Fall" class="brand-card" data-brand="trufflehunter" data-occasions="birthday,anniversary,just-because">
+                            <div class="brand-image">
+                                <div class="https://www.trufflehunter.co.uk/cdn/shop/files/truffle-hunter-logo-side_1.png?v=1767345676">
+                                    <span class="brand-placeholder-text">TruffleHunter</span>
+                                </div>
+                            </div>
+                            <div class="brand-info">
+                                <h3 class="brand-name">TruffleHunter</h3>
+                                <p class="brand-category">Gourmet Truffle Products</p>
+                                <p class="brand-description">Artisan truffle oils, butters, and seasonings. Elevate everyday cooking into culinary luxury.</p>
+                            </div>
+                        </a>
+
+                        <!-- BRAND 10: CTRNE -->
+                        <a href="https://ctrne.com?sca_ref=11194854.jyZxaS7ljz" class="brand-card" data-brand="ctrne" data-occasions="birthday,fathers-day,just-because">
+                            <div class="brand-image">
+                                <div class="https://ctrne.com/cdn/shop/files/CTRNE-Logo-Black-Transparent.png?v=1713801209">
+                                    <span class="brand-placeholder-text">Ctrne</span>
+                                </div>
+                            </div>
+                            <div class="brand-info">
+                                <h3 class="brand-name">Ctrne</h3>
+                                <p class="brand-category">Crystal-Infused Footwear</p>
+                                <p class="brand-description">Casual trainers with citrine crystals in the sole. Walk in style while manifesting your best life.</p>
+                            </div>
+                        </a>
+
+                    </div>
+
+                    <!-- No Results Message -->
+                    <div class="no-results" id="no-results" style="display: none;">
+                        <p>No brands match your selected filters.</p>
+                        <button onclick="clearAllFilters()" class="btn btn-secondary">Clear Filters</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="products-cta">
+        <div class="container">
+            <h2>Never Miss Another Special Moment</h2>
+            <p>Get timely reminders with curated gift suggestions from our luxury partners.</p>
+            <a href="signup.html" class="btn btn-primary btn-large">Start Free Today</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4 class="footer-title">AGLAEA</h4>
+                    <p class="footer-tagline">Moments, quietly made.<br>Beautifully remembered.</p>
+                </div>
+                
+                <div class="footer-col">
+                    <h5 class="footer-heading">Product</h5>
+                    <ul class="footer-links">
+                        <li><a href="products.html">Browse Gifts</a></li>
+                        <li><a href="upgrade.html">Pricing</a></li>
+                        <li><a href="signup.html">Sign Up</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h5 class="footer-heading">Company</h5>
+                    <ul class="footer-links">
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Privacy</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h5 class="footer-heading">Contact</h5>
+                    <ul class="footer-links">
+                        <li><a href="mailto:hello@aglaea.co.uk">hello@aglaea.co.uk</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2026 Aglaea. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/products-brands.js"></script>
+</body>
+</html>
