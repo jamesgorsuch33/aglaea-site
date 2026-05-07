@@ -1,7 +1,7 @@
 /* ============================================================
    PRODUCTS PAGE STYLES - BRAND LEVEL
    ============================================================ */
-
+ 
 /* Products Hero */
 .products-hero {
     background: linear-gradient(135deg, var(--cream) 0%, var(--stone) 100%);
@@ -9,7 +9,7 @@
     text-align: center;
     border-bottom: 1px solid var(--stone);
 }
-
+ 
 .products-hero h1 {
     font-family: var(--font-display);
     font-size: 3.5rem;
@@ -18,35 +18,35 @@
     color: var(--charcoal);
     letter-spacing: -0.5px;
 }
-
+ 
 .hero-subtitle {
     font-size: 1.25rem;
     color: var(--slate);
     font-weight: 300;
 }
-
+ 
 /* Products Main Section */
 .products-main {
     padding: 3rem 0 5rem;
     background: white;
 }
-
+ 
 .products-layout {
     display: grid;
     grid-template-columns: 280px 1fr;
     gap: 3rem;
 }
-
+ 
 /* ============================================================
    SIDEBAR FILTERS (Desktop)
    ============================================================ */
-
+ 
 .filters-sidebar {
     position: sticky;
     top: 2rem;
     height: fit-content;
 }
-
+ 
 .filters-header {
     display: flex;
     justify-content: space-between;
@@ -55,14 +55,14 @@
     padding-bottom: 1rem;
     border-bottom: 2px solid var(--gold);
 }
-
+ 
 .filters-header h3 {
     font-family: var(--font-display);
     font-size: 1.75rem;
     font-weight: 500;
     color: var(--charcoal);
 }
-
+ 
 .filters-clear {
     background: none;
     border: none;
@@ -72,16 +72,16 @@
     cursor: pointer;
     transition: all 0.3s ease;
 }
-
+ 
 .filters-clear:hover {
     color: var(--charcoal);
     text-decoration: underline;
 }
-
+ 
 .filter-group {
     margin-bottom: 2rem;
 }
-
+ 
 .filter-group h4 {
     font-family: var(--font-display);
     font-size: 1.125rem;
@@ -89,13 +89,13 @@
     color: var(--charcoal);
     margin-bottom: 1rem;
 }
-
+ 
 .filter-options {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
 }
-
+ 
 .filter-checkbox {
     display: flex;
     align-items: center;
@@ -104,11 +104,11 @@
     color: var(--slate);
     transition: color 0.3s ease;
 }
-
+ 
 .filter-checkbox:hover {
     color: var(--charcoal);
 }
-
+ 
 .filter-checkbox input[type="checkbox"] {
     margin-right: 0.75rem;
     width: 18px;
@@ -116,20 +116,20 @@
     cursor: pointer;
     accent-color: var(--gold);
 }
-
+ 
 /* Mobile Filters Toggle (Hidden on Desktop) */
 .mobile-filters-toggle {
     display: none;
 }
-
+ 
 /* ============================================================
    PRODUCTS CONTENT AREA
    ============================================================ */
-
+ 
 .products-content {
     min-height: 500px;
 }
-
+ 
 /* Toolbar */
 .products-toolbar {
     display: flex;
@@ -139,28 +139,28 @@
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--stone);
 }
-
+ 
 .results-count {
     color: var(--slate);
     font-size: 0.938rem;
 }
-
+ 
 .results-count span {
     font-weight: 600;
     color: var(--charcoal);
 }
-
+ 
 .sort-controls {
     display: flex;
     align-items: center;
     gap: 0.75rem;
 }
-
+ 
 .sort-controls label {
     font-size: 0.938rem;
     color: var(--slate);
 }
-
+ 
 .sort-controls select {
     padding: 0.5rem 1rem;
     border: 1px solid var(--stone);
@@ -172,28 +172,28 @@
     cursor: pointer;
     transition: all 0.3s ease;
 }
-
+ 
 .sort-controls select:hover {
     border-color: var(--gold);
 }
-
+ 
 .sort-controls select:focus {
     outline: none;
     border-color: var(--gold);
     box-shadow: 0 0 0 3px rgba(201, 168, 112, 0.1);
 }
-
+ 
 /* ============================================================
    BRAND CARDS GRID - 3 PER ROW
    ============================================================ */
-
+ 
 .brands-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2.5rem;
     align-items: stretch;
 }
-
+ 
 .brand-card {
     display: flex;
     flex-direction: column;
@@ -204,32 +204,35 @@
     text-decoration: none;
     transition: all 0.3s ease;
     cursor: pointer;
+    height: 100%;
+    min-height: 480px;
 }
-
+ 
 .brand-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
     border-color: var(--gold);
 }
-
+ 
 .brand-image {
     width: 100%;
-    height: 280px;
+    height: 240px;
     background: linear-gradient(135deg, var(--stone) 0%, var(--cream) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    padding: 2rem;
 }
-
+ 
 .brand-image > img {
-    max-width: 70%;
-    max-height: 70%;
+    max-width: 50%;
+    max-height: 50%;
     width: auto;
     height: auto;
     object-fit: contain;
 }
-
+ 
 .image-placeholder {
     display: flex;
     align-items: center;
@@ -237,7 +240,7 @@
     width: 100%;
     height: 100%;
 }
-
+ 
 .brand-placeholder-text {
     font-family: var(--font-display);
     font-size: 1.5rem;
@@ -246,14 +249,14 @@
     padding: 1rem;
     line-height: 1.2;
 }
-
+ 
 .brand-info {
     padding: 1.5rem;
     flex: 1;
     display: flex;
     flex-direction: column;
 }
-
+ 
 .brand-name {
     font-family: var(--font-display);
     font-size: 1.5rem;
@@ -262,7 +265,7 @@
     margin-bottom: 0.5rem;
     line-height: 1.2;
 }
-
+ 
 .brand-category {
     font-size: 0.875rem;
     color: var(--gold);
@@ -271,37 +274,37 @@
     font-weight: 600;
     margin-bottom: 0.75rem;
 }
-
+ 
 .brand-description {
     font-size: 0.938rem;
     color: var(--slate);
     line-height: 1.6;
     flex: 1;
 }
-
+ 
 /* No Results */
 .no-results {
     text-align: center;
     padding: 4rem 2rem;
 }
-
+ 
 .no-results p {
     font-size: 1.125rem;
     color: var(--slate);
     margin-bottom: 1.5rem;
 }
-
+ 
 /* ============================================================
    PRODUCTS CTA
    ============================================================ */
-
+ 
 .products-cta {
     background: linear-gradient(135deg, var(--gold) 0%, #B8935A 100%);
     padding: 5rem 0;
     text-align: center;
     color: white;
 }
-
+ 
 .products-cta h2 {
     font-family: var(--font-display);
     font-size: 2.75rem;
@@ -309,17 +312,17 @@
     margin-bottom: 1rem;
     letter-spacing: -0.5px;
 }
-
+ 
 .products-cta p {
     font-size: 1.188rem;
     margin-bottom: 2rem;
     opacity: 0.95;
 }
-
+ 
 /* ============================================================
    RESPONSIVE DESIGN
    ============================================================ */
-
+ 
 /* Tablet (768px - 1024px) */
 @media (max-width: 1024px) {
     .brands-grid {
@@ -332,7 +335,7 @@
         gap: 2rem;
     }
 }
-
+ 
 /* Mobile (Below 768px) */
 @media (max-width: 768px) {
     .products-hero h1 {
@@ -414,7 +417,7 @@
         flex: 1;
     }
 }
-
+ 
 /* Small Mobile (Below 480px) */
 @media (max-width: 480px) {
     .products-hero h1 {
