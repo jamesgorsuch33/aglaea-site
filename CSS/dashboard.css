@@ -1,283 +1,294 @@
 /* ============================================================
-   DASHBOARD STYLES
+   DASHBOARD V2 STYLES
+   Person-Grouped Cards + Just Because Support
    ============================================================ */
 
+/* Dashboard Section */
 .dashboard-section {
-    min-height: calc(100vh - 80px);
-    padding: var(--space-lg) 0;
+    padding: 3rem 0 5rem;
     background: var(--cream);
+    min-height: calc(100vh - 80px);
 }
 
 /* Welcome Header */
 .welcome-header {
-    text-align: center;
-    margin-bottom: var(--space-lg);
+    margin-bottom: 2rem;
 }
 
 .welcome-header h1 {
-    font-size: clamp(2rem, 4vw, 3rem);
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 400;
+    color: var(--charcoal);
     margin-bottom: 0.5rem;
 }
 
 .welcome-header p {
-    color: var(--slate);
     font-size: 1.125rem;
+    color: var(--slate);
 }
 
 /* Stats Card */
 .stats-card {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--space-md);
-    margin-bottom: var(--space-lg);
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    background: white;
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2rem;
 }
 
 .stat {
-    background: white;
-    padding: var(--space-md);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--stone);
     text-align: center;
 }
 
 .stat-number {
     display: block;
     font-family: var(--font-display);
-    font-size: 2.5rem;
+    font-size: 2rem;
+    font-weight: 500;
     color: var(--gold);
     margin-bottom: 0.5rem;
 }
 
 .stat-label {
-    display: block;
     font-size: 0.875rem;
     color: var(--slate);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.5px;
 }
 
 /* Dashboard Grid */
 .dashboard-grid {
     display: grid;
     grid-template-columns: 2fr 1fr;
-    gap: var(--space-md);
-    margin-bottom: var(--space-lg);
+    gap: 2rem;
+    margin-bottom: 2rem;
 }
 
+/* Dashboard Card */
 .dashboard-card {
     background: white;
-    padding: var(--space-lg);
+    padding: 2rem;
     border-radius: var(--radius-lg);
-    border: 1px solid var(--stone);
-}
-
-.dashboard-card h2 {
-    font-size: 1.5rem;
-    margin-bottom: var(--space-md);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--space-md);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--stone);
 }
 
-.card-header h2 {
-    margin: 0;
-}
-
-/* Reminders List */
-.reminders-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-}
-
-.reminder-item {
-    background: var(--cream);
-    padding: var(--space-md);
-    border-radius: var(--radius-md);
-    border-left: 4px solid var(--gold);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: var(--transition);
-}
-
-.reminder-item:hover {
-    transform: translateX(4px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.reminder-item.urgent {
-    border-left-color: #C0614A;
-    background: #FFF5F5;
-}
-
-.reminder-item.soon {
-    border-left-color: #E8A950;
-    background: #FFF9F0;
-}
-
-.reminder-item.distant {
-    border-left-color: #5FA877;
-    background: #F5FFF8;
-}
-
-.reminder-item.purchased {
-    border-left-color: #9CA3AF;
-    background: #F9FAFB;
-    opacity: 0.75;
-}
-
-.purchased-badge {
-    display: inline-block;
-    background: #10B981;
-    color: white;
-    font-size: 0.688rem;
-    font-weight: 600;
-    padding: 0.125rem 0.5rem;
-    border-radius: 8px;
-    margin-left: 0.5rem;
-    vertical-align: middle;
-}
-
-.gift-purchased-checkbox {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 0.75rem;
-    cursor: pointer;
-    font-size: 0.875rem;
-    color: var(--slate);
-    user-select: none;
-}
-
-.gift-purchased-checkbox input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    accent-color: var(--gold);
-}
-
-.gift-purchased-checkbox:hover {
+.dashboard-card h2 {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 500;
     color: var(--charcoal);
 }
 
-.reminder-info h3 {
-    font-size: 1.125rem;
-    margin-bottom: 0.25rem;
+/* ============================================================
+   PEOPLE LIST (Person-Grouped Cards)
+   ============================================================ */
+
+.people-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-.reminder-info p {
-    font-size: 0.875rem;
-    color: var(--slate);
-    margin-bottom: 0.5rem;
+.person-card {
+    border: 1px solid var(--stone);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    background: var(--cream);
+    transition: all 0.3s ease;
 }
 
-.reminder-countdown {
-    display: inline-block;
-    background: #5FA877; /* Default green for distant */
+.person-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Person Header */
+.person-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--stone);
+}
+
+.person-name-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.person-name {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--charcoal);
+}
+
+/* Just Because Badge */
+.jb-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: linear-gradient(135deg, var(--gold), #B8935A);
     color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-size: 0.813rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
     font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
-.reminder-countdown.urgent {
-    background: #C0614A; /* Red for ≤7 days */
-}
-
-.reminder-countdown.soon {
-    background: #E8A950; /* Yellow/orange for 8-14 days */
-}
-
-.reminder-countdown.distant {
-    background: #5FA877; /* Green for >14 days */
-}
-
-.reminder-countdown.purchased {
-    background: #10B981; /* Green for purchased */
-}
-
-.reminder-actions {
+.person-actions {
     display: flex;
     gap: 0.5rem;
 }
 
-.reminder-actions button {
+.btn-icon {
+    padding: 0.5rem;
     background: transparent;
     border: 1px solid var(--stone);
-    color: var(--slate);
-    padding: 0.5rem 1rem;
     border-radius: var(--radius-sm);
-    font-size: 0.813rem;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s ease;
+    color: var(--slate);
+    font-size: 1rem;
 }
 
-.reminder-actions button:hover {
-    background: var(--stone);
+.btn-icon:hover {
+    background: var(--gold);
+    color: white;
+    border-color: var(--gold);
 }
 
-.reminder-actions button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+/* Reminders Within Person Card */
+.person-reminders {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
-.reminder-actions button:disabled:hover {
-    background: transparent;
+.reminder-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.875rem 1rem;
+    background: white;
+    border: 1px solid var(--stone);
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
 }
 
-.reminder-actions .delete-btn:hover {
-    background: #FFE5E5;
-    border-color: #C0614A;
-    color: #C0614A;
+.reminder-item:hover {
+    border-color: var(--gold);
+    box-shadow: 0 2px 6px rgba(201, 168, 112, 0.2);
 }
 
+.reminder-info {
+    flex: 1;
+}
+
+.reminder-occasion {
+    font-weight: 500;
+    color: var(--charcoal);
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.reminder-icon {
+    font-size: 1.125rem;
+}
+
+/* Date-Based Reminder */
+.reminder-date {
+    font-size: 0.875rem;
+    color: var(--slate);
+}
+
+/* Just Because Reminder */
+.reminder-frequency {
+    font-size: 0.875rem;
+    color: var(--gold);
+    font-weight: 500;
+}
+
+.reminder-next {
+    font-size: 0.75rem;
+    color: var(--slate);
+    margin-top: 0.25rem;
+}
+
+.reminder-status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+}
+
+.days-until {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gold);
+}
+
+.days-until.upcoming {
+    color: #E24A4A;
+}
+
+/* Loading and Empty States */
 .loading {
     text-align: center;
-    padding: var(--space-lg);
-    color: var(--soft-gray);
+    padding: 3rem;
+    color: var(--slate);
 }
 
 .empty-state {
     text-align: center;
-    padding: var(--space-lg);
-    color: var(--soft-gray);
+    padding: 3rem;
 }
 
-.empty-state-icon {
-    font-size: 4rem;
-    margin-bottom: var(--space-sm);
-    opacity: 0.3;
+.empty-state p {
+    color: var(--slate);
+    margin-bottom: 1.5rem;
 }
 
 /* Quick Actions */
 .quick-actions {
     display: flex;
     flex-direction: column;
-    gap: var(--space-sm);
+    gap: 1rem;
 }
 
 .action-card {
     display: flex;
     align-items: center;
-    gap: var(--space-sm);
-    padding: var(--space-md);
-    background: var(--cream);
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--stone);
     border-radius: var(--radius-md);
-    transition: var(--transition);
-    cursor: pointer;
     text-decoration: none;
-    color: inherit;
+    transition: all 0.3s ease;
 }
 
 .action-card:hover {
-    background: var(--stone);
-    transform: translateX(4px);
+    border-color: var(--gold);
+    box-shadow: 0 4px 12px rgba(201, 168, 112, 0.15);
+    transform: translateY(-2px);
 }
 
 .action-icon {
@@ -285,40 +296,48 @@
 }
 
 .action-card h3 {
-    font-size: 1rem;
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--charcoal);
     margin-bottom: 0.25rem;
 }
 
 .action-card p {
-    font-size: 0.813rem;
+    font-size: 0.875rem;
     color: var(--slate);
-    margin: 0;
 }
 
 /* Upgrade Banner */
 .upgrade-banner {
-    background: linear-gradient(135deg, var(--charcoal) 0%, #1a1a1a 100%);
-    color: var(--cream);
-    padding: var(--space-lg);
+    background: linear-gradient(135deg, var(--gold), #B8935A);
+    color: white;
+    padding: 2.5rem;
     border-radius: var(--radius-lg);
     text-align: center;
 }
 
 .upgrade-banner h2 {
-    color: var(--cream);
-    margin-bottom: 0.5rem;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 400;
+    margin-bottom: 1rem;
 }
 
 .upgrade-banner p {
-    color: var(--stone);
-    margin-bottom: var(--space-md);
+    font-size: 1.125rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.95;
 }
 
 .upgrade-banner.hidden {
     display: none;
 }
 
-/* Modal */
+/* ============================================================
+   MODAL STYLES
+   ============================================================ */
+
 .modal {
     position: fixed;
     top: 0;
@@ -329,139 +348,278 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2000;
-    padding: 1rem;
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.3s ease;
 }
 
 .modal.hidden {
-    display: none;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .modal-content {
     background: white;
     border-radius: var(--radius-lg);
-    padding: 2rem;
-    max-width: 480px;
-    width: 100%;
+    width: 90%;
+    max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
+    padding: 1.5rem 2rem;
     border-bottom: 1px solid var(--stone);
 }
 
 .modal-header h2 {
-    margin: 0;
-    font-size: 1.5rem;
     font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 500;
     color: var(--charcoal);
 }
 
 .modal-close {
     background: transparent;
     border: none;
-    font-size: 1.75rem;
-    color: var(--soft-gray);
+    font-size: 2rem;
+    color: var(--slate);
     cursor: pointer;
-    line-height: 1;
     padding: 0;
-    width: 32px;
-    height: 32px;
-    transition: var(--transition);
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease;
 }
 
 .modal-close:hover {
     color: var(--charcoal);
 }
 
-/* Modal Form Styles */
-.modal .form-group {
-    margin-bottom: 1.25rem;
+/* Form Styles */
+form {
+    padding: 2rem;
 }
 
-.modal .form-group label {
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
     display: block;
-    margin-bottom: 0.5rem;
-    font-size: 0.938rem;
     font-weight: 500;
     color: var(--charcoal);
+    margin-bottom: 0.5rem;
 }
 
-.modal .form-group input[type="text"],
-.modal .form-group input[type="date"],
-.modal .form-group select {
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group select {
     width: 100%;
-    padding: 0.75rem;
+    padding: 0.75rem 1rem;
     border: 1px solid var(--stone);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     font-family: var(--font-body);
-    font-size: 0.938rem;
-    color: var(--charcoal);
-    transition: var(--transition);
+    font-size: 1rem;
+    transition: all 0.3s ease;
 }
 
-.modal .form-group input:focus,
-.modal .form-group select:focus {
+.form-group input:focus,
+.form-group select:focus {
     outline: none;
     border-color: var(--gold);
     box-shadow: 0 0 0 3px rgba(201, 168, 112, 0.1);
 }
 
-.modal .form-helper {
+.form-helper {
     display: block;
-    font-size: 0.813rem;
+    font-size: 0.875rem;
     color: var(--slate);
-    margin-top: 0.375rem;
-}
-
-.modal .custom-occasion {
     margin-top: 0.5rem;
 }
 
-.modal-actions {
-    display: flex;
-    gap: 0.75rem;
-    margin-top: 1.5rem;
-    padding-top: 1rem;
+.custom-occasion.hidden {
+    display: none;
 }
 
-.modal-actions .btn {
-    flex: 1;
-    padding: 0.75rem 1.5rem;
+/* Checkbox Label */
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    font-weight: 400;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--gold);
+}
+
+/* Form Divider */
+.form-divider {
+    height: 1px;
+    background: var(--stone);
+    margin: 2rem 0;
+}
+
+/* Just Because Options */
+.just-because-options {
+    background: var(--cream);
+    padding: 1.5rem;
+    border-radius: var(--radius-md);
+    margin-top: 1rem;
+}
+
+.just-because-options.hidden {
+    display: none;
+}
+
+/* Info Box */
+.info-box {
+    background: #E8F4F8;
+    border-left: 4px solid #4A90E2;
+    padding: 1rem;
+    border-radius: var(--radius-sm);
+    margin-top: 1rem;
+}
+
+.info-box p {
+    font-size: 0.875rem;
+    color: var(--charcoal);
+    margin: 0;
+}
+
+.info-box p + p {
+    margin-top: 0.5rem;
+}
+
+.info-box strong {
+    color: #4A90E2;
+}
+
+/* Upgrade Prompt */
+.upgrade-prompt {
+    background: linear-gradient(135deg, var(--gold), #B8935A);
+    color: white;
+    padding: 1.5rem;
+    border-radius: var(--radius-md);
+    margin-top: 1rem;
+}
+
+.upgrade-prompt.hidden {
+    display: none;
+}
+
+.upgrade-prompt h3 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.upgrade-prompt p {
+    margin-bottom: 1rem;
+    opacity: 0.95;
+}
+
+.upgrade-prompt ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 1.5rem;
+}
+
+.upgrade-prompt li {
+    padding: 0.25rem 0;
     font-size: 0.938rem;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+.btn-small {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+}
+
+/* Modal Actions */
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--stone);
+}
+
+/* ============================================================
+   RESPONSIVE DESIGN
+   ============================================================ */
+
+@media (max-width: 1024px) {
     .dashboard-grid {
         grid-template-columns: 1fr;
     }
     
     .stats-card {
         grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-section {
+        padding: 2rem 0 3rem;
+    }
+    
+    .welcome-header h1 {
+        font-size: 2rem;
+    }
+    
+    .dashboard-card {
+        padding: 1.5rem;
+    }
+    
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .person-card {
+        padding: 1rem;
+    }
+    
+    .person-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
     }
     
     .reminder-item {
         flex-direction: column;
         align-items: flex-start;
+        gap: 0.5rem;
     }
     
-    .reminder-actions {
-        width: 100%;
-        margin-top: var(--space-sm);
+    .reminder-status {
+        align-items: flex-start;
     }
     
-    .reminder-actions button {
-        flex: 1;
+    .modal-content {
+        width: 95%;
+        max-height: 95vh;
     }
-}
-
-.hidden {
-    display: none;
+    
+    form {
+        padding: 1.5rem;
+    }
+    
+    .modal-header {
+        padding: 1rem 1.5rem;
+    }
 }
