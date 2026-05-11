@@ -629,4 +629,4 @@ window.pauseJustBecause = async function(personId, reminderId) {
 
 // Make functions available globally for onclick handlers
 window.loadDashboard = loadDashboard;
-}
+});
