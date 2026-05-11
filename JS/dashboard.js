@@ -412,7 +412,8 @@ document.getElementById('enableJustBecause').addEventListener('change', (e) => {
 });
 
 // Show/hide custom months dropdown
-document.getElementById('jbFrequency').addEventListener('change', (e) => {
+document.querySelectorAll('input[name="jbFrequency"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
     const customGroup = document.getElementById('customMonthsGroup');
     const randomGroup = document.getElementById('randomPerYearGroup');
     
@@ -509,7 +510,8 @@ async function handleFormSubmission() {
     
     // Create Just Because reminder if enabled and allowed
     if (enableJB && currentUserTier !== 'free') {
-        const frequency = document.getElementById('jbFrequency').value;
+        const frequencyRadio = document.querySelector('input[name="jbFrequency"]:checked');
+        const frequency = frequencyRadio ? frequencyRadio.value : 'every_6_weeks';
         const customMonths = frequency === 'custom' 
             ? parseInt(document.getElementById('jbCustomMonths').value)
             : null;
