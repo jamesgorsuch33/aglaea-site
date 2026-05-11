@@ -10,9 +10,10 @@ import {
     createDateBasedReminder,
     createJustBecauseReminder,
     updatePerson,
+    updateReminder,
     deletePerson,
     deleteReminder
-} from './firebase-config.js';
+} from './firebase-config-v2.js';
 
 // Get Firebase instances
 const auth = window.firebaseAuth;
