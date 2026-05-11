@@ -3,7 +3,7 @@
 // People-Centric Model with Just Because Support
 // ============================================================
 
-import { initializeApp } from 'firebase/app';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, collection, doc, addDoc, getDoc, getDocs, updateDoc, deleteDoc, query, where, Timestamp } from 'firebase/firestore';
 
