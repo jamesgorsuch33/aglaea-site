@@ -622,4 +622,113 @@ form {
     .modal-header {
         padding: 1rem 1.5rem;
     }
+   /* Radio Button Styles */
+.form-section-label {
+    display: block;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin-bottom: 1rem;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.radio-group-header {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--slate);
+    margin: 0.5rem 0 0.25rem 0;
+}
+
+.radio-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 2px solid var(--stone);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.radio-option:hover {
+    border-color: var(--gold);
+    background: var(--cream);
+}
+
+.radio-option input[type="radio"] {
+    margin-top: 0.25rem;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--gold);
+    flex-shrink: 0;
+}
+
+.radio-option:has(input[type="radio"]:checked) {
+    border-color: var(--gold);
+    background: linear-gradient(135deg, rgba(250, 247, 242, 1) 0%, rgba(201, 168, 112, 0.1) 100%);
+    box-shadow: 0 2px 8px rgba(201, 168, 112, 0.2);
+}
+
+.radio-label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+}
+
+.radio-label strong {
+    font-size: 1rem;
+    color: var(--charcoal);
+    font-weight: 500;
+}
+
+.radio-label small {
+    font-size: 0.875rem;
+    color: var(--slate);
+}
+
+.radio-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 0.5rem 0;
+}
+
+.radio-divider::before,
+.radio-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--stone);
+}
+
+.radio-divider span {
+    padding: 0 1rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--slate);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+@media (max-width: 768px) {
+    .radio-option {
+        padding: 0.875rem;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+    }
+    
+    .modal-actions .btn {
+        width: 100%;
+    }
+}
 }
