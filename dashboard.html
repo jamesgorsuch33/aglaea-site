@@ -177,80 +177,16 @@
                         <input type="checkbox" id="enableJustBecause">
                         <span>✨ Also set up Just Because reminders for <span id="justBecausePersonName">this person</span></span>
                     </label>
-                    <span class="form-helper">Surprise them with unexpected gifts throughout the year</span>
+                    <span class="form-helper">Surprise them with unexpected gifts throughout the year (Essential tier required)</span>
                 </div>
 
                 <!-- Just Because Options (Hidden until checkbox is ticked) -->
                 <div id="justBecauseOptions" class="just-because-options hidden">
                     
-                    <!-- Frequency -->
-                    <div class="form-group">
-                        <label for="jbFrequency">How often?</label>
-                        <select id="jbFrequency" required>
-                            <option value="monthly">Every month (12x per year)</option>
-                            <option value="every_6_weeks" selected>Every 6 weeks (8x per year)</option>
-                            <option value="every_2_months">Every 2 months (6x per year)</option>
-                            <option value="every_3_months">Every 3 months (4x per year)</option>
-                            <option value="every_6_months">Every 6 months (2x per year)</option>
-                            <option value="custom">Custom...</option>
-                            <option value="random">Random</option>
-                        </select>
-                    </div>
-
-                    <!-- Custom Months (shown when custom selected) -->
-                    <div id="customMonthsGroup" class="form-group hidden">
-                        <label for="jbCustomMonths">Every X months</label>
-                        <select id="jbCustomMonths">
-                            <option value="1">1 month</option>
-                            <option value="2">2 months</option>
-                            <option value="3">3 months</option>
-                            <option value="4" selected>4 months</option>
-                            <option value="5">5 months</option>
-                            <option value="6">6 months</option>
-                            <option value="7">7 months</option>
-                            <option value="8">8 months</option>
-                            <option value="9">9 months</option>
-                            <option value="10">10 months</option>
-                            <option value="11">11 months</option>
-                            <option value="12">12 months</option>
-                        </select>
-                    </div>
-
-                    <!-- Random Per Year (shown when random selected) -->
-                    <div id="randomPerYearGroup" class="form-group hidden">
-                        <label for="jbRandomPerYear">How many times per year?</label>
-                        <select id="jbRandomPerYear">
-                            <option value="2">2 times per year</option>
-                            <option value="3">3 times per year</option>
-                            <option value="4" selected>4 times per year</option>
-                            <option value="5">5 times per year</option>
-                            <option value="6">6 times per year</option>
-                        </select>
-                    </div>
-
-                    <!-- Start Date Option -->
-                    <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="jbStartImmediately" checked>
-                            <span>Start sending Just Because reminders immediately</span>
-                        </label>
-                    </div>
-
-                    <div id="jbStartDateGroup" class="form-group hidden">
-                        <label for="jbStartDate">Start from date</label>
-                        <input type="date" id="jbStartDate">
-                    </div>
-
-                    <!-- Smart Scheduling Note -->
-                    <div class="info-box">
-                        <p><strong>✓ Smart scheduling enabled</strong></p>
-                        <p>We'll automatically avoid sending Just Because reminders within 3 weeks of their birthday, anniversary, and other special dates.</p>
-                    </div>
-
-                    <!-- Upgrade Prompt for Free Users -->
-                    <div id="jbUpgradePrompt" class="upgrade-prompt hidden">
+                    <!-- Upgrade Prompt for Free Users (Shown First for Free Tier) -->
+                    <div id="jbUpgradePrompt" class="upgrade-prompt">
                         <h3>✨ Just Because Reminders</h3>
-                        <p>This feature requires Essential (£4.99/month)</p>
+                        <p><strong>Essential tier required (£4.99/month)</strong></p>
                         <ul>
                             <li>✓ Unlimited Just Because reminders</li>
                             <li>✓ Smart date avoidance</li>
@@ -258,16 +194,134 @@
                             <li>✓ All frequency options</li>
                         </ul>
                         <a href="upgrade.html" class="btn btn-primary btn-small">Upgrade to Essential</a>
+                        <p style="margin-top: 1rem; font-size: 0.875rem; opacity: 0.9;">Please upgrade to add Just Because reminders, or uncheck the box above.</p>
+                    </div>
+
+                    <!-- Just Because Config (Only shown for Essential/Premium Users) -->
+                    <div id="jbConfigSection" class="hidden">
+                        
+                        <!-- Frequency Options - Radio Buttons -->
+<div class="form-group">
+    <label class="form-section-label">How often would you like to send Just Because gifts?</label>
+    
+    <div class="radio-group">
+        <p class="radio-group-header">REGULAR SCHEDULE</p>
+        
+        <label class="radio-option">
+            <input type="radio" name="jbFrequency" value="monthly">
+            <span class="radio-label">
+                <strong>Every month</strong>
+                <small>12 gifts per year</small>
+            </span>
+        </label>
+        
+        <label class="radio-option">
+            <input type="radio" name="jbFrequency" value="every_6_weeks" checked>
+            <span class="radio-label">
+                <strong>Every 6 weeks</strong>
+                <small>8 gifts per year • Recommended</small>
+            </span>
+        </label>
+        
+        <label class="radio-option">
+            <input type="radio" name="jbFrequency" value="every_2_months">
+            <span class="radio-label">
+                <strong>Every 2 months</strong>
+                <small>6 gifts per year</small>
+            </span>
+        </label>
+        
+        <label class="radio-option">
+            <input type="radio" name="jbFrequency" value="every_3_months">
+            <span class="radio-label">
+                <strong>Every 3 months</strong>
+                <small>4 gifts per year</small>
+            </span>
+        </label>
+        
+        <label class="radio-option">
+            <input type="radio" name="jbFrequency" value="every_6_months">
+            <span class="radio-label">
+                <strong>Every 6 months</strong>
+                <small>2 gifts per year</small>
+            </span>
+        </label>
+        
+        <label class="radio-option">
+            <input type="radio" name="jbFrequency" value="custom">
+            <span class="radio-label">
+                <strong>Custom</strong>
+                <small>Choose your own schedule</small>
+            </span>
+        </label>
+        
+        <div class="radio-divider">
+            <span>OR</span>
+        </div>
+        
+        <label class="radio-option">
+            <input type="radio" name="jbFrequency" value="random">
+            <span class="radio-label">
+                <strong>Random surprises</strong>
+                <small>We'll pick dates throughout the year</small>
+            </span>
+        </label>
+    </div>
+</div>
+
+<!-- Custom Months (shown when custom selected) -->
+<div id="customMonthsGroup" class="form-group hidden">
+    <label for="jbCustomMonths">How many gifts per year?</label>
+    <select id="jbCustomMonths">
+        <option value="1">12 gifts per year (monthly)</option>
+        <option value="2">6 gifts per year (every 2 months)</option>
+        <option value="3" selected>4 gifts per year (every 3 months)</option>
+        <option value="4">3 gifts per year (every 4 months)</option>
+        <option value="6">2 gifts per year (every 6 months)</option>
+        <option value="12">1 gift per year (annual)</option>
+    </select>
+</div>
+
+<!-- Random Per Year (shown when random selected) -->
+<div id="randomPerYearGroup" class="form-group hidden">
+    <label for="jbRandomPerYear">How many surprise gifts per year?</label>
+    <select id="jbRandomPerYear">
+        <option value="2">2 gifts per year</option>
+        <option value="3">3 gifts per year</option>
+        <option value="4" selected>4 gifts per year</option>
+        <option value="5">5 gifts per year</option>
+        <option value="6">6 gifts per year</option>
+    </select>
+    <span class="form-helper">We'll choose random dates and avoid your other reminders</span>
+</div>
+                        </div>
+
+                        <!-- Start Date Option -->
+                        <div class="form-group">
+                            <label class="form-section-label">When should we start?</label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="jbStartImmediately" checked>
+                                <span>Start reminders immediately</span>
+                            </label>
+                        </div>
+
+                        <div id="jbStartDateGroup" class="form-group hidden">
+                            <label for="jbStartDate">Or start from this date:</label>
+                            <input type="date" id="jbStartDate">
+                        </div>
+
+                        <!-- Smart Scheduling Note -->
+                        <div class="info-box">
+                            <p><strong>✓ Smart scheduling enabled</strong></p>
+                            <p>We'll automatically avoid sending reminders within 3 weeks of birthdays, anniversaries, and other special dates.</p>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary modal-close">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add Reminder</button>
+                    <button type="submit" class="btn btn-primary" id="submitReminderBtn">Add Reminder</button>
                 </div>
-            </form>
-        </div>
-    </div>
 
     <!-- Firebase SDKs -->
     <script type="module">
