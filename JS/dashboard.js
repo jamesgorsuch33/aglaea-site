@@ -12,7 +12,7 @@ import {
     updatePerson,
     deletePerson,
     deleteReminder
-} from './firebase-config-v2.js';
+} from './firebase-config.js';
 
 // Get Firebase instances
 const auth = window.firebaseAuth;
