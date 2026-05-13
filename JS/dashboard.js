@@ -389,7 +389,7 @@ document.getElementById('newOccasion').addEventListener('change', (e) => {
     }
 });
 
-// Show/hide Just Because options
+// Enable/disable Just Because based on checkbox
 document.getElementById('enableJustBecause').addEventListener('change', (e) => {
     const options = document.getElementById('justBecauseOptions');
     const upgradePrompt = document.getElementById('jbUpgradePrompt');
@@ -417,8 +417,7 @@ document.getElementById('enableJustBecause').addEventListener('change', (e) => {
     }
 });
 
-// Show/hide custom months dropdown
-// Listen to ALL radio buttons
+// Show/hide custom/random dropdowns based on radio selection
 document.querySelectorAll('input[name="jbFrequency"]').forEach(radio => {
     radio.addEventListener('change', (e) => {
         const customGroup = document.getElementById('customMonthsGroup');
@@ -446,6 +445,36 @@ document.getElementById('jbStartImmediately').addEventListener('change', (e) => 
     } else {
         startDateGroup.classList.remove('hidden');
         document.getElementById('jbStartDate').required = true;
+    }
+});
+
+// Form submission with tier check
+document.getElementById('newReminderForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const enableJB = document.getElementById('enableJustBecause').checked;
+    
+    // Block submission if Just Because enabled but user is free
+    if (enableJB && currentUserTier === 'free') {
+        alert('Just Because reminders require Essential tier. Please upgrade or uncheck the Just Because option.');
+        return;
+    }
+    
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Adding...';
+    
+    try {
+        await handleFormSubmission();
+        modal.classList.add('hidden');
+        resetForm();
+        await loadDashboard();
+    } catch (error) {
+        console.error('Error adding reminder:', error);
+        alert('Error adding reminder. Please try again.');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Add Reminder';
     }
 });
 
