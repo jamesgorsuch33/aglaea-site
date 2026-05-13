@@ -101,14 +101,18 @@ async function createAccount() {
         const user = userCredential.user;
         
         // Create user document in Firestore
-        await firebase.firestore().collection('users').doc(user.uid).set({
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            email: formData.email,
-            phone: formData.phone || '',
-            plan: 'free',
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
+       await firebase.firestore().collection('users').doc(user.uid).set({
+       firstName: formData.firstName,
+       lastName: formData.lastName,
+       email: formData.email,
+       phone: formData.phone || '',
+       tier: 'free',
+       stripeCustomerId: null,
+       subscriptionId: null,
+       subscriptionStatus: null,
+       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+});
         
         // Add reminders to Firestore
         const batch = firebase.firestore().batch();
