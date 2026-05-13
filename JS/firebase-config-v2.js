@@ -5,7 +5,7 @@
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getFirestore, collection, doc, addDoc, getDoc, getDocs, updateDoc, deleteDoc, query, where, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getFirestore, collection, doc, addDoc, getDoc, getDocs, updateDoc, deleteDoc, setDoc, query, where, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -573,6 +573,102 @@ function formatDate(date) {
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
 }
+// ============================================================
+// USER MANAGEMENT FUNCTIONS
+// ============================================================
+
+/**
+ * Create or update user document in Firestore
+ * @param {string} userId - Firebase Auth user ID
+ * @param {Object} userData - User data to save
+ * @returns {Promise<void>}
+ */
+export async function createOrUpdateUser(userId, userData) {
+    try {
+        const userRef = doc(db, 'users', userId);
+        const userDoc = await getDoc(userRef);
+        
+        if (userDoc.exists()) {
+            // Update existing user
+            await updateDoc(userRef, {
+                ...userData,
+                updatedAt: Timestamp.now()
+            });
+        } else {
+            // Create new user
+            await setDoc(userRef, {
+                tier: 'free',
+                ...userData,
+                createdAt: Timestamp.now(),
+                updatedAt: Timestamp.now()
+            });
+        }
+    } catch (error) {
+        console.error('Error creating/updating user:', error);
+        throw error;
+    }
+}
+
+/**
+ * Get user document from Firestore
+ * @param {string} userId - Firebase Auth user ID
+ * @returns {Promise<Object|null>} - User data or null if not found
+ */
+export async function getUser(userId) {
+    try {
+        const userRef = doc(db, 'users', userId);
+        const userDoc = await getDoc(userRef);
+        
+        if (userDoc.exists()) {
+            return {
+                id: userDoc.id,
+                ...userDoc.data()
+            };
+        }
+        return null;
+    } catch (error) {
+        console.error('Error getting user:', error);
+        throw error;
+    }
+}
+
+/**
+ * Update user tier
+ * @param {string} userId - Firebase Auth user ID
+ * @param {string} tier - New tier ('free', 'essential', 'premium')
+ * @returns {Promise<void>}
+ */
+export async function updateUserTier(userId, tier) {
+    try {
+        const userRef = doc(db, 'users', userId);
+        await updateDoc(userRef, {
+            tier,
+            updatedAt: Timestamp.now()
+        });
+    } catch (error) {
+        console.error('Error updating user tier:', error);
+        throw error;
+    }
+}
+
+/**
+ * Update user Stripe information
+ * @param {string} userId - Firebase Auth user ID
+ * @param {Object} stripeData - Stripe customer and subscription data
+ * @returns {Promise<void>}
+ */
+export async function updateUserStripeInfo(userId, stripeData) {
+    try {
+        const userRef = doc(db, 'users', userId);
+        await updateDoc(userRef, {
+            ...stripeData,
+            updatedAt: Timestamp.now()
+        });
+    } catch (error) {
+        console.error('Error updating user Stripe info:', error);
+        throw error;
+    }
+}
 
 // Export helper functions for use in UI
-export { formatDate, addWeeks, addMonths };
+export { formatDate, addWeeks, addMonths, createOrUpdateUser, getUser, updateUserTier, updateUserStripeInfo };
