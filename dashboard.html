@@ -133,15 +133,11 @@
                     <label for="newRelationship">Relationship (Optional)</label>
                     <select id="newRelationship">
                         <option value="">Select relationship</option>
-                        <option value="Mother">Mother</option>
-                        <option value="Father">Father</option>
-                        <option value="Partner">Partner</option>
-                        <option value="Spouse">Spouse</option>
-                        <option value="Sibling">Sibling</option>
-                        <option value="Child">Child</option>
-                        <option value="Friend">Friend</option>
-                        <option value="Colleague">Colleague</option>
-                        <option value="Other">Other</option>
+                        <option value="family">Family</option>
+                        <option value="friend">Friend</option>
+                        <option value="partner">Partner</option>
+                        <option value="colleague">Colleague</option>
+                        <option value="other">Other</option>
                     </select>
                 </div>
                 
@@ -150,25 +146,28 @@
                     <label for="newOccasion">Occasion</label>
                     <select id="newOccasion" required>
                         <option value="">Select occasion</option>
-                        <option value="Birthday">Birthday</option>
-                        <option value="Anniversary">Anniversary</option>
-                        <option value="Valentine's Day">Valentine's Day</option>
-                        <option value="Mother's Day">Mother's Day</option>
-                        <option value="Father's Day">Father's Day</option>
-                        <option value="Christmas">Christmas</option>
-                        <option value="Wedding">Wedding</option>
-                        <option value="Other">Other</option>
+                        <option value="birthday">Birthday</option>
+                        <option value="anniversary">Anniversary</option>
+                        <option value="christmas">Christmas</option>
+                        <option value="valentines">Valentine's Day</option>
+                        <option value="mothers_day">Mother's Day</option>
+                        <option value="fathers_day">Father's Day</option>
+                        <option value="other">Other</option>
                     </select>
-                    <input type="text" id="newCustomOccasion" class="custom-occasion hidden" placeholder="Enter occasion name">
+                </div>
+                
+                <div id="newCustomOccasion" class="form-group hidden">
+                    <label for="newCustomOccasionName">Custom Occasion Name</label>
+                    <input type="text" id="newCustomOccasionName" placeholder="e.g. Graduation, Promotion">
                 </div>
                 
                 <!-- Date -->
                 <div class="form-group">
                     <label for="newDate">Date</label>
                     <input type="date" id="newDate" required>
-                    <span class="form-helper">💡 Enter the actual date of the occasion</span>
+                    <span class="form-helper">Enter the actual date of the occasion (we'll remind you in advance)</span>
                 </div>
-
+                
                 <!-- Just Because Section -->
                 <div class="form-divider"></div>
                 
@@ -180,10 +179,10 @@
                     <span class="form-helper">Surprise them with unexpected gifts throughout the year (Essential tier required)</span>
                 </div>
 
-                <!-- Just Because Options (Hidden until checkbox is ticked) -->
+                <!-- Just Because Options -->
                 <div id="justBecauseOptions" class="just-because-options hidden">
                     
-                    <!-- Upgrade Prompt for Free Users -->
+                    <!-- Upgrade Prompt -->
                     <div id="jbUpgradePrompt" class="upgrade-prompt">
                         <h3>✨ Just Because Reminders</h3>
                         <p><strong>Essential tier required (£4.99/month)</strong></p>
@@ -194,18 +193,18 @@
                             <li>✓ All frequency options</li>
                         </ul>
                         <a href="upgrade.html" class="btn btn-primary btn-small">Upgrade to Essential</a>
-                        <p style="margin-top: 1rem; font-size: 0.875rem; opacity: 0.9;">Preview the options below, then upgrade to activate Just Because reminders.</p>
+                        <p style="margin-top: 1rem; font-size: 0.875rem; opacity: 0.9;">Preview the options below, then upgrade to activate.</p>
                     </div>
 
-                    <!-- Just Because Config (Greyed out for Free Users, Active for Essential/Premium) -->
+                    <!-- Just Because Config -->
                     <div id="jbConfigSection" class="jb-config-section">
                         
                         <div class="info-box" style="margin-bottom: 1.5rem;">
                             <p><strong>ℹ️ About Just Because reminders</strong></p>
-                            <p>These surprise gift reminders are <strong>in addition to</strong> the birthday, anniversary, or other date-based reminders you set up above. They help you create unexpected moments of thoughtfulness throughout the year.</p>
+                            <p>These surprise gift reminders are <strong>in addition to</strong> the birthday, anniversary, or other date-based reminders you set up above.</p>
                         </div>
                         
-                        <!-- Frequency Options - Radio Buttons -->
+                        <!-- Frequency Radio Buttons -->
                         <div class="form-group">
                             <label class="form-section-label">How often would you like to send Just Because gifts?</label>
                             
@@ -273,6 +272,63 @@
                                 </label>
                             </div>
                         </div>
+
+                        <!-- Custom Months -->
+                        <div id="customMonthsGroup" class="form-group hidden">
+                            <label for="jbCustomMonths">How many gifts per year?</label>
+                            <select id="jbCustomMonths">
+                                <option value="1">12 gifts per year (monthly)</option>
+                                <option value="2">6 gifts per year (every 2 months)</option>
+                                <option value="3" selected>4 gifts per year (every 3 months)</option>
+                                <option value="4">3 gifts per year (every 4 months)</option>
+                                <option value="6">2 gifts per year (every 6 months)</option>
+                                <option value="12">1 gift per year (annual)</option>
+                            </select>
+                        </div>
+
+                        <!-- Random Per Year -->
+                        <div id="randomPerYearGroup" class="form-group hidden">
+                            <label for="jbRandomPerYear">How many surprise gifts per year?</label>
+                            <select id="jbRandomPerYear">
+                                <option value="2">2 gifts per year</option>
+                                <option value="3">3 gifts per year</option>
+                                <option value="4" selected>4 gifts per year</option>
+                                <option value="5">5 gifts per year</option>
+                                <option value="6">6 gifts per year</option>
+                            </select>
+                            <span class="form-helper">We'll choose random dates and avoid your other reminders</span>
+                        </div>
+
+                        <!-- Start Date -->
+                        <div class="form-group">
+                            <label class="form-section-label">When should we start?</label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="jbStartImmediately" checked>
+                                <span>Start reminders immediately</span>
+                            </label>
+                        </div>
+
+                        <div id="jbStartDateGroup" class="form-group hidden">
+                            <label for="jbStartDate">Or start from this date:</label>
+                            <input type="date" id="jbStartDate">
+                        </div>
+
+                        <!-- Smart Scheduling -->
+                        <div class="info-box">
+                            <p><strong>✓ Smart scheduling enabled</strong></p>
+                            <p>We'll automatically avoid sending reminders within 3 weeks of birthdays, anniversaries, and other special dates.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Modal Actions (INSIDE FORM) -->
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-close">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitReminderBtn">Add Reminder</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
                         <!-- Custom Months (ONLY shown when custom selected) -->
                         <div id="customMonthsGroup" class="form-group hidden">
