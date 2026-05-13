@@ -12,7 +12,9 @@ import {
     updatePerson,
     updateReminder,
     deletePerson,
-    deleteReminder
+    deleteReminder,
+    getUser,
+    createOrUpdateUser
 } from './firebase-config-v2.js';
 
 // Get Firebase instances
@@ -31,7 +33,35 @@ auth.onAuthStateChanged((user) => {
         currentUser = user;
         document.getElementById('userEmail').textContent = user.email;
         document.getElementById('userName').textContent = user.displayName || user.email.split('@')[0];
+
+ /**
+ * Load user data and set tier
+ * @returns {Promise<Object>} - User data
+ */
+async function loadUserData() {
+    try {
+        const userId = auth.currentUser.uid;
+        const userData = await getUser(userId);
         
+        if (userData) {
+            // Update global tier variable
+            currentUserTier = userData.tier || 'free';
+            return userData;
+        } else {
+            // User document doesn't exist - create it
+            await createOrUpdateUser(userId, {
+                email: auth.currentUser.email,
+                tier: 'free'
+            });
+            currentUserTier = 'free';
+            return { tier: 'free' };
+        }
+    } catch (error) {
+        console.error('Error loading user data:', error);
+        currentUserTier = 'free';
+        return { tier: 'free' };
+    }
+}
         // Load dashboard data
         loadDashboard();
     } else {
@@ -45,6 +75,12 @@ auth.onAuthStateChanged((user) => {
 
 async function loadDashboard() {
     try {
+        // Load user data first to get tier
+        await loadUserData();  // ← ADD THIS LINE
+        
+        // Show loading state
+        document.getElementById('peopleList').innerHTML = `
+        
         // Get all people for this user
         const people = await getPeopleForUser(currentUser.uid);
         
