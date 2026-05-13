@@ -393,40 +393,48 @@ document.getElementById('newOccasion').addEventListener('change', (e) => {
 document.getElementById('enableJustBecause').addEventListener('change', (e) => {
     const options = document.getElementById('justBecauseOptions');
     const upgradePrompt = document.getElementById('jbUpgradePrompt');
+    const configSection = document.getElementById('jbConfigSection');
     
     if (e.target.checked) {
-        // Check if user has Essential tier
+        options.classList.remove('hidden');
+        
+        // Check user tier
         if (currentUserTier === 'free') {
-            options.classList.remove('hidden');
+            // Show upgrade prompt
             upgradePrompt.classList.remove('hidden');
-            // Disable frequency select
-            document.getElementById('jbFrequency').disabled = true;
-            document.getElementById('jbStartImmediately').disabled = true;
+            // Grey out config section
+            configSection.classList.add('disabled');
         } else {
-            options.classList.remove('hidden');
+            // Hide upgrade prompt
             upgradePrompt.classList.add('hidden');
+            // Enable config section
+            configSection.classList.remove('disabled');
         }
     } else {
         options.classList.add('hidden');
+        // Reset to default state
+        configSection.classList.remove('disabled');
     }
 });
 
 // Show/hide custom months dropdown
+// Listen to ALL radio buttons
 document.querySelectorAll('input[name="jbFrequency"]').forEach(radio => {
     radio.addEventListener('change', (e) => {
-    const customGroup = document.getElementById('customMonthsGroup');
-    const randomGroup = document.getElementById('randomPerYearGroup');
-    
-    if (e.target.value === 'custom') {
-        customGroup.classList.remove('hidden');
-        randomGroup.classList.add('hidden');
-    } else if (e.target.value === 'random') {
-        randomGroup.classList.remove('hidden');
-        customGroup.classList.add('hidden');
-    } else {
+        const customGroup = document.getElementById('customMonthsGroup');
+        const randomGroup = document.getElementById('randomPerYearGroup');
+        
+        // Hide both first
         customGroup.classList.add('hidden');
         randomGroup.classList.add('hidden');
-    }
+        
+        // Show only the relevant one
+        if (e.target.value === 'custom') {
+            customGroup.classList.remove('hidden');
+        } else if (e.target.value === 'random') {
+            randomGroup.classList.remove('hidden');
+        }
+    });
 });
 
 // Show/hide start date input
@@ -444,6 +452,14 @@ document.getElementById('jbStartImmediately').addEventListener('change', (e) => 
 // Form submission
 document.getElementById('newReminderForm').addEventListener('submit', async (e) => {
     e.preventDefault();
+    
+    const enableJB = document.getElementById('enableJustBecause').checked;
+    
+    // Block submission if Just Because enabled but user is free
+    if (enableJB && currentUserTier === 'free') {
+        alert('Just Because reminders require Essential tier. Please upgrade or uncheck the Just Because option.');
+        return;
+    }
     
     const submitBtn = e.target.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
@@ -547,11 +563,14 @@ function resetForm() {
     document.getElementById('randomPerYearGroup').classList.add('hidden');
     document.getElementById('jbStartDateGroup').classList.add('hidden');
     document.getElementById('jbUpgradePrompt').classList.add('hidden');
+    document.getElementById('jbConfigSection').classList.remove('disabled');
     document.getElementById('justBecausePersonName').textContent = 'this person';
     
-    // Re-enable fields if they were disabled
-    document.getElementById('jbFrequency').disabled = false;
-    document.getElementById('jbStartImmediately').disabled = false;
+    // Reset radio buttons to default (every 6 weeks)
+    const defaultRadio = document.querySelector('input[name="jbFrequency"][value="every_6_weeks"]');
+    if (defaultRadio) {
+        defaultRadio.checked = true;
+    }
 }
 
 // ============================================================
