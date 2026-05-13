@@ -732,3 +732,79 @@ form {
     }
 }
 }
+/* ============================================================
+   ADD TO END OF dashboard.css
+   Greyed Out Just Because Section for Free Users
+   ============================================================ */
+
+/* Just Because Config Section */
+.jb-config-section {
+    position: relative;
+}
+
+/* Greyed out state for free users */
+.jb-config-section.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    user-select: none;
+    filter: grayscale(50%);
+}
+
+/* Show overlay message on greyed section */
+.jb-config-section.disabled::after {
+    content: '🔒 Upgrade to Essential to activate';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(201, 168, 112, 0.95);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Info box at top */
+.info-box {
+    background: #E8F4F8;
+    border-left: 4px solid #4A90E2;
+    padding: 1rem;
+    border-radius: var(--radius-sm);
+}
+
+.info-box p {
+    font-size: 0.875rem;
+    color: var(--charcoal);
+    margin: 0;
+}
+
+.info-box p + p {
+    margin-top: 0.5rem;
+}
+
+.info-box strong {
+    color: #4A90E2;
+}
+
+/* Modal Actions - Ensure proper positioning */
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--stone);
+    width: 100%;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .jb-config-section.disabled::after {
+        font-size: 0.875rem;
+        padding: 0.75rem 1.5rem;
+    }
+}
