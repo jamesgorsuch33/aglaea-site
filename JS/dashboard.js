@@ -103,11 +103,7 @@ async function loadDashboard() {
         
     } catch (error) {
         console.error('Error loading dashboard:', error);
-        document.getElementById('peopleList').innerHTML = `
-            <div class="empty-state">
-                <p>Error loading reminders. Please refresh the page.</p>
-            </div>
-        `;
+        document.getElementById('peopleList').innerHTML = '<div class="empty-state"><p>Error loading reminders. Please refresh the page.</p></div>';
     }
 }
 
