@@ -446,146 +446,6 @@ document.getElementById('editReminderForm').addEventListener('submit', handleEdi
 }
 
 // ============================================================
-// HANDLE FORM SUBMIT
-// ============================================================
-
-async function handleFormSubmit(e) {
-    e.preventDefault();
-    
-    const enableJB = document.getElementById('enableJustBecause').checked;
-    
-    // Block free users from submitting Just Because
-    if (enableJB && currentUserTier === 'free') {
-        alert('Just Because reminders require Essential tier. Please upgrade or uncheck the Just Because option.');
-        return;
-    }
-    
-    const submitBtn = document.getElementById('submitReminderBtn');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Adding...';
-    
-    try {
-        // Get form values
-        const personName = document.getElementById('newName').value.trim();
-        const occasion = document.getElementById('newOccasion').value;
-        const customOccasionName = document.getElementById('newCustomOccasionName').value.trim();
-        const occasionDate = document.getElementById('newDate').value;
-        const notes = document.getElementById('newNotes').value.trim();
-        
-        // Create person
-        const personId = await createPerson(currentUser.uid, personName);
-
-        // Update hasJustBecause flag if needed
-        if (enableJB && currentUserTier !== 'free') {
-        await updatePerson(personId, { hasJustBecause: true });
-        }
-        
-        // Create date-based reminder
-        await createDateBasedReminder(personId, {
-            occasion: occasion,
-            customOccasionName: occasion === 'custom' ? customOccasionName : null,
-            date: occasionDate,
-            notes: notes
-        });
-        
-        // Create Just Because reminder if enabled and allowed
-        if (enableJB && currentUserTier !== 'free') {
-            const frequencyRadio = document.querySelector('input[name="jbFrequency"]:checked');
-            const frequency = frequencyRadio ? frequencyRadio.value : 'every_6_weeks';
-            
-            const customMonths = frequency === 'custom' 
-                ? parseInt(document.getElementById('jbCustomMonths').value)
-                : null;
-            
-            const randomPerYear = frequency === 'random'
-                ? parseInt(document.getElementById('jbRandomPerYear').value)
-                : null;
-            
-            const startImmediately = document.getElementById('jbStartImmediately').checked;
-            const startDate = startImmediately 
-                ? null 
-                : document.getElementById('jbStartDate').value;
-            
-            await createJustBecauseReminder(personId, {
-                frequency: frequency,
-                customMonths: customMonths,
-                randomPerYear: randomPerYear,
-                startImmediately: startImmediately,
-                startDate: startDate,
-                smsEnabled: currentUserTier !== 'free'
-            });
-        }
-        
-        // Close modal and reload
-        document.getElementById('addReminderModal').classList.add('hidden');
-        resetForm();
-        loadDashboard();
-        
-    } catch (error) {
-        console.error('Error adding reminder:', error);
-        alert('Error adding reminder. Please try again.');
-    } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Add Reminder';
-    }
-}
-
-// ============================================================
-// HANDLE DELETE PERSON
-// ============================================================
-
-async function handleDeletePerson(e) {
-    const personId = e.target.dataset.personId;
-    
-    if (!confirm('Are you sure you want to delete this person and all their reminders?')) {
-        return;
-    }
-    
-    try {
-        await deletePerson(personId);
-        loadDashboard();
-    } catch (error) {
-        console.error('Error deleting person:', error);
-        alert('Error deleting person. Please try again.');
-    }
-}
-
-// ============================================================
-// RESET FORM
-// ============================================================
-
-function resetForm() {
-    document.getElementById('newReminderForm').reset();
-    document.getElementById('newCustomOccasion').classList.add('hidden');
-    document.getElementById('justBecauseOptions').classList.add('hidden');
-    document.getElementById('customMonthsGroup').classList.add('hidden');
-    document.getElementById('randomPerYearGroup').classList.add('hidden');
-    document.getElementById('jbStartDateGroup').classList.add('hidden');
-    document.getElementById('jbUpgradePrompt').classList.add('hidden');
-    document.getElementById('jbConfigSection').classList.remove('disabled');
-    document.getElementById('justBecausePersonName').textContent = 'this person';
-    
-    // Reset radio to default
-    const defaultRadio = document.querySelector('input[name="jbFrequency"][value="every_6_weeks"]');
-    if (defaultRadio) {
-        defaultRadio.checked = true;
-    }
-}
-
-// ============================================================
-// HELPER FUNCTIONS
-// ============================================================
-
-function capitalize(str) {
-    if (!str) return '';
-    return str.charAt(0).toUpperCase() + str.slice(1).replace(/-/g, ' ');
-}
-
-// ============================================================
-// EXPORT FOR GLOBAL ACCESS
-// ============================================================
-
-    // ============================================================
 // HANDLE EDIT REMINDER
 // ============================================================
 
@@ -594,7 +454,6 @@ async function handleEditReminder(e) {
     const reminderId = e.target.dataset.reminderId;
     
     try {
-        // Get the reminder data
         const reminders = await getRemindersForPerson(personId);
         const reminder = reminders.find(function(r) { return r.id === reminderId; });
         
@@ -603,17 +462,14 @@ async function handleEditReminder(e) {
             return;
         }
         
-        // Get person data for name
         const people = await getPeopleForUser(currentUser.uid);
         const person = people.find(function(p) { return p.id === personId; });
         
-        // Pre-fill the form
         document.getElementById('editReminderId').value = reminderId;
         document.getElementById('editPersonId').value = personId;
         document.getElementById('editReminderType').value = reminder.reminderType;
         document.getElementById('editName').value = person ? person.personName : '';
         
-        // Show appropriate fields based on reminder type
         if (reminder.reminderType === 'date-based') {
             document.getElementById('editDateFields').classList.remove('hidden');
             document.getElementById('editJBFields').classList.add('hidden');
@@ -634,7 +490,6 @@ async function handleEditReminder(e) {
             document.getElementById('editJBFrequency').value = reminder.frequency || 'every_6_weeks';
         }
         
-        // Show the modal
         document.getElementById('editReminderModal').classList.remove('hidden');
         
     } catch (error) {
@@ -656,10 +511,8 @@ async function handleEditSubmit(e) {
     const personName = document.getElementById('editName').value.trim();
     
     try {
-        // Update person name
         await updatePerson(personId, { personName: personName });
         
-        // Update reminder based on type
         if (reminderType === 'date-based') {
             const occasion = document.getElementById('editOccasion').value;
             const customOccasionName = document.getElementById('editCustomOccasionName').value.trim();
@@ -680,7 +533,6 @@ async function handleEditSubmit(e) {
             });
         }
         
-        // Close modal and reload
         document.getElementById('editReminderModal').classList.add('hidden');
         loadDashboard();
         
@@ -710,5 +562,10 @@ async function handleDeleteReminder(e) {
         alert('Error deleting reminder. Please try again.');
     }
 }
-    
+
+// ============================================================
+// EXPORT FOR GLOBAL ACCESS
+// ============================================================
+
 window.loadDashboard = loadDashboard;
+    
