@@ -1000,3 +1000,68 @@ form {
         justify-content: flex-end;
     }
 }
+
+/* ============================================================
+   MODAL ACTION BUTTONS - FIXED SIZING
+   ============================================================ */
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    align-items: center;
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--stone);
+    width: 100%;
+}
+
+.modal-actions .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    min-width: 120px;
+    max-width: 200px;
+    height: auto;
+    line-height: 1.2;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.modal-actions .btn-secondary {
+    background: white;
+    color: var(--charcoal);
+    border: 1px solid var(--stone);
+    font-family: var(--font-body);
+}
+
+.modal-actions .btn-secondary:hover {
+    background: var(--cream);
+    border-color: var(--gold);
+}
+
+.modal-actions .btn-primary {
+    background: var(--gold);
+    color: white;
+    border: 1px solid var(--gold);
+    font-family: var(--font-body);
+}
+
+.modal-actions .btn-primary:hover {
+    background: #B8935A;
+    border-color: #B8935A;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .modal-actions {
+        flex-direction: column-reverse;
+    }
+    
+    .modal-actions .btn {
+        width: 100%;
+        max-width: 100%;
+    }
+}
