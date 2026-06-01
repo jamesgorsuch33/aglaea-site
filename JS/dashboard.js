@@ -585,4 +585,130 @@ function capitalize(str) {
 // EXPORT FOR GLOBAL ACCESS
 // ============================================================
 
+    // ============================================================
+// HANDLE EDIT REMINDER
+// ============================================================
+
+async function handleEditReminder(e) {
+    const personId = e.target.dataset.personId;
+    const reminderId = e.target.dataset.reminderId;
+    
+    try {
+        // Get the reminder data
+        const reminders = await getRemindersForPerson(personId);
+        const reminder = reminders.find(function(r) { return r.id === reminderId; });
+        
+        if (!reminder) {
+            alert('Reminder not found');
+            return;
+        }
+        
+        // Get person data for name
+        const people = await getPeopleForUser(currentUser.uid);
+        const person = people.find(function(p) { return p.id === personId; });
+        
+        // Pre-fill the form
+        document.getElementById('editReminderId').value = reminderId;
+        document.getElementById('editPersonId').value = personId;
+        document.getElementById('editReminderType').value = reminder.reminderType;
+        document.getElementById('editName').value = person ? person.personName : '';
+        
+        // Show appropriate fields based on reminder type
+        if (reminder.reminderType === 'date-based') {
+            document.getElementById('editDateFields').classList.remove('hidden');
+            document.getElementById('editJBFields').classList.add('hidden');
+            
+            document.getElementById('editOccasion').value = reminder.occasion || 'birthday';
+            document.getElementById('editDate').value = reminder.date || '';
+            document.getElementById('editNotes').value = reminder.notes || '';
+            
+            if (reminder.occasion === 'custom') {
+                document.getElementById('editCustomOccasion').classList.remove('hidden');
+                document.getElementById('editCustomOccasionName').value = reminder.customOccasionName || '';
+            } else {
+                document.getElementById('editCustomOccasion').classList.add('hidden');
+            }
+        } else if (reminder.reminderType === 'just-because') {
+            document.getElementById('editDateFields').classList.add('hidden');
+            document.getElementById('editJBFields').classList.remove('hidden');
+            document.getElementById('editJBFrequency').value = reminder.frequency || 'every_6_weeks';
+        }
+        
+        // Show the modal
+        document.getElementById('editReminderModal').classList.remove('hidden');
+        
+    } catch (error) {
+        console.error('Error loading reminder for edit:', error);
+        alert('Error loading reminder. Please try again.');
+    }
+}
+
+// ============================================================
+// HANDLE EDIT SUBMIT
+// ============================================================
+
+async function handleEditSubmit(e) {
+    e.preventDefault();
+    
+    const reminderId = document.getElementById('editReminderId').value;
+    const personId = document.getElementById('editPersonId').value;
+    const reminderType = document.getElementById('editReminderType').value;
+    const personName = document.getElementById('editName').value.trim();
+    
+    try {
+        // Update person name
+        await updatePerson(personId, { personName: personName });
+        
+        // Update reminder based on type
+        if (reminderType === 'date-based') {
+            const occasion = document.getElementById('editOccasion').value;
+            const customOccasionName = document.getElementById('editCustomOccasionName').value.trim();
+            const date = document.getElementById('editDate').value;
+            const notes = document.getElementById('editNotes').value.trim();
+            
+            await updateReminder(personId, reminderId, {
+                occasion: occasion,
+                customOccasionName: occasion === 'custom' ? customOccasionName : null,
+                date: date,
+                notes: notes
+            });
+        } else if (reminderType === 'just-because') {
+            const frequency = document.getElementById('editJBFrequency').value;
+            
+            await updateReminder(personId, reminderId, {
+                frequency: frequency
+            });
+        }
+        
+        // Close modal and reload
+        document.getElementById('editReminderModal').classList.add('hidden');
+        loadDashboard();
+        
+    } catch (error) {
+        console.error('Error updating reminder:', error);
+        alert('Error updating reminder. Please try again.');
+    }
+}
+
+// ============================================================
+// HANDLE DELETE REMINDER
+// ============================================================
+
+async function handleDeleteReminder(e) {
+    const personId = e.target.dataset.personId;
+    const reminderId = e.target.dataset.reminderId;
+    
+    if (!confirm('Are you sure you want to delete this reminder?')) {
+        return;
+    }
+    
+    try {
+        await deleteReminder(personId, reminderId);
+        loadDashboard();
+    } catch (error) {
+        console.error('Error deleting reminder:', error);
+        alert('Error deleting reminder. Please try again.');
+    }
+}
+    
 window.loadDashboard = loadDashboard;
