@@ -193,10 +193,19 @@ function renderPeopleList(peopleWithReminders) {
     listEl.innerHTML = html;
     
     // Attach delete handlers
-    document.querySelectorAll('.delete-person').forEach(function(btn) {
-        btn.addEventListener('click', handleDeletePerson);
-    });
-}
+document.querySelectorAll('.delete-person').forEach(function(btn) {
+    btn.addEventListener('click', handleDeletePerson);
+});
+
+// Attach edit handlers
+document.querySelectorAll('.edit-reminder').forEach(function(btn) {
+    btn.addEventListener('click', handleEditReminder);
+});
+
+// Attach delete reminder handlers
+document.querySelectorAll('.delete-reminder').forEach(function(btn) {
+    btn.addEventListener('click', handleDeleteReminder);
+});
 
 // ============================================================
 // RENDER DATE REMINDER
