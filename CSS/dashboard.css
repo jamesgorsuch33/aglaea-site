@@ -808,3 +808,195 @@ form {
         padding: 0.75rem 1.5rem;
     }
 }
+
+/* ============================================================
+   IMPROVED PERSON CARD LAYOUT
+   ============================================================ */
+
+.person-card {
+    background: white;
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--stone);
+}
+
+.person-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--stone);
+}
+
+.person-header h3 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--charcoal);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.reminders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.reminder-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background: var(--cream);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--gold);
+    transition: all 0.2s ease;
+}
+
+.reminder-item:hover {
+    background: white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.reminder-item.just-because {
+    border-left-color: #B8935A;
+    background: linear-gradient(135deg, var(--cream) 0%, rgba(201, 168, 112, 0.05) 100%);
+}
+
+.reminder-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.reminder-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.reminder-info > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.reminder-info strong {
+    font-size: 1rem;
+    color: var(--charcoal);
+    font-weight: 500;
+}
+
+.reminder-info small {
+    font-size: 0.875rem;
+    color: var(--slate);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.days-until {
+    color: var(--gold);
+    font-weight: 600;
+}
+
+.days-today {
+    color: #d4574c;
+    font-weight: 600;
+}
+
+.days-passed {
+    color: var(--slate);
+    opacity: 0.7;
+}
+
+.reminder-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-icon {
+    background: transparent;
+    border: 1px solid var(--stone);
+    border-radius: var(--radius-sm);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+}
+
+.btn-icon:hover {
+    background: white;
+    border-color: var(--gold);
+    transform: translateY(-1px);
+}
+
+.delete-person {
+    border-color: transparent;
+}
+
+.delete-person:hover {
+    background: #fff5f5;
+    border-color: #d4574c;
+}
+
+.no-reminders {
+    color: var(--slate);
+    font-style: italic;
+    margin: 0;
+    padding: 1rem;
+    text-align: center;
+    background: var(--cream);
+    border-radius: var(--radius-sm);
+}
+
+.jb-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: linear-gradient(135deg, var(--gold), #B8935A);
+    color: white;
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-family: var(--font-body);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.section-header h2 {
+    font-family: var(--font-display);
+    margin: 0;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .reminder-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .reminder-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
