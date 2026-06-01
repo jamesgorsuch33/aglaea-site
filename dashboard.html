@@ -329,6 +329,80 @@
         </div>
     </div>
 
+<!-- Edit Reminder Modal -->
+    <div id="editReminderModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Reminder</h2>
+                <button class="modal-close" data-modal="editReminderModal">&times;</button>
+            </div>
+            
+            <form id="editReminderForm">
+                <input type="hidden" id="editReminderId">
+                <input type="hidden" id="editPersonId">
+                <input type="hidden" id="editReminderType">
+                
+                <!-- Person's Name (Read-only) -->
+                <div class="form-group">
+                    <label for="editName">Person's Name</label>
+                    <input type="text" id="editName" placeholder="e.g. Mum, Sarah" required>
+                </div>
+                
+                <!-- Date-based fields (hidden if Just Because) -->
+                <div id="editDateFields">
+                    <div class="form-group">
+                        <label for="editOccasion">Occasion</label>
+                        <select id="editOccasion">
+                            <option value="birthday">Birthday</option>
+                            <option value="anniversary">Anniversary</option>
+                            <option value="mothers-day">Mother's Day</option>
+                            <option value="fathers-day">Father's Day</option>
+                            <option value="christmas">Christmas</option>
+                            <option value="valentines">Valentine's Day</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    
+                    <div id="editCustomOccasion" class="form-group hidden">
+                        <label for="editCustomOccasionName">Custom Occasion Name</label>
+                        <input type="text" id="editCustomOccasionName">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editDate">Date</label>
+                        <input type="date" id="editDate">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editNotes">Notes (Optional)</label>
+                        <textarea id="editNotes" rows="3"></textarea>
+                    </div>
+                </div>
+                
+                <!-- Just Because fields (hidden if date-based) -->
+                <div id="editJBFields" class="hidden">
+                    <div class="form-group">
+                        <label class="form-section-label">How often?</label>
+                        <select id="editJBFrequency">
+                            <option value="monthly">Every month (12 gifts/year)</option>
+                            <option value="every_6_weeks">Every 6 weeks (8 gifts/year)</option>
+                            <option value="every_2_months">Every 2 months (6 gifts/year)</option>
+                            <option value="every_3_months">Every 3 months (4 gifts/year)</option>
+                            <option value="every_6_months">Every 6 months (2 gifts/year)</option>
+                            <option value="random">Random surprises</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Modal Actions -->
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-close" data-modal="editReminderModal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
     <script type="module">
     import { auth } from './js/firebase-config-v2.js';
     import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
