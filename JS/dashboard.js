@@ -136,13 +136,13 @@ function updateStats(peopleWithReminders) {
     
     if (dateReminders.length > 0) {
         const sorted = dateReminders.sort(function(a, b) {
-            const dateA = new Date(a.occasionDate);
-            const dateB = new Date(b.occasionDate);
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
             return dateA - dateB;
         });
         
         const next = sorted[0];
-        const nextDate = new Date(next.occasionDate);
+        const nextDate = new Date(next.date);
         const dateStr = nextDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
         document.getElementById('nextReminder').textContent = dateStr;
     } else {
@@ -203,7 +203,7 @@ function renderPeopleList(peopleWithReminders) {
 // ============================================================
 
 function renderDateReminder(reminder, personId) {
-    const date = new Date(reminder.occasionDate);
+    const date = new Date(reminder.date);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const daysUntil = Math.ceil((date - today) / (1000 * 60 * 60 * 24));
@@ -444,7 +444,7 @@ async function handleFormSubmit(e) {
         await createDateBasedReminder(personId, {
             occasion: occasion,
             customOccasionName: occasion === 'custom' ? customOccasionName : null,
-            occasionDate: occasionDate,
+            date: occasionDate,
             notes: notes
         });
         
