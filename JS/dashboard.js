@@ -324,6 +324,33 @@ function setupEventListeners() {
             resetForm();
         }
     });
+
+    // Edit reminder modal - close handlers
+document.querySelectorAll('[data-modal="editReminderModal"]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        document.getElementById('editReminderModal').classList.add('hidden');
+    });
+});
+
+// Edit reminder modal - click outside to close
+document.getElementById('editReminderModal').addEventListener('click', function(e) {
+    if (e.target.id === 'editReminderModal') {
+        document.getElementById('editReminderModal').classList.add('hidden');
+    }
+});
+
+// Edit reminder form - occasion change
+document.getElementById('editOccasion').addEventListener('change', function(e) {
+    const customGroup = document.getElementById('editCustomOccasion');
+    if (e.target.value === 'custom') {
+        customGroup.classList.remove('hidden');
+    } else {
+        customGroup.classList.add('hidden');
+    }
+});
+
+// Edit reminder form - submit
+document.getElementById('editReminderForm').addEventListener('submit', handleEditSubmit);
     
     // Custom occasion toggle
     const occasionSelect = document.getElementById('newOccasion');
