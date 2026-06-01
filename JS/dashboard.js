@@ -435,10 +435,12 @@ async function handleFormSubmit(e) {
         const notes = document.getElementById('newNotes').value.trim();
         
         // Create person
-        const personId = await createPerson(currentUser.uid, {
-            personName: personName,
-            hasJustBecause: enableJB && currentUserTier !== 'free'
-        });
+        const personId = await createPerson(currentUser.uid, personName);
+
+        // Update hasJustBecause flag if needed
+        if (enableJB && currentUserTier !== 'free') {
+        await updatePerson(personId, { hasJustBecause: true });
+        }
         
         // Create date-based reminder
         await createDateBasedReminder(personId, {
