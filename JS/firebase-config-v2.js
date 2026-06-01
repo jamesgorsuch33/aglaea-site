@@ -671,4 +671,4 @@ export async function updateUserStripeInfo(userId, stripeData) {
 }
 
 // Export helper functions for use in UI
-export { formatDate, addWeeks, addMonths, createOrUpdateUser, getUser, updateUserTier, updateUserStripeInfo };
+export { formatDate, addWeeks, addMonths };
