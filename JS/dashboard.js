@@ -244,6 +244,7 @@ function renderDateReminder(reminder, personId) {
     html += '</div>';
     html += '</div>';
     html += '<div class="reminder-actions">';
+    html += '<button class="btn-icon edit-reminder" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Edit">✏️</button>';
     html += '<button class="btn-icon delete-reminder" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Delete">🗑️</button>';
     html += '</div>';
     html += '</div>';
@@ -287,6 +288,7 @@ function renderJustBecauseReminder(reminder, personId) {
     html += '</div>';
     html += '</div>';
     html += '<div class="reminder-actions">';
+    html += '<button class="btn-icon edit-reminder" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Edit">✏️</button>';
     html += '<button class="btn-icon delete-reminder" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Delete">🗑️</button>';
     html += '</div>';
     html += '</div>';
