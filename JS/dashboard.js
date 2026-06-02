@@ -142,52 +142,106 @@ function updateStats(peopleWithReminders) {
 
 function renderPeopleList(peopleWithReminders) {
     const listEl = document.getElementById('peopleList');
+    const pastGiftsSection = document.getElementById('pastGiftsSection');
+    const pastGiftsList = document.getElementById('pastGiftsList');
     
     if (peopleWithReminders.length === 0) {
         listEl.innerHTML = '<div class="empty-state"><p>No reminders yet. Click "Add Reminder" to get started!</p></div>';
+        if (pastGiftsSection) pastGiftsSection.classList.add('hidden');
         return;
     }
     
-    let html = '';
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    let activeHtml = '';
+    let pastHtml = '';
+    let hasPastGifts = false;
     
     peopleWithReminders.forEach(function(person) {
         const jbBadge = person.hasJustBecause ? '<span class="jb-badge">✨ JB</span>' : '';
         
-        html += '<div class="person-card" data-person-id="' + person.id + '">';
-        html += '<div class="person-header">';
-        html += '<h3>' + person.personName + ' ' + jbBadge + '</h3>';
-        html += '<button class="btn-icon delete-person" data-person-id="' + person.id + '" title="Delete person">🗑️</button>';
-        html += '</div>';
+        // Split reminders into active and past
+        const activeReminders = [];
+        const pastReminders = [];
         
-        if (person.reminders.length === 0) {
-            html += '<p class="no-reminders">No reminders for this person</p>';
-        } else {
-            html += '<div class="reminders-list">';
-            person.reminders.forEach(function(reminder) {
-                if (reminder.reminderType === 'date-based') {
-                    html += renderDateReminder(reminder, person.id);
-                } else if (reminder.reminderType === 'just-because') {
-                    html += renderJustBecauseReminder(reminder, person.id);
+        person.reminders.forEach(function(reminder) {
+            if (reminder.reminderType === 'date-based') {
+                const reminderDate = new Date(reminder.date);
+                reminderDate.setHours(0, 0, 0, 0);
+                if (reminderDate < today) {
+                    pastReminders.push(reminder);
+                } else {
+                    activeReminders.push(reminder);
                 }
-            });
-            html += '</div>';
+            } else {
+                // Just Because reminders stay active (recurring)
+                activeReminders.push(reminder);
+            }
+        });
+        
+        // Render active card
+        if (activeReminders.length > 0 || person.reminders.length === 0) {
+            activeHtml += '<div class="person-card" data-person-id="' + person.id + '">';
+            activeHtml += '<div class="person-header">';
+            activeHtml += '<h3>' + person.personName + ' ' + jbBadge + '</h3>';
+            activeHtml += '<button class="btn-icon delete-person" data-person-id="' + person.id + '" title="Delete person">🗑️</button>';
+            activeHtml += '</div>';
+            
+            if (activeReminders.length === 0) {
+                activeHtml += '<p class="no-reminders">No upcoming reminders</p>';
+            } else {
+                activeHtml += '<div class="reminders-list">';
+                activeReminders.forEach(function(reminder) {
+                    if (reminder.reminderType === 'date-based') {
+                        activeHtml += renderDateReminder(reminder, person.id);
+                    } else if (reminder.reminderType === 'just-because') {
+                        activeHtml += renderJustBecauseReminder(reminder, person.id);
+                    }
+                });
+                activeHtml += '</div>';
+            }
+            activeHtml += '</div>';
         }
         
-        html += '</div>';
+        // Render past gifts card
+        if (pastReminders.length > 0) {
+            hasPastGifts = true;
+            pastHtml += '<div class="person-card past" data-person-id="' + person.id + '">';
+            pastHtml += '<div class="person-header"><h3>' + person.personName + '</h3></div>';
+            pastHtml += '<div class="reminders-list">';
+            pastReminders.forEach(function(reminder) {
+                pastHtml += renderPastReminder(reminder, person.id);
+            });
+            pastHtml += '</div>';
+            pastHtml += '</div>';
+        }
     });
     
-    listEl.innerHTML = html;
+    listEl.innerHTML = activeHtml;
     
+    if (hasPastGifts && pastGiftsSection) {
+        pastGiftsList.innerHTML = pastHtml;
+        pastGiftsSection.classList.remove('hidden');
+    } else if (pastGiftsSection) {
+        pastGiftsSection.classList.add('hidden');
+    }
+    
+    // Attach handlers
     document.querySelectorAll('.delete-person').forEach(function(btn) {
         btn.addEventListener('click', handleDeletePerson);
     });
-    
     document.querySelectorAll('.edit-reminder').forEach(function(btn) {
         btn.addEventListener('click', handleEditReminder);
     });
-    
     document.querySelectorAll('.delete-reminder').forEach(function(btn) {
         btn.addEventListener('click', handleDeleteReminder);
+    });
+    document.querySelectorAll('.mark-purchased').forEach(function(btn) {
+        btn.addEventListener('click', handleMarkPurchased);
+    });
+    document.querySelectorAll('.undo-purchase').forEach(function(btn) {
+        btn.addEventListener('click', handleUndoPurchase);
     });
 }
 
@@ -228,18 +282,28 @@ function renderDateReminder(reminder, personId) {
         daysText = '<span class="days-until">in ' + daysUntil + ' days</span>';
     }
     
-    let html = '<div class="reminder-item date-based" data-reminder-id="' + reminder.id + '">';
+    const isPurchased = reminder.giftPurchased === true;
+    const purchasedClass = isPurchased ? ' purchased' : '';
+    const purchasedBadge = isPurchased ? '<span class="purchased-badge">✓ Purchased</span>' : '';
+    
+    let actionButtons = '';
+    if (isPurchased) {
+        actionButtons += '<button class="btn-icon undo-purchase" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Undo">↩️</button>';
+    } else {
+        actionButtons += '<button class="btn-icon mark-purchased" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Mark as purchased">✓</button>';
+    }
+    actionButtons += '<button class="btn-icon edit-reminder" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Edit">✏️</button>';
+    actionButtons += '<button class="btn-icon delete-reminder" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Delete">🗑️</button>';
+    
+    let html = '<div class="reminder-item date-based' + purchasedClass + '" data-reminder-id="' + reminder.id + '">';
     html += '<div class="reminder-info">';
     html += '<span class="reminder-icon">' + icon + '</span>';
     html += '<div>';
-    html += '<strong>' + capitalize(occasionLabel) + '</strong>';
+    html += '<strong>' + capitalize(occasionLabel) + ' ' + purchasedBadge + '</strong>';
     html += '<small>' + dateStr + ' • ' + daysText + '</small>';
     html += '</div>';
     html += '</div>';
-    html += '<div class="reminder-actions">';
-    html += '<button class="btn-icon edit-reminder" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Edit">✏️</button>';
-    html += '<button class="btn-icon delete-reminder" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Delete">🗑️</button>';
-    html += '</div>';
+    html += '<div class="reminder-actions">' + actionButtons + '</div>';
     html += '</div>';
     
     return html;
@@ -268,11 +332,24 @@ function renderJustBecauseReminder(reminder, personId) {
         nextDateText = nextDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
     }
     
-    let html = '<div class="reminder-item just-because" data-reminder-id="' + reminder.id + '">';
+    const isPurchased = reminder.giftPurchased === true;
+    const purchasedClass = isPurchased ? ' purchased' : '';
+    const purchasedBadge = isPurchased ? '<span class="purchased-badge">✓ Purchased</span>' : '';
+    
+    let actionButtons = '';
+    if (isPurchased) {
+        actionButtons += '<button class="btn-icon undo-purchase" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Undo">↩️</button>';
+    } else {
+        actionButtons += '<button class="btn-icon mark-purchased" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Mark as purchased">✓</button>';
+    }
+    actionButtons += '<button class="btn-icon edit-reminder" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Edit">✏️</button>';
+    actionButtons += '<button class="btn-icon delete-reminder" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Delete">🗑️</button>';
+    
+    let html = '<div class="reminder-item just-because' + purchasedClass + '" data-reminder-id="' + reminder.id + '">';
     html += '<div class="reminder-info">';
     html += '<span class="reminder-icon">✨</span>';
     html += '<div>';
-    html += '<strong>Just Because</strong>';
+    html += '<strong>Just Because ' + purchasedBadge + '</strong>';
     html += '<small>' + frequencyText;
     if (nextDateText) {
         html += ' • Next: ' + nextDateText;
@@ -280,10 +357,7 @@ function renderJustBecauseReminder(reminder, personId) {
     html += '</small>';
     html += '</div>';
     html += '</div>';
-    html += '<div class="reminder-actions">';
-    html += '<button class="btn-icon edit-reminder" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Edit">✏️</button>';
-    html += '<button class="btn-icon delete-reminder" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Delete">🗑️</button>';
-    html += '</div>';
+    html += '<div class="reminder-actions">' + actionButtons + '</div>';
     html += '</div>';
     
     return html;
@@ -669,6 +743,88 @@ function resetForm() {
 function capitalize(str) {
     if (!str) return '';
     return str.charAt(0).toUpperCase() + str.slice(1).replace(/-/g, ' ');
+}
+
+// ============================================================
+// RENDER PAST REMINDER (simplified for history)
+// ============================================================
+
+function renderPastReminder(reminder, personId) {
+    const date = new Date(reminder.date);
+    const dateStr = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    
+    let occasionLabel = reminder.occasion;
+    if (reminder.occasion === 'custom' && reminder.customOccasionName) {
+        occasionLabel = reminder.customOccasionName;
+    }
+    
+    const occasionIcons = {
+        'birthday': '🎂',
+        'anniversary': '💕',
+        'mothers-day': '🌷',
+        'fathers-day': '👔',
+        'christmas': '🎄',
+        'valentines': '💝',
+        'custom': '🎁'
+    };
+    const icon = occasionIcons[reminder.occasion] || '🎁';
+    
+    const isPurchased = reminder.giftPurchased === true;
+    const purchasedBadge = isPurchased 
+        ? '<span class="purchased-badge">✓ Purchased</span>' 
+        : '<span class="not-purchased-badge">Not purchased</span>';
+    
+    let html = '<div class="reminder-item past">';
+    html += '<div class="reminder-info">';
+    html += '<span class="reminder-icon">' + icon + '</span>';
+    html += '<div>';
+    html += '<strong>' + capitalize(occasionLabel) + ' ' + purchasedBadge + '</strong>';
+    html += '<small>' + dateStr + '</small>';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    
+    return html;
+}
+
+// ============================================================
+// HANDLE MARK PURCHASED
+// ============================================================
+
+async function handleMarkPurchased(e) {
+    const personId = e.target.dataset.personId;
+    const reminderId = e.target.dataset.reminderId;
+    
+    try {
+        await updateReminder(personId, reminderId, {
+            giftPurchased: true,
+            purchasedDate: new Date().toISOString()
+        });
+        loadDashboard();
+    } catch (error) {
+        console.error('Error marking as purchased:', error);
+        alert('Error marking as purchased. Please try again.');
+    }
+}
+
+// ============================================================
+// HANDLE UNDO PURCHASE
+// ============================================================
+
+async function handleUndoPurchase(e) {
+    const personId = e.target.dataset.personId;
+    const reminderId = e.target.dataset.reminderId;
+    
+    try {
+        await updateReminder(personId, reminderId, {
+            giftPurchased: false,
+            purchasedDate: null
+        });
+        loadDashboard();
+    } catch (error) {
+        console.error('Error undoing purchase:', error);
+        alert('Error undoing purchase. Please try again.');
+    }
 }
 
 // ============================================================
