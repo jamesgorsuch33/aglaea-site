@@ -1070,3 +1070,78 @@ form {
 .hidden {
     display: none !important;
 }
+
+/* ============================================================
+   PURCHASED STATE & PAST GIFTS
+   ============================================================ */
+
+.reminder-item.purchased {
+    opacity: 0.6;
+    background: var(--cream);
+}
+
+.reminder-item.purchased .reminder-info strong {
+    text-decoration: line-through;
+    text-decoration-color: var(--slate);
+}
+
+.purchased-badge {
+    display: inline-block;
+    background: #4CAF50;
+    color: white;
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-left: 0.5rem;
+}
+
+.not-purchased-badge {
+    display: inline-block;
+    background: #999;
+    color: white;
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-left: 0.5rem;
+}
+
+.past-gifts-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--stone);
+}
+
+.past-gifts-section h2 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--slate);
+    margin-bottom: 1.5rem;
+}
+
+.person-card.past {
+    opacity: 0.75;
+}
+
+.person-card.past .reminder-item {
+    background: transparent;
+    border-left-color: var(--stone);
+}
+
+.btn-icon.mark-purchased {
+    color: #4CAF50;
+}
+
+.btn-icon.mark-purchased:hover {
+    background: #f0fff4;
+    border-color: #4CAF50;
+}
+
+.btn-icon.undo-purchase {
+    color: var(--slate);
+}
