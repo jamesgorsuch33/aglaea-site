@@ -58,10 +58,12 @@ exports.handler = async (event, context) => {
         // Update user plan in Firestore
         if (userId) {
           await db.collection('users').doc(userId).set({
-            plan: 'essential',
-            stripeCustomerId: session.customer,
-            stripeSubscriptionId: session.subscription,
-            upgradedAt: admin.firestore.FieldValue.serverTimestamp()
+          tier: 'essential',
+          stripeCustomerId: session.customer,
+          subscriptionId: session.subscription,
+          subscriptionStatus: 'active',
+          upgradedAt: admin.firestore.FieldValue.serverTimestamp(),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp()
           }, { merge: true });
           
           console.log('User plan updated to Essential');
@@ -82,8 +84,10 @@ exports.handler = async (event, context) => {
         if (!snapshot.empty) {
           const userDoc = snapshot.docs[0];
           await userDoc.ref.set({
-            plan: 'free',
-            cancelledAt: admin.firestore.FieldValue.serverTimestamp()
+          tier: 'free',
+          subscriptionStatus: 'cancelled',
+          cancelledAt: admin.firestore.FieldValue.serverTimestamp(),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp()
           }, { merge: true });
           
           console.log('User downgraded to Free');
