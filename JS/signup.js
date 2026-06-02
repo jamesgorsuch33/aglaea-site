@@ -92,6 +92,15 @@ async function handleRemindersSubmit(e) {
 // Create Account in Firebase
 async function createAccount() {
     try {
+       async function createAccount() {
+    // Prevent double submission
+    const submitBtn = document.querySelector('button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Creating account...';
+    }
+    
+    try {
         // Create user in Firebase Auth
         const userCredential = await firebase.auth().createUserWithEmailAndPassword(
             formData.email,
@@ -143,8 +152,14 @@ async function createAccount() {
         showSuccess();
         
     } catch (error) {
-        console.error('Signup error:', error);
-        alert(getErrorMessage(error.code));
+    console.error('Error creating account:', error);
+    alert('Error creating account: ' + error.message);
+    
+    // Re-enable button on error
+    const submitBtn = document.querySelector('button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Account';
     }
 }
 
