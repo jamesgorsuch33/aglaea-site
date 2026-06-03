@@ -1,371 +1,168 @@
-// ============================================================
-// SIGNUP LOGIC - CLEAN VERSION
-// 2-step flow: Account Details + Add Reminders
-// Creates user with tier: 'free' and reminders in people/ collection
-// ============================================================
-
-// Form data storage
-const formData = {
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    phone: '',
-    reminders: []
-};
-
-let reminderCount = 1;
-const maxReminders = 5;
-
-// ============================================================
-// STEP 1: ACCOUNT DETAILS FORM
-// ============================================================
-
-document.getElementById('accountForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up — Aglaea</title>
+    <meta name="description" content="Create your free Aglaea account and never miss another special moment.">
     
-    // Collect step 1 data
-    formData.firstName = document.getElementById('firstName').value.trim();
-    formData.lastName = document.getElementById('lastName').value.trim();
-    formData.email = document.getElementById('email').value.trim();
-    formData.password = document.getElementById('password').value;
-    formData.phone = document.getElementById('phone').value.trim();
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     
-    // Move to step 2
-    document.getElementById('step1').classList.add('hidden');
-    document.getElementById('step2').classList.remove('hidden');
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/signup.css">
+</head>
+<body>
     
-    // Update progress indicator
-    document.querySelector('[data-step="1"]').classList.add('completed');
-    document.querySelector('[data-step="2"]').classList.add('active');
-});
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-content">
+            <a href="index.html" class="logo">AGLAEA</a>
+            <nav class="nav">
+                <a href="index.html">← Back to Home</a>
+            </nav>
+        </div>
+    </header>
 
-// ============================================================
-// BACK BUTTON (Step 2 -> Step 1)
-// ============================================================
+    <!-- Signup Section -->
+    <section class="signup-section">
+        <div class="container">
+            <div class="signup-container">
+                
+                <!-- Progress Indicator -->
+                <div class="progress-bar">
+                    <div class="progress-step active" data-step="1">
+                        <div class="progress-circle">1</div>
+                        <span>Your Details</span>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step" data-step="2">
+                        <div class="progress-circle">2</div>
+                        <span>Add Reminders</span>
+                    </div>
+                </div>
 
-document.getElementById('backBtn').addEventListener('click', function() {
-    document.getElementById('step2').classList.add('hidden');
-    document.getElementById('step1').classList.remove('hidden');
+                <!-- Step 1: Account Details -->
+                <div class="signup-step" id="step1">
+                    <h1 class="signup-title">Create Your Account</h1>
+                    <p class="signup-subtitle">Start remembering the moments that matter</p>
+                    
+                    <form id="accountForm" class="signup-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">First Name</label>
+                                <input type="text" id="firstName" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="lastName">Last Name</label>
+                                <input type="text" id="lastName" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" required>
+                            <span class="form-helper">We'll send your reminder notifications here</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" required minlength="6">
+                            <span class="form-helper">Minimum 6 characters</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone Number (Optional)</label>
+                            <input type="tel" id="phone" placeholder="+44 7XXX XXXXXX">
+                            <span class="form-helper">For SMS reminders (Essential plan only)</span>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-full">Next: Add Reminders</button>
+                    </form>
+                </div>
+
+                <!-- Step 2: Add Reminders -->
+                <div class="signup-step hidden" id="step2">
+                    <h1 class="signup-title">Add Your First Reminders</h1>
+                    <p class="signup-subtitle">Set up 1-5 free reminders to get started</p>
+                    
+                    <form id="remindersForm" class="signup-form">
+                        
+                        <div id="remindersContainer">
+                            <!-- Reminder 1 (Required) -->
+                            <div class="reminder-input" data-reminder="1">
+                                <div class="reminder-header">
+                                    <h3>Reminder 1 <span class="required-badge">Required</span></h3>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="name1">Person's Name</label>
+                                    <input type="text" id="name1" placeholder="e.g. Mum, Sarah, Best Friend" required>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="occasion1">Occasion</label>
+                                        <select id="occasion1" required>
+                                            <option value="">Select occasion</option>
+                                            <option value="birthday">Birthday</option>
+                                            <option value="anniversary">Anniversary</option>
+                                            <option value="valentines">Valentine's Day</option>
+                                            <option value="mothers-day">Mother's Day</option>
+                                            <option value="fathers-day">Father's Day</option>
+                                            <option value="christmas">Christmas</option>
+                                            <option value="just-because">Just Because</option>
+                                            <option value="other">Other (type your own)</option>
+                                        </select>
+                                        <input type="text" id="customOccasion1" class="custom-occasion hidden" placeholder="Enter occasion name">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="date1">Date</label>
+                                        <input type="date" id="date1" required>
+                                    </div>
+                                </div>
+                                
+                                <p class="date-helper">💡 Enter the actual date of the occasion (we'll remind you 10 days before)</p>
+                            </div>
+                        </div>
+                        
+                        <button type="button" id="addReminderBtn" class="btn btn-outline btn-full add-reminder-btn">
+                            + Add Another Reminder <span class="reminder-count">(1/5)</span>
+                        </button>
+                        
+                        <div class="form-actions">
+                            <button type="button" id="backBtn" class="btn btn-secondary">← Back</button>
+                            <button type="submit" class="btn btn-primary">Create My Account</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Success Message (hidden initially) -->
+                <div class="signup-step hidden" id="successStep">
+                    <div class="success-message">
+                        <div class="success-icon">✓</div>
+                        <h1 class="signup-title">Welcome to Aglaea!</h1>
+                        <p class="signup-subtitle">Your account has been created successfully</p>
+                        <p style="margin-bottom: 2rem;">Check your email for a welcome message and your first reminder confirmations.</p>
+                        <a href="index.html" class="btn btn-primary btn-large">Back to Home</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     
-    document.querySelector('[data-step="2"]').classList.remove('active');
-});
+    <!-- Firebase Config & Signup Logic -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/signup.js"></script>
 
-// ============================================================
-// OCCASION CHANGE - Show/Hide Custom Field
-// ============================================================
-
-function handleOccasionChange(reminderNum) {
-    const occasionSelect = document.getElementById('occasion' + reminderNum);
-    const customInput = document.getElementById('customOccasion' + reminderNum);
-    
-    if (occasionSelect && customInput) {
-        if (occasionSelect.value === 'other') {
-            customInput.classList.remove('hidden');
-            customInput.required = true;
-        } else {
-            customInput.classList.add('hidden');
-            customInput.required = false;
-        }
-    }
-}
-
-// Attach handler to reminder 1's occasion select
-document.getElementById('occasion1').addEventListener('change', function() {
-    handleOccasionChange(1);
-});
-
-// ============================================================
-// ADD ANOTHER REMINDER BUTTON
-// ============================================================
-
-document.getElementById('addReminderBtn').addEventListener('click', function() {
-    if (reminderCount >= maxReminders) {
-        alert('You can add up to 5 reminders during signup. You can add more from your dashboard after signing up.');
-        return;
-    }
-    
-    reminderCount++;
-    
-    const container = document.getElementById('remindersContainer');
-    
-    const reminderHtml = 
-        '<div class="reminder-input" data-reminder="' + reminderCount + '">' +
-            '<div class="reminder-header">' +
-                '<h3>Reminder ' + reminderCount + '</h3>' +
-                '<button type="button" class="remove-reminder-btn" onclick="removeReminder(' + reminderCount + ')" title="Remove this reminder">×</button>' +
-            '</div>' +
-            '<div class="form-group">' +
-                '<label for="name' + reminderCount + '">Person\'s Name</label>' +
-                '<input type="text" id="name' + reminderCount + '" placeholder="e.g. Mum, Sarah, Best Friend" required>' +
-            '</div>' +
-            '<div class="form-row">' +
-                '<div class="form-group">' +
-                    '<label for="occasion' + reminderCount + '">Occasion</label>' +
-                    '<select id="occasion' + reminderCount + '" required>' +
-                        '<option value="">Select occasion</option>' +
-                        '<option value="birthday">Birthday</option>' +
-                        '<option value="anniversary">Anniversary</option>' +
-                        '<option value="valentines">Valentine\'s Day</option>' +
-                        '<option value="mothers-day">Mother\'s Day</option>' +
-                        '<option value="fathers-day">Father\'s Day</option>' +
-                        '<option value="christmas">Christmas</option>' +
-                        '<option value="other">Other (type your own)</option>' +
-                    '</select>' +
-                    '<input type="text" id="customOccasion' + reminderCount + '" class="custom-occasion hidden" placeholder="Enter occasion name">' +
-                '</div>' +
-                '<div class="form-group">' +
-                    '<label for="date' + reminderCount + '">Date</label>' +
-                    '<input type="date" id="date' + reminderCount + '" required>' +
-                '</div>' +
-            '</div>' +
-            '<p class="date-helper">💡 Enter the actual date of the occasion (we\'ll remind you 10 days before)</p>' +
-        '</div>';
-    
-    container.insertAdjacentHTML('beforeend', reminderHtml);
-    
-    // Attach occasion change handler to new reminder
-    const newOccasion = document.getElementById('occasion' + reminderCount);
-    if (newOccasion) {
-        newOccasion.addEventListener('change', function() {
-            handleOccasionChange(reminderCount);
-        });
-    }
-    
-    updateReminderCount();
-});
-
-// ============================================================
-// REMOVE REMINDER
-// ============================================================
-
-function removeReminder(reminderNum) {
-    const reminderEl = document.querySelector('[data-reminder="' + reminderNum + '"]');
-    if (reminderEl) {
-        reminderEl.remove();
-        updateReminderCount();
-    }
-}
-
-// ============================================================
-// UPDATE REMINDER COUNT
-// ============================================================
-
-function updateReminderCount() {
-    const remindersInContainer = document.querySelectorAll('#remindersContainer .reminder-input').length;
-    const countDisplay = document.querySelector('.reminder-count');
-    if (countDisplay) {
-        countDisplay.textContent = '(' + remindersInContainer + '/' + maxReminders + ')';
-    }
-}
-
-// ============================================================
-// STEP 2: REMINDERS FORM SUBMIT
-// ============================================================
-
-document.getElementById('remindersForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    // Find the submit button and disable it (prevent double-submit)
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Creating account...';
-    }
-    
-    try {
-        // Collect all reminders from the form
-        formData.reminders = [];
-        
-        const reminderInputs = document.querySelectorAll('#remindersContainer .reminder-input');
-        
-        reminderInputs.forEach(function(reminderEl) {
-            const num = reminderEl.dataset.reminder;
-            const name = document.getElementById('name' + num).value.trim();
-            const occasion = document.getElementById('occasion' + num).value;
-            const date = document.getElementById('date' + num).value;
-            const customOccasionEl = document.getElementById('customOccasion' + num);
-            const customOccasionName = customOccasionEl ? customOccasionEl.value.trim() : '';
-            
-            if (name && occasion && date) {
-                formData.reminders.push({
-                    personName: name,
-                    occasion: occasion === 'other' ? 'custom' : occasion,
-                    customOccasionName: occasion === 'other' ? customOccasionName : null,
-                    date: date,
-                    notes: ''
-                });
-            }
-        });
-        
-        if (formData.reminders.length === 0) {
-            alert('Please add at least one reminder.');
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Create My Account';
-            }
-            return;
-        }
-        
-        // Create the account
-        await createAccount();
-        
-    } catch (error) {
-        console.error('Submit error:', error);
-        alert('Error: ' + error.message);
-        
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Create My Account';
-        }
-    }
-});
-
-// ============================================================
-// CREATE ACCOUNT
-// ============================================================
-
-async function createAccount() {
-    try {
-        // Step 1: Create user in Firebase Auth
-        const userCredential = await firebase.auth().createUserWithEmailAndPassword(
-            formData.email,
-            formData.password
-        );
-        
-        const user = userCredential.user;
-        
-        // Step 2: Create user document in Firestore
-        await firebase.firestore().collection('users').doc(user.uid).set({
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            email: formData.email,
-            phone: formData.phone || '',
-            tier: 'free',
-            stripeCustomerId: null,
-            subscriptionId: null,
-            subscriptionStatus: null,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        
-        // Step 3: Create reminders in people/ collection (new structure)
-        for (let i = 0; i < formData.reminders.length; i++) {
-            const reminder = formData.reminders[i];
-            
-            // Create person document
-            const personRef = await firebase.firestore().collection('people').add({
-                userId: user.uid,
-                personName: reminder.personName,
-                relationship: null,
-                hasJustBecause: false,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            
-            // Create date-based reminder in subcollection
-            await firebase.firestore()
-                .collection('people')
-                .doc(personRef.id)
-                .collection('reminders')
-                .add({
-                    reminderType: 'date-based',
-                    occasion: reminder.occasion,
-                    customOccasionName: reminder.customOccasionName,
-                    date: reminder.date,
-                    notes: reminder.notes || '',
-                    giftPurchased: false,
-                    purchasedDate: null,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-        }
-        
-        // Step 4: Sync to Mailchimp (optional, don't block on failure)
-        try {
-            await syncToMailchimp(user.uid);
-        } catch (mailchimpError) {
-            console.error('Mailchimp sync error (non-blocking):', mailchimpError);
-        }
-        
-        // Step 5: Show success and redirect
-        showSuccess();
-        
-    } catch (error) {
-        console.error('Error creating account:', error);
-        
-        let userMessage = 'Error creating account. Please try again.';
-        
-        if (error.code === 'auth/email-already-in-use') {
-            userMessage = 'This email is already in use. Please sign in instead, or use a different email.';
-        } else if (error.code === 'auth/weak-password') {
-            userMessage = 'Password is too weak. Please use at least 6 characters.';
-        } else if (error.code === 'auth/invalid-email') {
-            userMessage = 'Please enter a valid email address.';
-        }
-        
-        alert(userMessage);
-        
-        // Re-enable submit button
-        const submitBtn = document.querySelector('#remindersForm button[type="submit"]');
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Create My Account';
-        }
-        
-        throw error;
-    }
-}
-
-// ============================================================
-// MAILCHIMP SYNC
-// ============================================================
-
-async function syncToMailchimp(userId) {
-    if (formData.reminders.length === 0) {
-        return;
-    }
-    
-    try {
-        await fetch('/.netlify/functions/mailchimp-sync-reminders', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email: formData.email,
-                firstName: formData.firstName,
-                lastName: formData.lastName,
-                phone: formData.phone,
-                reminders: formData.reminders
-            })
-        });
-    } catch (error) {
-        console.error('Mailchimp sync failed:', error);
-        // Don't throw - this shouldn't block signup
-    }
-}
-
-// ============================================================
-// SHOW SUCCESS
-// ============================================================
-
-function showSuccess() {
-    document.getElementById('step2').classList.add('hidden');
-    document.getElementById('successStep').classList.remove('hidden');
-    
-    // Update progress
-    document.querySelector('[data-step="2"]').classList.add('completed');
-    
-    // Auto-redirect to dashboard after 3 seconds
-    setTimeout(function() {
-        window.location.href = 'dashboard.html';
-    }, 3000);
-}
-
-// ============================================================
-// EXPOSE FUNCTIONS GLOBALLY (for inline onclick handlers)
-// ============================================================
-
-window.removeReminder = removeReminder;
-window.handleOccasionChange = handleOccasionChange;
+</body>
+</html>
