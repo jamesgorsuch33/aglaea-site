@@ -31,7 +31,7 @@ auth.onAuthStateChanged(function(user) {
     if (user) {
         currentUser = user;
         document.getElementById('userEmail').textContent = user.email;
-        document.getElementById('userName').textContent = user.displayName || user.email.split('@')[0];
+        document.getElementById('userName').textContent = user.email.split('@')[0];
         loadDashboard();
         setupEventListeners();
     } else {
@@ -49,6 +49,11 @@ async function loadUserData() {
         
         if (userData) {
             currentUserTier = userData.tier || 'free';
+            
+            // Update display name with first name
+            if (userData.firstName) {
+                document.getElementById('userName').textContent = userData.firstName;
+            }
         } else {
             await createOrUpdateUser(currentUser.uid, {
                 email: currentUser.email,
