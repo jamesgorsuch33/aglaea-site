@@ -679,24 +679,14 @@ async function handleEditReminder(e) {
         document.getElementById('editReminderId').value = reminderId;
         document.getElementById('editPersonId').value = personId;
         document.getElementById('editReminderType').value = reminder.reminderType;
-        document.getElementById('editName').value = person ? person.personName : '';
-
-// Set relationship
+        
+        // Set person display (read-only)
+const personName = person ? person.personName : '';
 const relationship = person && person.relationship ? person.relationship : '';
-const relationshipSelect = document.getElementById('editRelationship');
-const commonRelationships = ['Partner', 'Spouse', 'Mum', 'Dad', 'Sister', 'Brother', 'Daughter', 'Son', 'Grandmother', 'Grandfather', 'Aunt', 'Uncle', 'Cousin', 'Friend', 'Best Friend', 'Colleague', 'Boss', 'Neighbour'];
 
-if (commonRelationships.indexOf(relationship) !== -1) {
-    relationshipSelect.value = relationship;
-    document.getElementById('editCustomRelationship').classList.add('hidden');
-} else if (relationship) {
-    relationshipSelect.value = 'Other';
-    document.getElementById('editCustomRelationship').classList.remove('hidden');
-    document.getElementById('editCustomRelationshipName').value = relationship;
-} else {
-    relationshipSelect.value = '';
-    document.getElementById('editCustomRelationship').classList.add('hidden');
-}
+document.getElementById('editPersonDisplay').textContent = personName;
+document.getElementById('editRelationshipDisplay').textContent = relationship || '';
+document.getElementById('editRelationshipDisplay').style.display = relationship ? 'inline-block' : 'none';
         
         if (reminder.reminderType === 'date-based') {
             document.getElementById('editDateFields').classList.remove('hidden');
@@ -712,6 +702,7 @@ if (commonRelationships.indexOf(relationship) !== -1) {
             } else {
                 document.getElementById('editCustomOccasion').classList.add('hidden');
             }
+            
         } else if (reminder.reminderType === 'just-because') {
             document.getElementById('editDateFields').classList.add('hidden');
             document.getElementById('editJBFields').classList.remove('hidden');
