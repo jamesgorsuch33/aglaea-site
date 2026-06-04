@@ -1145,3 +1145,41 @@ form {
 .btn-icon.undo-purchase {
     color: var(--slate);
 }
+
+/* ============================================================
+   RELATIONSHIP TAG & PERSON ACTIONS
+   ============================================================ */
+
+.relationship-tag {
+    display: inline-block;
+    background: var(--cream);
+    color: var(--slate);
+    padding: 0.2rem 0.625rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-left: 0.5rem;
+    border: 1px solid var(--stone);
+    font-family: var(--font-body);
+}
+
+.person-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.btn-icon.add-reminder-to-person {
+    background: var(--gold);
+    color: white;
+    border-color: var(--gold);
+    font-size: 1.25rem;
+    font-weight: 300;
+    line-height: 1;
+}
+
+.btn-icon.add-reminder-to-person:hover {
+    background: #B8935A;
+    border-color: #B8935A;
+    transform: translateY(-1px);
+}
