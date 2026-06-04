@@ -748,17 +748,8 @@ async function handleEditSubmit(e) {
     const reminderId = document.getElementById('editReminderId').value;
     const personId = document.getElementById('editPersonId').value;
     const reminderType = document.getElementById('editReminderType').value;
-    const personName = document.getElementById('editName').value.trim();
-    
     try {
-        const relationshipValue = document.getElementById('editRelationship').value;
-        const customRelationship = document.getElementById('editCustomRelationshipName').value.trim();
-        const relationship = relationshipValue === 'Other' ? customRelationship : relationshipValue;
-
-        await updatePerson(personId, { 
-            personName: personName,
-            relationship: relationship
-    });
+    // Person info is NOT editable - skip updatePerson call
         
         if (reminderType === 'date-based') {
             const occasion = document.getElementById('editOccasion').value;
