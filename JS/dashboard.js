@@ -453,19 +453,6 @@ function setupEventListeners() {
             }
         });
     }
-
-    // Edit relationship change handler
-    const editRelationshipSelect = document.getElementById('editRelationship');
-    if (editRelationshipSelect) {
-        editRelationshipSelect.addEventListener('change', function(e) {
-            const customGroup = document.getElementById('editCustomRelationship');
-            if (e.target.value === 'Other') {
-                customGroup.classList.remove('hidden');
-            } else {
-                customGroup.classList.add('hidden');
-            }
-        });
-    }
     
     const nameInput = document.getElementById('newName');
     if (nameInput) {
