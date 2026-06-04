@@ -569,27 +569,41 @@ async function handleFormSubmit(e) {
         
         // Check if we're adding to an existing person (from + button)
         const existingPersonId = document.getElementById('newReminderForm').dataset.existingPersonId;
-        
-        let personId;
-        
-        if (existingPersonId) {
-            // Use the existing person
-            personId = existingPersonId;
-        } else {
-            // Check for smart match: same name + relationship
-            const existingPeople = await getPeopleForUser(currentUser.uid);
-            const match = existingPeople.find(function(p) {
-                return p.personName.toLowerCase() === personName.toLowerCase() && 
-                       (p.relationship || '').toLowerCase() === relationship.toLowerCase();
-            });
-            
-            if (match) {
-                personId = match.id;
-            } else {
-                // Create new person
-                personId = await createPerson(currentUser.uid, personName, relationship);
-            }
-        }
+
+let personId;
+
+// Always check for smart match by name + relationship
+const existingPeople = await getPeopleForUser(currentUser.uid);
+const match = existingPeople.find(function(p) {
+    return p.personName.toLowerCase() === personName.toLowerCase() && 
+           (p.relationship || '').toLowerCase() === relationship.toLowerCase();
+});
+
+if (match) {
+    // Found a person with matching name + relationship - use them
+    personId = match.id;
+} else if (existingPersonId) {
+    // + button was clicked but user changed name/relationship - check if changed
+    const originalPerson = existingPeople.find(function(p) { 
+        return p.id === existingPersonId; 
+    });
+    
+    const nameChanged = originalPerson && 
+        originalPerson.personName.toLowerCase() !== personName.toLowerCase();
+    const relationshipChanged = originalPerson && 
+        (originalPerson.relationship || '').toLowerCase() !== relationship.toLowerCase();
+    
+    if (nameChanged || relationshipChanged) {
+        // User modified the details - create a new person
+        personId = await createPerson(currentUser.uid, personName, relationship);
+    } else {
+        // Same name + relationship - use the existing person
+        personId = existingPersonId;
+    }
+} else {
+    // No + button used, no match - create new person
+    personId = await createPerson(currentUser.uid, personName, relationship);
+}
         
         if (enableJB && currentUserTier !== 'free') {
             await updatePerson(personId, { hasJustBecause: true });
