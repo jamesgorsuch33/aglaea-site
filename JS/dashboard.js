@@ -187,10 +187,15 @@ function renderPeopleList(peopleWithReminders) {
         
         // Render active card
         if (activeReminders.length > 0 || person.reminders.length === 0) {
+            const relationshipTag = person.relationship ? '<span class="relationship-tag">' + person.relationship + '</span>' : '';
+
             activeHtml += '<div class="person-card" data-person-id="' + person.id + '">';
             activeHtml += '<div class="person-header">';
-            activeHtml += '<h3>' + person.personName + ' ' + jbBadge + '</h3>';
+            activeHtml += '<h3>' + person.personName + ' ' + relationshipTag + ' ' + jbBadge + '</h3>';
+            activeHtml += '<div class="person-actions">';
+            activeHtml += '<button class="btn-icon add-reminder-to-person" data-person-id="' + person.id + '" data-person-name="' + person.personName + '" data-relationship="' + (person.relationship || '') + '" title="Add reminder for this person">+</button>';
             activeHtml += '<button class="btn-icon delete-person" data-person-id="' + person.id + '" title="Delete person">🗑️</button>';
+            activeHtml += '</div>';
             activeHtml += '</div>';
             
             if (activeReminders.length === 0) {
