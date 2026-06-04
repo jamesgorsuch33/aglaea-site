@@ -137,8 +137,41 @@
                 <!-- Person's Name -->
                 <div class="form-group">
                     <label for="newName">Person's Name</label>
-                    <input type="text" id="newName" placeholder="e.g. Mum, Sarah, Best Friend" required>
+                    <input type="text" id="newName" placeholder="e.g. Sarah, John, Emma" required>
                 </div>
+
+            <!-- Relationship -->
+            <div class="form-group">
+                <label for="newRelationship">Relationship</label>
+                <select id="newRelationship" required>
+                    <option value="">Select relationship...</option>
+                    <option value="Partner">Partner</option>
+                    <option value="Spouse">Spouse</option>
+                    <option value="Mum">Mum</option>
+                    <option value="Dad">Dad</option>
+                    <option value="Sister">Sister</option>
+                    <option value="Brother">Brother</option>
+                    <option value="Daughter">Daughter</option>
+                    <option value="Son">Son</option>
+                    <option value="Grandmother">Grandmother</option>
+                    <option value="Grandfather">Grandfather</option>
+                    <option value="Aunt">Aunt</option>
+                    <option value="Uncle">Uncle</option>
+                    <option value="Cousin">Cousin</option>
+                    <option value="Friend">Friend</option>
+                    <option value="Best Friend">Best Friend</option>
+                    <option value="Colleague">Colleague</option>
+                    <option value="Boss">Boss</option>
+                    <option value="Neighbour">Neighbour</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <!-- Custom Relationship (shown when Other selected) -->
+            <div id="newCustomRelationship" class="form-group hidden">
+                <label for="newCustomRelationshipName">Specify relationship</label>
+                <input type="text" id="newCustomRelationshipName" placeholder="e.g. Mentor, Godparent">
+            </div>
                 
                 <!-- Occasion -->
                 <div class="form-group">
@@ -348,11 +381,44 @@
                 <input type="hidden" id="editPersonId">
                 <input type="hidden" id="editReminderType">
                 
-                <!-- Person's Name (Read-only) -->
-                <div class="form-group">
-                    <label for="editName">Person's Name</label>
-                    <input type="text" id="editName" placeholder="e.g. Mum, Sarah" required>
-                </div>
+            <!-- Person's Name -->
+            <div class="form-group">
+                <label for="editName">Person's Name</label>
+                <input type="text" id="editName" required>
+            </div>
+
+            <!-- Relationship -->
+            <div class="form-group">
+                <label for="editRelationship">Relationship</label>
+                <select id="editRelationship" required>
+                    <option value="">Select relationship...</option>
+                    <option value="Partner">Partner</option>
+                    <option value="Spouse">Spouse</option>
+                    <option value="Mum">Mum</option>
+                    <option value="Dad">Dad</option>
+                    <option value="Sister">Sister</option>
+                    <option value="Brother">Brother</option>
+                    <option value="Daughter">Daughter</option>
+                    <option value="Son">Son</option>
+                    <option value="Grandmother">Grandmother</option>
+                    <option value="Grandfather">Grandfather</option>
+                    <option value="Aunt">Aunt</option>
+                    <option value="Uncle">Uncle</option>
+                    <option value="Cousin">Cousin</option>
+                    <option value="Friend">Friend</option>
+                    <option value="Best Friend">Best Friend</option>
+                    <option value="Colleague">Colleague</option>
+                    <option value="Boss">Boss</option>
+                    <option value="Neighbour">Neighbour</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <!-- Custom Relationship -->
+            <div id="editCustomRelationship" class="form-group hidden">
+                <label for="editCustomRelationshipName">Specify relationship</label>
+                <input type="text" id="editCustomRelationshipName">
+            </div>
                 
                 <!-- Date-based fields (hidden if Just Because) -->
                 <div id="editDateFields">
