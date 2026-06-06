@@ -369,15 +369,27 @@
     </div>
 
 <!-- Edit Reminder Modal -->
-    <!-- Person Info (Read-only display) -->
-<div class="form-group">
-    <label>Reminder for</label>
-    <div class="person-info-display">
-        <span id="editPersonDisplay" class="person-display-name"></span>
-        <span id="editRelationshipDisplay" class="person-display-relationship"></span>
-    </div>
-    <span class="form-helper">To change name or relationship, create a new recipient and delete this one</span>
-</div>
+    <div id="editReminderModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Reminder</h2>
+                <button class="modal-close" data-modal="editReminderModal">&times;</button>
+            </div>
+            
+            <form id="editReminderForm">
+                <input type="hidden" id="editReminderId">
+                <input type="hidden" id="editPersonId">
+                <input type="hidden" id="editReminderType">
+                
+            <!-- Person Info (Read-only display) -->
+            <div class="form-group">
+                <label>Reminder for</label>
+                <div class="person-info-display">
+                    <span id="editPersonDisplay" class="person-display-name"></span>
+                    <span id="editRelationshipDisplay" class="person-display-relationship"></span>
+                   </div>
+                <span class="form-helper">To change name or relationship, create a new recipient and delete this one</span>
+            </div>
                 
                 <!-- Date-based fields (hidden if Just Because) -->
                 <div id="editDateFields">
