@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Settings — Aglaea</title>
+    <meta name="description" content="Manage your Aglaea account settings.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/settings.css">
+</head>
+<body>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-content">
+            <a href="index.html" class="logo">AGLAEA</a>
+            <nav class="nav">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="products.html">Gifts</a>
+                <a href="upgrade.html">Upgrade</a>
+                <a href="settings.html" class="active" title="Settings">⚙️</a>
+                <button class="btn-nav" id="logoutBtn">Sign Out</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Settings Section -->
+    <section class="settings-section">
+        <div class="container">
+            
+            <div class="settings-header">
+                <h1>Account Settings</h1>
+                <p>Manage your profile, subscription, and account preferences</p>
+            </div>
+
+            <!-- Profile Information -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <h2>Profile Information</h2>
+                    <span class="settings-card-description">Update your personal details</span>
+                </div>
+                
+                <form id="profileForm" class="settings-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="settingsFirstName">First Name</label>
+                            <input type="text" id="settingsFirstName" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="settingsLastName">Last Name</label>
+                            <input type="text" id="settingsLastName" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="settingsEmail">Email Address</label>
+                        <input type="email" id="settingsEmail" required>
+                        <span class="form-helper">Your reminder notifications will be sent here</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="settingsPhone">Phone Number</label>
+                        <input type="tel" id="settingsPhone" placeholder="+44 7XXX XXXXXX">
+                        <span class="form-helper">For SMS reminders (Essential plan only)</span>
+                    </div>
+                    
+                    <div class="settings-actions">
+                        <button type="submit" class="btn btn-primary" id="saveProfileBtn">Save Changes</button>
+                        <span id="profileSuccess" class="success-message hidden">✓ Saved successfully</span>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Security -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <h2>Security</h2>
+                    <span class="settings-card-description">Update your password</span>
+                </div>
+                
+                <form id="passwordForm" class="settings-form">
+                    <div class="form-group">
+                        <label for="settingsNewPassword">New Password</label>
+                        <input type="password" id="settingsNewPassword" minlength="6" required>
+                        <span class="form-helper">Minimum 6 characters</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="settingsConfirmPassword">Confirm New Password</label>
+                        <input type="password" id="settingsConfirmPassword" minlength="6" required>
+                    </div>
+                    
+                    <div class="settings-actions">
+                        <button type="submit" class="btn btn-primary" id="updatePasswordBtn">Update Password</button>
+                        <span id="passwordSuccess" class="success-message hidden">✓ Password updated</span>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Subscription -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <h2>Subscription</h2>
+                    <span class="settings-card-description">Manage your plan and billing</span>
+                </div>
+                
+                <div id="subscriptionDetails" class="subscription-details">
+                    <div class="subscription-info-row">
+                        <span class="subscription-label">Current Plan</span>
+                        <span class="subscription-value" id="currentPlan">Loading...</span>
+                    </div>
+                    
+                    <div class="subscription-info-row" id="billingRow">
+                        <span class="subscription-label">Billing</span>
+                        <span class="subscription-value" id="billingAmount">-</span>
+                    </div>
+                    
+                    <div class="subscription-info-row" id="nextBillingRow">
+                        <span class="subscription-label">Next billing date</span>
+                        <span class="subscription-value" id="nextBillingDate">-</span>
+                    </div>
+                </div>
+                
+                <!-- Free user: Upgrade options -->
+                <div id="freeUserSection" class="hidden">
+                    <p class="settings-helper">Upgrade to Essential for unlimited reminders + Just Because moments</p>
+                    <div class="settings-actions">
+                        <a href="upgrade.html" class="btn btn-primary">Upgrade to Essential</a>
+                    </div>
+                </div>
+                
+                <!-- Essential user: Annual upgrade prompt + cancel -->
+                <div id="essentialUserSection" class="hidden">
+                    <div class="annual-upgrade-prompt">
+                        <span class="annual-prompt-icon">💡</span>
+                        <div class="annual-prompt-text">
+                            <strong>Save with annual billing</strong>
+                            <p>Switch to annual and save vs paying monthly</p>
+                        </div>
+                        <a href="upgrade.html" class="btn btn-outline btn-small">Switch to Annual</a>
+                    </div>
+                    
+                    <div class="settings-actions">
+                        <button type="button" class="btn btn-danger-outline" id="cancelSubscriptionBtn">Cancel Subscription</button>
+                    </div>
+                </div>
+                
+                <!-- Cancellation pending -->
+                <div id="cancellationPendingSection" class="hidden">
+                    <div class="cancellation-notice">
+                        <p><strong>Your subscription is set to cancel</strong></p>
+                        <p id="cancellationDate">Your Essential plan will end on -</p>
+                        <p>You'll keep access to all Essential features until then.</p>
+                    </div>
+                    
+                    <div class="settings-actions">
+                        <button type="button" class="btn btn-primary" id="reactivateSubscriptionBtn">Reactivate Subscription</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="settings-card danger-zone">
+                <div class="settings-card-header">
+                    <h2>⚠️ Danger Zone</h2>
+                    <span class="settings-card-description">Irreversible actions</span>
+                </div>
+                
+                <div class="danger-section">
+                    <div class="danger-content">
+                        <h3>Delete Account</h3>
+                        <p>This will permanently delete your account and all your reminders. This cannot be undone.</p>
+                    </div>
+                    
+                    <button type="button" class="btn btn-danger" id="deleteAccountBtn">Delete My Account</button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Cancel Subscription Confirmation Modal -->
+    <div id="cancelSubscriptionModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cancel Subscription?</h2>
+                <button class="modal-close" data-modal="cancelSubscriptionModal">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <p>Are you sure you want to cancel your Essential subscription?</p>
+                
+                <div class="cancellation-info">
+                    <p><strong>What happens when you cancel:</strong></p>
+                    <ul>
+                        <li>You'll keep Essential features until <span id="cancelEndDate">the end of your billing period</span></li>
+                        <li>After that, your account will downgrade to Free</li>
+                        <li>You'll be limited to 5 reminders</li>
+                        <li>Just Because reminders will be paused</li>
+                        <li>You can reactivate anytime before the cancellation date</li>
+                    </ul>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-close" data-modal="cancelSubscriptionModal">Keep Subscription</button>
+                    <button type="button" class="btn btn-danger" id="confirmCancelBtn">Yes, Cancel Subscription</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Confirmation Modal -->
+    <div id="deleteAccountModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚠️ Delete Account?</h2>
+                <button class="modal-close" data-modal="deleteAccountModal">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="danger-warning">
+                    <p><strong>This action is permanent and cannot be undone.</strong></p>
+                    <p>Deleting your account will:</p>
+                    <ul>
+                        <li>Permanently delete your profile</li>
+                        <li>Delete all your reminders and recipients</li>
+                        <li>Cancel any active subscription immediately</li>
+                        <li>Remove all your data from our systems</li>
+                    </ul>
+                </div>
+                
+                <div class="form-group">
+                    <label for="deleteConfirmInput">Type <strong>DELETE</strong> to confirm:</label>
+                    <input type="text" id="deleteConfirmInput" placeholder="Type DELETE">
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-close" data-modal="deleteAccountModal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn" disabled>Delete My Account Permanently</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { auth } from './js/firebase-config-v2.js';
+        import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        
+        window.firebaseAuth = auth;
+        
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = 'signin.html';
+            }
+        });
+        
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await signOut(auth);
+            window.location.href = 'index.html';
+        });
+    </script>
+    
+    <!-- Settings Logic -->
+    <script type="module" src="js/settings.js"></script>
+
+</body>
+</html>
