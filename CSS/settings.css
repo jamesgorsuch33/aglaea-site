@@ -484,3 +484,53 @@
         width: 100%;
     }
 }
+
+/* ============================================================
+   FORCE MODAL BUTTON STYLING (Override conflicts)
+   ============================================================ */
+
+#cancelSubscriptionModal .modal-actions .btn,
+#deleteAccountModal .modal-actions .btn {
+    padding: 0.875rem 1.75rem !important;
+    font-size: 0.938rem !important;
+    line-height: 1.2 !important;
+    height: auto !important;
+    min-width: 160px !important;
+    max-width: none !important;
+    border-radius: var(--radius-sm) !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+}
+
+#cancelSubscriptionModal .btn-secondary,
+#deleteAccountModal .btn-secondary {
+    background: white !important;
+    color: var(--charcoal) !important;
+    border: 1px solid var(--stone) !important;
+}
+
+#cancelSubscriptionModal .btn-secondary:hover,
+#deleteAccountModal .btn-secondary:hover {
+    background: var(--cream) !important;
+    border-color: var(--gold) !important;
+}
+
+#cancelSubscriptionModal .btn-danger,
+#deleteAccountModal .btn-danger {
+    background: #d4574c !important;
+    color: white !important;
+    border: 1px solid #d4574c !important;
+}
+
+#cancelSubscriptionModal .btn-danger:hover:not(:disabled),
+#deleteAccountModal .btn-danger:hover:not(:disabled) {
+    background: #b8463c !important;
+    border-color: #b8463c !important;
+}
