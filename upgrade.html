@@ -17,9 +17,13 @@
     
     <!-- Header -->
     <header class="header">
-        <div class="container header-content">
-            <a href="index.html" class="logo">AGLAEA</a>
-            <nav class="nav">
+    <div class="container header-content">
+        <a href="index.html" class="logo">AGLAEA</a>
+        
+        <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Open menu">☰</button>
+        
+        <nav class="nav" id="mainNav">
+            <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu">×</button>
                 <a href="dashboard.html">Dashboard</a>
                 <a href="products.html">Gifts</a>
                 <a href="upgrade.html">Upgrade</a>
@@ -27,6 +31,7 @@
                 <a href="signup.html" class="btn-nav">Get Started</a>
             </nav>
         </div>
+        <div class="mobile-menu-backdrop" id="mobileMenuBackdrop"></div>
     </header>
 
     <!-- Upgrade Section -->
@@ -260,6 +265,7 @@
     
     <!-- Upgrade Logic -->
     <script src="js/upgrade.js"></script>
+    <script src="js/mobile-menu.js"></script>
 
 </body>
 </html>
