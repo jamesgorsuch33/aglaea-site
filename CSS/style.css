@@ -1011,12 +1011,38 @@ h6 { font-size: 1rem; }
     display: none;
     background: transparent;
     border: none;
-    font-size: 1.75rem;
-    color: var(--charcoal);
     cursor: pointer;
     padding: 0.5rem;
     line-height: 1;
     transition: color 0.2s ease;
+    width: 44px;
+    height: 44px;
+    position: relative;
+    z-index: 1001;
+}
+
+/* CSS-drawn hamburger icon (more reliable than ☰ character) */
+.mobile-menu-toggle::before,
+.mobile-menu-toggle::after,
+.mobile-menu-toggle span {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--charcoal);
+    margin: 5px auto;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+}
+
+.mobile-menu-toggle span {
+    display: block;
+}
+
+.mobile-menu-toggle:hover::before,
+.mobile-menu-toggle:hover::after,
+.mobile-menu-toggle:hover span {
+    background: var(--gold);
 }
 
 .mobile-menu-toggle:hover {
