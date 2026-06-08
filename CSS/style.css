@@ -1191,13 +1191,19 @@ h6 { font-size: 1rem; }
 @media (max-width: 768px) {
     .mobile-menu-toggle {
         display: block !important;
-        background: rgba(0, 0, 0, 0.05) !important;
-        border-radius: 6px !important;
+        background: transparent !important;
     }
     
+    /* Make hamburger lines light cream/gold to match AGLAEA logo */
     .mobile-menu-toggle::before,
     .mobile-menu-toggle::after,
     .mobile-menu-toggle span {
-        background: #1a1a1a !important;
+        background: #d4b78f !important;
+    }
+    
+    .mobile-menu-toggle:hover::before,
+    .mobile-menu-toggle:hover::after,
+    .mobile-menu-toggle:hover span {
+        background: #ebd4a8 !important;
     }
 }
