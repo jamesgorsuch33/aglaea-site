@@ -1183,3 +1183,21 @@ h6 { font-size: 1rem; }
         overflow: hidden;
     }
 }
+
+/* ============================================================
+   FORCE HAMBURGER VISIBILITY (override conflicts)
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .mobile-menu-toggle {
+        display: block !important;
+        background: rgba(0, 0, 0, 0.05) !important;
+        border-radius: 6px !important;
+    }
+    
+    .mobile-menu-toggle::before,
+    .mobile-menu-toggle::after,
+    .mobile-menu-toggle span {
+        background: #1a1a1a !important;
+    }
+}
