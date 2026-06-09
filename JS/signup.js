@@ -79,11 +79,13 @@ document.getElementById('occasion1').addEventListener('change', function() {
 // ADD ANOTHER REMINDER BUTTON
 // ============================================================
 
-document.getElementById('addReminderBtn').addEventListener('click', function() {
-    if (reminderCount >= maxReminders) {
-        alert('You can add up to 5 reminders during signup. You can add more from your dashboard after signing up.');
-        return;
-    }
+const addReminderBtnEl = document.getElementById('addReminderBtn');
+if (addReminderBtnEl) {
+    addReminderBtnEl.addEventListener('click', function() {
+        if (reminderCount >= maxReminders) {
+            alert('You can add up to 5 reminders during signup. You can add more from your dashboard after signing up.');
+            return;
+        }
     
     reminderCount++;
     
