@@ -109,6 +109,39 @@
                                     <input type="text" id="name1" placeholder="e.g. Mum, Sarah, Best Friend" required>
                                 </div>
                                 
+                                <!-- Relationship -->
+                                <div class="form-group">
+                                    <label for="signupRelationship">Relationship</label>
+                                    <select id="signupRelationship" required>
+                                        <option value="">Select relationship...</option>
+                                        <option value="Partner">Partner</option>
+                                        <option value="Spouse">Spouse</option>
+                                        <option value="Mum">Mum</option>
+                                        <option value="Dad">Dad</option>
+                                        <option value="Sister">Sister</option>
+                                        <option value="Brother">Brother</option>
+                                        <option value="Daughter">Daughter</option>
+                                        <option value="Son">Son</option>
+                                        <option value="Grandmother">Grandmother</option>
+                                        <option value="Grandfather">Grandfather</option>
+                                        <option value="Aunt">Aunt</option>
+                                        <option value="Uncle">Uncle</option>
+                                        <option value="Cousin">Cousin</option>
+                                        <option value="Friend">Friend</option>
+                                        <option value="Best Friend">Best Friend</option>
+                                        <option value="Colleague">Colleague</option>
+                                        <option value="Boss">Boss</option>
+                                        <option value="Neighbour">Neighbour</option>
+                                        <option value="Other">Other</option>
+                                     </select>
+                                </div>
+
+                                <!-- Custom Relationship (shown when Other selected) -->
+                                <div id="signupCustomRelationship" class="form-group hidden">
+                                    <label for="signupCustomRelationshipName">Specify relationship</label>
+                                    <input type="text" id="signupCustomRelationshipName" placeholder="e.g. Mentor, Godparent">
+                                </div>
+                                
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label for="occasion1">Occasion</label>
