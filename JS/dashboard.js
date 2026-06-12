@@ -17,6 +17,17 @@ import {
     createOrUpdateUser
 } from './firebase-config-v2.js';
 
+import {
+    showFieldError,
+    clearFieldError,
+    clearAllErrors,
+    validateRequired,
+    validateFutureDate,
+    setButtonLoading,
+    resetButton,
+    setupFieldValidation
+} from './form-validation.js';
+
 // Get Firebase instances
 const auth = window.firebaseAuth;
 
@@ -441,6 +452,21 @@ function setupEventListeners() {
         });
     }
 
+    // Real-time validation for Add Reminder modal
+    setupFieldValidation('newName', function(value) {
+        return validateRequired(value, 'Name');
+    });
+
+    setupFieldValidation('newDate', function(value) {
+        return validateFutureDate(value, true);
+    });
+
+    // Real-time validation for Edit Reminder modal (date-based)
+    setupFieldValidation('editDate', function(value) {
+        if (!value) return { valid: false, message: 'Please select a date' };
+        return { valid: true, message: '' };
+    });
+
     // Relationship change handler
     const relationshipSelect = document.getElementById('newRelationship');
     if (relationshipSelect) {
@@ -532,6 +558,9 @@ function setupEventListeners() {
 async function handleFormSubmit(e) {
     e.preventDefault();
     
+    // Clear previous errors
+    clearAllErrors('newReminderForm');
+    
     const enableJB = document.getElementById('enableJustBecause').checked;
     
     if (enableJB && currentUserTier === 'free') {
@@ -539,58 +568,92 @@ async function handleFormSubmit(e) {
         return;
     }
     
-    const submitBtn = document.getElementById('submitReminderBtn');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Adding...';
+    // Get all values for validation
+    const personName = document.getElementById('newName').value.trim();
+    const relationshipValue = document.getElementById('newRelationship').value;
+    const customRelationship = document.getElementById('newCustomRelationshipName').value.trim();
+    const relationship = relationshipValue === 'Other' ? customRelationship : relationshipValue;
+    
+    const occasion = document.getElementById('newOccasion').value;
+    const customOccasionName = document.getElementById('newCustomOccasionName').value.trim();
+    const occasionDate = document.getElementById('newDate').value;
+    const notes = document.getElementById('newNotes').value.trim();
+    
+    // Validate
+    let hasErrors = false;
+    
+    const nameCheck = validateRequired(personName, 'Name');
+    if (!nameCheck.valid) {
+        showFieldError('newName', nameCheck.message);
+        hasErrors = true;
+    }
+    
+    if (!relationshipValue) {
+        showFieldError('newRelationship', 'Please select a relationship');
+        hasErrors = true;
+    } else if (relationshipValue === 'Other' && !customRelationship) {
+        showFieldError('newCustomRelationshipName', 'Please specify the relationship');
+        hasErrors = true;
+    }
+    
+    if (!occasion) {
+        showFieldError('newOccasion', 'Please select an occasion');
+        hasErrors = true;
+    } else if (occasion === 'custom' && !customOccasionName) {
+        showFieldError('newCustomOccasionName', 'Please specify the occasion');
+        hasErrors = true;
+    }
+    
+    const dateCheck = validateFutureDate(occasionDate, true);
+    if (!dateCheck.valid) {
+        showFieldError('newDate', dateCheck.message);
+        hasErrors = true;
+    }
+    
+    if (hasErrors) {
+        // Focus first error field
+        const firstError = document.querySelector('#newReminderForm .field-error');
+        if (firstError) {
+            firstError.focus();
+        }
+        return;
+    }
+    
+    // Set loading state
+    setButtonLoading('submitReminderBtn', 'Adding...');
     
     try {
-        const personName = document.getElementById('newName').value.trim();
-        const relationshipValue = document.getElementById('newRelationship').value;
-        const customRelationship = document.getElementById('newCustomRelationshipName').value.trim();
-        const relationship = relationshipValue === 'Other' ? customRelationship : relationshipValue;
-        
-        const occasion = document.getElementById('newOccasion').value;
-        const customOccasionName = document.getElementById('newCustomOccasionName').value.trim();
-        const occasionDate = document.getElementById('newDate').value;
-        const notes = document.getElementById('newNotes').value.trim();
-        
-        // Check if we're adding to an existing person (from + button)
         const existingPersonId = document.getElementById('newReminderForm').dataset.existingPersonId;
-
-let personId;
-
-// Always check for smart match by name + relationship
-const existingPeople = await getPeopleForUser(currentUser.uid);
-const match = existingPeople.find(function(p) {
-    return p.personName.toLowerCase() === personName.toLowerCase() && 
-           (p.relationship || '').toLowerCase() === relationship.toLowerCase();
-});
-
-if (match) {
-    // Found a person with matching name + relationship - use them
-    personId = match.id;
-} else if (existingPersonId) {
-    // + button was clicked but user changed name/relationship - check if changed
-    const originalPerson = existingPeople.find(function(p) { 
-        return p.id === existingPersonId; 
-    });
-    
-    const nameChanged = originalPerson && 
-        originalPerson.personName.toLowerCase() !== personName.toLowerCase();
-    const relationshipChanged = originalPerson && 
-        (originalPerson.relationship || '').toLowerCase() !== relationship.toLowerCase();
-    
-    if (nameChanged || relationshipChanged) {
-        // User modified the details - create a new person
-        personId = await createPerson(currentUser.uid, personName, relationship);
-    } else {
-        // Same name + relationship - use the existing person
-        personId = existingPersonId;
-    }
-} else {
-    // No + button used, no match - create new person
-    personId = await createPerson(currentUser.uid, personName, relationship);
-}
+        
+        let personId;
+        
+        // Smart matching logic
+        const existingPeople = await getPeopleForUser(currentUser.uid);
+        const match = existingPeople.find(function(p) {
+            return p.personName.toLowerCase() === personName.toLowerCase() && 
+                   (p.relationship || '').toLowerCase() === relationship.toLowerCase();
+        });
+        
+        if (match) {
+            personId = match.id;
+        } else if (existingPersonId) {
+            const originalPerson = existingPeople.find(function(p) { 
+                return p.id === existingPersonId; 
+            });
+            
+            const nameChanged = originalPerson && 
+                originalPerson.personName.toLowerCase() !== personName.toLowerCase();
+            const relationshipChanged = originalPerson && 
+                (originalPerson.relationship || '').toLowerCase() !== relationship.toLowerCase();
+            
+            if (nameChanged || relationshipChanged) {
+                personId = await createPerson(currentUser.uid, personName, relationship);
+            } else {
+                personId = existingPersonId;
+            }
+        } else {
+            personId = await createPerson(currentUser.uid, personName, relationship);
+        }
         
         if (enableJB && currentUserTier !== 'free') {
             await updatePerson(personId, { hasJustBecause: true });
@@ -638,8 +701,7 @@ if (match) {
         console.error('Error adding reminder:', error);
         alert('Error adding reminder. Please try again.');
     } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Add Reminder';
+        resetButton('submitReminderBtn');
     }
 }
 
@@ -647,60 +709,81 @@ if (match) {
 // HANDLE EDIT REMINDER
 // ============================================================
 
-async function handleEditReminder(e) {
-    const personId = e.target.dataset.personId;
-    const reminderId = e.target.dataset.reminderId;
+async function handleEditSubmit(e) {
+    e.preventDefault();
+    
+    // Clear previous errors
+    clearAllErrors('editReminderForm');
+    
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const btnId = submitBtn.id || 'editSaveBtn';
+    if (!submitBtn.id) submitBtn.id = btnId;
+    
+    const reminderId = document.getElementById('editReminderId').value;
+    const personId = document.getElementById('editPersonId').value;
+    const reminderType = document.getElementById('editReminderType').value;
+    
+    let hasErrors = false;
+    
+    if (reminderType === 'date-based') {
+        const editDate = document.getElementById('editDate').value;
+        
+        if (!editDate) {
+            showFieldError('editDate', 'Please select a date');
+            hasErrors = true;
+        }
+        
+        const occasion = document.getElementById('editOccasion').value;
+        const customOccasionName = document.getElementById('editCustomOccasionName').value.trim();
+        
+        if (occasion === 'custom' && !customOccasionName) {
+            showFieldError('editCustomOccasionName', 'Please specify the occasion');
+            hasErrors = true;
+        }
+    }
+    
+    if (hasErrors) {
+        const firstError = document.querySelector('#editReminderForm .field-error');
+        if (firstError) {
+            firstError.focus();
+        }
+        return;
+    }
+    
+    setButtonLoading(btnId, 'Saving...');
     
     try {
-        const reminders = await getRemindersForPerson(personId);
-        const reminder = reminders.find(function(r) { return r.id === reminderId; });
+        // Person info is NOT editable - skip updatePerson call
         
-        if (!reminder) {
-            alert('Reminder not found');
-            return;
+        if (reminderType === 'date-based') {
+            const occasion = document.getElementById('editOccasion').value;
+            const customOccasionName = document.getElementById('editCustomOccasionName').value.trim();
+            const date = document.getElementById('editDate').value;
+            const notes = document.getElementById('editNotes').value.trim();
+            
+            await updateDateBasedReminder(personId, reminderId, {
+                occasion: occasion,
+                customOccasionName: occasion === 'custom' ? customOccasionName : null,
+                date: date,
+                notes: notes
+            });
+            
+        } else if (reminderType === 'just-because') {
+            const frequency = document.getElementById('editJBFrequency').value;
+            
+            await updateJustBecauseReminder(personId, reminderId, {
+                frequency: frequency
+            });
         }
         
-        const people = await getPeopleForUser(currentUser.uid);
-        const person = people.find(function(p) { return p.id === personId; });
-        
-        document.getElementById('editReminderId').value = reminderId;
-        document.getElementById('editPersonId').value = personId;
-        document.getElementById('editReminderType').value = reminder.reminderType;
-        
-        // Set person display (read-only)
-const personName = person ? person.personName : '';
-const relationship = person && person.relationship ? person.relationship : '';
-
-document.getElementById('editPersonDisplay').textContent = personName;
-document.getElementById('editRelationshipDisplay').textContent = relationship || '';
-document.getElementById('editRelationshipDisplay').style.display = relationship ? 'inline-block' : 'none';
-        
-        if (reminder.reminderType === 'date-based') {
-            document.getElementById('editDateFields').classList.remove('hidden');
-            document.getElementById('editJBFields').classList.add('hidden');
-            
-            document.getElementById('editOccasion').value = reminder.occasion || 'birthday';
-            document.getElementById('editDate').value = reminder.date || '';
-            document.getElementById('editNotes').value = reminder.notes || '';
-            
-            if (reminder.occasion === 'custom') {
-                document.getElementById('editCustomOccasion').classList.remove('hidden');
-                document.getElementById('editCustomOccasionName').value = reminder.customOccasionName || '';
-            } else {
-                document.getElementById('editCustomOccasion').classList.add('hidden');
-            }
-            
-        } else if (reminder.reminderType === 'just-because') {
-            document.getElementById('editDateFields').classList.add('hidden');
-            document.getElementById('editJBFields').classList.remove('hidden');
-            document.getElementById('editJBFrequency').value = reminder.frequency || 'every_6_weeks';
-        }
-        
-        document.getElementById('editReminderModal').classList.remove('hidden');
+        document.getElementById('editReminderModal').classList.add('hidden');
+        loadDashboard();
         
     } catch (error) {
-        console.error('Error loading reminder for edit:', error);
-        alert('Error loading reminder. Please try again.');
+        console.error('Error updating reminder:', error);
+        alert('Error updating reminder. Please try again.');
+    } finally {
+        resetButton(btnId);
     }
 }
 
