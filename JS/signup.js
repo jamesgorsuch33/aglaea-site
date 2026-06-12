@@ -1,7 +1,6 @@
 // ============================================================
 // SIGNUP FLOW - Two Step Process
-// Step 1: Account Details
-// Step 2: First Reminder
+// Matches signup.html actual structure
 // ============================================================
 
 import { auth } from './firebase-config-v2.js';
@@ -20,71 +19,68 @@ import {
 // STEP NAVIGATION
 // ============================================================
 
-let currentStep = 1;
-
 function showStep(step) {
-    document.getElementById('step1').classList.toggle('hidden', step !== 1);
-    document.getElementById('step2').classList.toggle('hidden', step !== 2);
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const successStep = document.getElementById('successStep');
     
-    // Update progress indicator if present
-    const progress1 = document.getElementById('progress1');
-    const progress2 = document.getElementById('progress2');
+    if (step1) step1.classList.toggle('hidden', step !== 1);
+    if (step2) step2.classList.toggle('hidden', step !== 2);
+    if (successStep) successStep.classList.add('hidden');
     
-    if (progress1) {
-        progress1.classList.toggle('active', step === 1);
-        progress1.classList.toggle('completed', step > 1);
-    }
-    if (progress2) {
-        progress2.classList.toggle('active', step === 2);
-    }
+    // Update progress indicator
+    const progressSteps = document.querySelectorAll('.progress-step');
+    progressSteps.forEach(function(progressStep) {
+        const stepNum = parseInt(progressStep.dataset.step);
+        progressStep.classList.toggle('active', stepNum === step);
+        progressStep.classList.toggle('completed', stepNum < step);
+    });
     
-    currentStep = step;
     window.scrollTo(0, 0);
 }
 
 // ============================================================
-// STEP 1 - ACCOUNT DETAILS
+// STEP 1 - ACCOUNT DETAILS FORM
 // ============================================================
 
-document.getElementById('step1Form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const firstName = document.getElementById('signupFirstName').value.trim();
-    const lastName = document.getElementById('signupLastName').value.trim();
-    const email = document.getElementById('signupEmail').value.trim();
-    const password = document.getElementById('signupPassword').value;
-    const confirmPassword = document.getElementById('signupConfirmPassword').value;
-    
-    // Validation
-    if (!firstName || !lastName || !email || !password) {
-        alert('Please fill in all required fields.');
-        return;
-    }
-    
-    if (password.length < 6) {
-        alert('Password must be at least 6 characters.');
-        return;
-    }
-    
-    if (password !== confirmPassword) {
-        alert('Passwords do not match.');
-        return;
-    }
-    
-    // Store data in form for Step 2 to use
-    window.signupData = {
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        password: password
-    };
-    
-    // Move to Step 2
-    showStep(2);
-});
+const accountForm = document.getElementById('accountForm');
+if (accountForm) {
+    accountForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const phone = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
+        
+        // Validation
+        if (!firstName || !lastName || !email || !password) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+        
+        if (password.length < 6) {
+            alert('Password must be at least 6 characters.');
+            return;
+        }
+        
+        // Store data for Step 2
+        window.signupData = {
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            password: password,
+            phone: phone
+        };
+        
+        // Move to Step 2
+        showStep(2);
+    });
+}
 
 // ============================================================
-// STEP 2 - RELATIONSHIP DROPDOWN HANDLER
+// RELATIONSHIP DROPDOWN HANDLER
 // ============================================================
 
 const relationshipSelect = document.getElementById('signupRelationship');
@@ -102,18 +98,20 @@ if (relationshipSelect) {
 }
 
 // ============================================================
-// STEP 2 - OCCASION DROPDOWN HANDLER (for custom occasion)
+// OCCASION DROPDOWN HANDLER (custom occasion)
 // ============================================================
 
-const occasionSelect = document.getElementById('signupOccasion');
+const occasionSelect = document.getElementById('occasion1');
 if (occasionSelect) {
     occasionSelect.addEventListener('change', function(e) {
-        const customGroup = document.getElementById('signupCustomOccasion');
-        if (customGroup) {
-            if (e.target.value === 'custom') {
-                customGroup.classList.remove('hidden');
+        const customInput = document.getElementById('customOccasion1');
+        if (customInput) {
+            if (e.target.value === 'other') {
+                customInput.classList.remove('hidden');
+                customInput.required = true;
             } else {
-                customGroup.classList.add('hidden');
+                customInput.classList.add('hidden');
+                customInput.required = false;
             }
         }
     });
@@ -123,139 +121,135 @@ if (occasionSelect) {
 // STEP 2 - CREATE ACCOUNT + FIRST REMINDER
 // ============================================================
 
-document.getElementById('step2Form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const submitBtn = document.getElementById('createAccountBtn');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Creating your account...';
-    
-    try {
-        // Get reminder details
-        const personName = document.getElementById('signupName').value.trim();
-        const relationshipValue = relationshipSelect ? relationshipSelect.value : '';
-        const customRelationship = document.getElementById('signupCustomRelationshipName') 
-            ? document.getElementById('signupCustomRelationshipName').value.trim() 
-            : '';
-        const relationship = relationshipValue === 'Other' ? customRelationship : relationshipValue;
+const remindersForm = document.getElementById('remindersForm');
+if (remindersForm) {
+    remindersForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
         
-        const occasion = document.getElementById('signupOccasion').value;
-        const customOccasionName = document.getElementById('signupCustomOccasionName')
-            ? document.getElementById('signupCustomOccasionName').value.trim()
-            : '';
-        const occasionDate = document.getElementById('signupDate').value;
-        const notes = document.getElementById('signupNotes') 
-            ? document.getElementById('signupNotes').value.trim() 
-            : '';
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Creating your account...';
         
-        // Validate
-        if (!personName || !occasion || !occasionDate) {
-            alert('Please fill in all required fields.');
+        try {
+            // Get reminder details
+            const personName = document.getElementById('name1').value.trim();
+            const relationshipValue = relationshipSelect ? relationshipSelect.value : '';
+            const customRelationshipInput = document.getElementById('signupCustomRelationshipName');
+            const customRelationship = customRelationshipInput ? customRelationshipInput.value.trim() : '';
+            const relationship = relationshipValue === 'Other' ? customRelationship : relationshipValue;
+            
+            const occasion = document.getElementById('occasion1').value;
+            const customOccasionInput = document.getElementById('customOccasion1');
+            const customOccasionName = customOccasionInput ? customOccasionInput.value.trim() : '';
+            const occasionDate = document.getElementById('date1').value;
+            
+            // Validate
+            if (!personName || !occasion || !occasionDate) {
+                alert('Please fill in all required fields.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+                return;
+            }
+            
+            if (!relationship) {
+                alert('Please select a relationship.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+                return;
+            }
+            
+            if (occasion === 'other' && !customOccasionName) {
+                alert('Please specify the occasion name.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+                return;
+            }
+            
+            // Get account data from Step 1
+            const accountData = window.signupData;
+            
+            if (!accountData) {
+                alert('Account details missing. Please go back to Step 1.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+                showStep(1);
+                return;
+            }
+            
+            // Step A: Create Firebase Auth user
+            const userCredential = await createUserWithEmailAndPassword(
+                auth, 
+                accountData.email, 
+                accountData.password
+            );
+            const user = userCredential.user;
+            
+            // Step B: Update display name in Auth
+            await updateProfile(user, {
+                displayName: accountData.firstName + ' ' + accountData.lastName
+            });
+            
+            // Step C: Create user document in Firestore
+            await createOrUpdateUser(user.uid, {
+                firstName: accountData.firstName,
+                lastName: accountData.lastName,
+                email: accountData.email,
+                phone: accountData.phone || '',
+                tier: 'free',
+                createdAt: new Date().toISOString()
+            });
+            
+            // Step D: Create the person (recipient)
+            const personId = await createPerson(user.uid, personName, relationship);
+            
+            // Step E: Create the date-based reminder
+            // Map 'other' occasion to 'custom' for consistency with dashboard
+            const occasionType = occasion === 'other' ? 'custom' : occasion;
+            
+            await createDateBasedReminder(personId, {
+                occasion: occasionType,
+                customOccasionName: occasion === 'other' ? customOccasionName : null,
+                date: occasionDate,
+                notes: ''
+            });
+            
+            // Success! Redirect to dashboard
+            window.location.href = 'dashboard.html';
+            
+        } catch (error) {
+            console.error('Signup error:', error);
+            
+            let message = 'Error creating account. Please try again.';
+            
+            if (error.code === 'auth/email-already-in-use') {
+                message = 'An account with this email already exists. Please sign in instead.';
+                showStep(1);
+            } else if (error.code === 'auth/invalid-email') {
+                message = 'Please enter a valid email address.';
+                showStep(1);
+            } else if (error.code === 'auth/weak-password') {
+                message = 'Password is too weak. Please use at least 6 characters.';
+                showStep(1);
+            } else if (error.code === 'auth/network-request-failed') {
+                message = 'Network error. Please check your connection and try again.';
+            }
+            
+            alert(message);
+            
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Create My Account';
-            return;
+            submitBtn.textContent = originalBtnText;
         }
-        
-        if (!relationship) {
-            alert('Please select a relationship.');
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Create My Account';
-            return;
-        }
-        
-        if (occasion === 'custom' && !customOccasionName) {
-            alert('Please specify the custom occasion name.');
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Create My Account';
-            return;
-        }
-        
-        // Get account data from Step 1
-        const accountData = window.signupData;
-        
-        if (!accountData) {
-            alert('Account details missing. Please go back to Step 1.');
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Create My Account';
-            showStep(1);
-            return;
-        }
-        
-        // Step A: Create Firebase Auth user
-        const userCredential = await createUserWithEmailAndPassword(
-            auth, 
-            accountData.email, 
-            accountData.password
-        );
-        const user = userCredential.user;
-        
-        // Step B: Update display name in Auth
-        await updateProfile(user, {
-            displayName: accountData.firstName + ' ' + accountData.lastName
-        });
-        
-        // Step C: Create user document in Firestore
-        await createOrUpdateUser(user.uid, {
-            firstName: accountData.firstName,
-            lastName: accountData.lastName,
-            email: accountData.email,
-            tier: 'free',
-            createdAt: new Date().toISOString()
-        });
-        
-        // Step D: Create the person (recipient)
-        const personId = await createPerson(user.uid, personName, relationship);
-        
-        // Step E: Create the date-based reminder
-        await createDateBasedReminder(personId, {
-            occasion: occasion,
-            customOccasionName: occasion === 'custom' ? customOccasionName : null,
-            date: occasionDate,
-            notes: notes
-        });
-        
-        // Success! Redirect to dashboard
-        window.location.href = 'dashboard.html';
-        
-    } catch (error) {
-        console.error('Signup error:', error);
-        
-        let message = 'Error creating account. Please try again.';
-        
-        if (error.code === 'auth/email-already-in-use') {
-            message = 'An account with this email already exists. Please sign in instead.';
-            showStep(1);
-        } else if (error.code === 'auth/invalid-email') {
-            message = 'Please enter a valid email address.';
-            showStep(1);
-        } else if (error.code === 'auth/weak-password') {
-            message = 'Password is too weak. Please use at least 6 characters.';
-            showStep(1);
-        } else if (error.code === 'auth/network-request-failed') {
-            message = 'Network error. Please check your connection and try again.';
-        }
-        
-        alert(message);
-        
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Create My Account';
-    }
-});
+    });
+}
 
 // ============================================================
 // BACK BUTTON (Step 2 to Step 1)
 // ============================================================
 
-const backBtn = document.getElementById('backToStep1');
+const backBtn = document.getElementById('backBtn');
 if (backBtn) {
     backBtn.addEventListener('click', function() {
         showStep(1);
     });
 }
-
-// ============================================================
-// INITIALIZE
-// ============================================================
-
-// Start at step 1
-showStep(1);
