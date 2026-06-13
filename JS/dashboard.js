@@ -809,48 +809,6 @@ function handleAddReminderToPerson(e) {
 }
 
 // ============================================================
-// HANDLE EDIT SUBMIT
-// ============================================================
-
-async function handleEditSubmit(e) {
-    e.preventDefault();
-    
-    const reminderId = document.getElementById('editReminderId').value;
-    const personId = document.getElementById('editPersonId').value;
-    const reminderType = document.getElementById('editReminderType').value;
-    try {
-    // Person info is NOT editable - skip updatePerson call
-        
-        if (reminderType === 'date-based') {
-            const occasion = document.getElementById('editOccasion').value;
-            const customOccasionName = document.getElementById('editCustomOccasionName').value.trim();
-            const date = document.getElementById('editDate').value;
-            const notes = document.getElementById('editNotes').value.trim();
-            
-            await updateReminder(personId, reminderId, {
-                occasion: occasion,
-                customOccasionName: occasion === 'custom' ? customOccasionName : null,
-                date: date,
-                notes: notes
-            });
-        } else if (reminderType === 'just-because') {
-            const frequency = document.getElementById('editJBFrequency').value;
-            
-            await updateReminder(personId, reminderId, {
-                frequency: frequency
-            });
-        }
-        
-        document.getElementById('editReminderModal').classList.add('hidden');
-        loadDashboard();
-        
-    } catch (error) {
-        console.error('Error updating reminder:', error);
-        alert('Error updating reminder. Please try again.');
-    }
-}
-
-// ============================================================
 // HANDLE DELETE PERSON
 // ============================================================
 
