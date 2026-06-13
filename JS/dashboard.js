@@ -760,18 +760,18 @@ async function handleEditSubmit(e) {
             const customOccasionName = document.getElementById('editCustomOccasionName').value.trim();
             const date = document.getElementById('editDate').value;
             const notes = document.getElementById('editNotes').value.trim();
-            
-            await updateDateBasedReminder(personId, reminderId, {
+    
+            await updateReminder(personId, reminderId, {
                 occasion: occasion,
                 customOccasionName: occasion === 'custom' ? customOccasionName : null,
                 date: date,
                 notes: notes
             });
-            
+    
         } else if (reminderType === 'just-because') {
             const frequency = document.getElementById('editJBFrequency').value;
-            
-            await updateJustBecauseReminder(personId, reminderId, {
+    
+            await updateReminder(personId, reminderId, {
                 frequency: frequency
             });
         }
