@@ -706,7 +706,82 @@ async function handleFormSubmit(e) {
 }
 
 // ============================================================
-// HANDLE EDIT REMINDER
+// HANDLE EDIT REMINDER (Opens edit modal with current data)
+// ============================================================
+
+async function handleEditReminder(e) {
+    const reminderId = e.target.dataset.reminderId;
+    const personId = e.target.dataset.personId;
+    
+    try {
+        // Get person and reminder data
+        const people = await getPeopleForUser(currentUser.uid);
+        const person = people.find(function(p) { return p.id === personId; });
+        
+        const reminders = await getRemindersForPerson(personId);
+        const reminder = reminders.find(function(r) { return r.id === reminderId; });
+        
+        if (!reminder) {
+            alert('Reminder not found');
+            return;
+        }
+        
+        const reminderType = reminder.reminderType;
+        
+        // Set hidden inputs
+        document.getElementById('editReminderId').value = reminderId;
+        document.getElementById('editPersonId').value = personId;
+        document.getElementById('editReminderType').value = reminderType;
+        
+        // Set person display (read-only)
+        const personName = person ? person.personName : '';
+        const relationship = person && person.relationship ? person.relationship : '';
+        
+        document.getElementById('editPersonDisplay').textContent = personName;
+        document.getElementById('editRelationshipDisplay').textContent = relationship || '';
+        document.getElementById('editRelationshipDisplay').style.display = relationship ? 'inline-block' : 'none';
+        
+        // Show appropriate fields based on type
+        const dateFields = document.getElementById('editDateFields');
+        const jbFields = document.getElementById('editJBFields');
+        
+        if (reminderType === 'date-based') {
+            dateFields.classList.remove('hidden');
+            jbFields.classList.add('hidden');
+            
+            document.getElementById('editOccasion').value = reminder.occasion || 'birthday';
+            
+            if (reminder.occasion === 'custom' && reminder.customOccasionName) {
+                document.getElementById('editCustomOccasion').classList.remove('hidden');
+                document.getElementById('editCustomOccasionName').value = reminder.customOccasionName;
+            } else {
+                document.getElementById('editCustomOccasion').classList.add('hidden');
+            }
+            
+            if (reminder.date) {
+                document.getElementById('editDate').value = reminder.date;
+            }
+            
+            document.getElementById('editNotes').value = reminder.notes || '';
+            
+        } else if (reminderType === 'just-because') {
+            dateFields.classList.add('hidden');
+            jbFields.classList.remove('hidden');
+            
+            document.getElementById('editJBFrequency').value = reminder.frequency || 'every_6_weeks';
+        }
+        
+        // Show the modal
+        document.getElementById('editReminderModal').classList.remove('hidden');
+        
+    } catch (error) {
+        console.error('Error loading reminder for edit:', error);
+        alert('Error loading reminder. Please try again.');
+    }
+}
+
+// ============================================================
+// HANDLE EDIT SUBMIT (Saves changes from edit modal)
 // ============================================================
 
 async function handleEditSubmit(e) {
@@ -753,8 +828,6 @@ async function handleEditSubmit(e) {
     setButtonLoading(btnId, 'Saving...');
     
     try {
-        // Person info is NOT editable - skip updatePerson call
-        
         if (reminderType === 'date-based') {
             const occasion = document.getElementById('editOccasion').value;
             const customOccasionName = document.getElementById('editCustomOccasionName').value.trim();
