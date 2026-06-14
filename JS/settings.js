@@ -1,5 +1,5 @@
 // ============================================================
-// SETTINGS PAGE LOGIC
+// SETTINGS PAGE LOGIC - With Inline Validation + Loading States
 // Profile, Security, Subscription, Account Deletion
 // ============================================================
 
@@ -18,6 +18,21 @@ import {
     reauthenticateWithCredential
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
+import {
+    showFieldError,
+    clearFieldError,
+    clearAllErrors,
+    validateEmail,
+    validatePassword,
+    validateRequired,
+    validatePhone,
+    setButtonLoading,
+    resetButton,
+    setupFieldValidation,
+    setupPasswordMatchValidation,
+    showSuccess
+} from './form-validation.js';
+
 const auth = window.firebaseAuth;
 
 let currentUser = null;
@@ -32,6 +47,7 @@ auth.onAuthStateChanged(async function(user) {
         currentUser = user;
         await loadUserData();
         setupEventListeners();
+        setupValidation();
     } else {
         window.location.href = 'signin.html';
     }
@@ -73,13 +89,11 @@ function displaySubscriptionDetails() {
     const tier = currentUserData.tier || 'free';
     const subscriptionStatus = currentUserData.subscriptionStatus || null;
     
-    // Hide all sections first
     document.getElementById('freeUserSection').classList.add('hidden');
     document.getElementById('essentialUserSection').classList.add('hidden');
     document.getElementById('cancellationPendingSection').classList.add('hidden');
     
     if (tier === 'free') {
-        // Show free user upgrade options
         document.getElementById('currentPlan').textContent = 'Free';
         document.getElementById('billingRow').classList.add('hidden');
         document.getElementById('nextBillingRow').classList.add('hidden');
@@ -91,7 +105,6 @@ function displaySubscriptionDetails() {
         document.getElementById('nextBillingRow').classList.remove('hidden');
         document.getElementById('billingAmount').textContent = '£4.99/month';
         
-        // Check if cancellation is pending
         if (subscriptionStatus === 'cancelling' && currentUserData.cancellationDate) {
             const cancelDate = new Date(currentUserData.cancellationDate);
             const cancelDateStr = cancelDate.toLocaleDateString('en-GB', { 
@@ -105,7 +118,6 @@ function displaySubscriptionDetails() {
                 'Your Essential plan will end on ' + cancelDateStr;
             document.getElementById('cancellationPendingSection').classList.remove('hidden');
         } else {
-            // Active subscription
             if (currentUserData.nextBillingDate) {
                 const nextDate = new Date(currentUserData.nextBillingDate);
                 document.getElementById('nextBillingDate').textContent = 
@@ -120,6 +132,37 @@ function displaySubscriptionDetails() {
             document.getElementById('essentialUserSection').classList.remove('hidden');
         }
     }
+}
+
+// ============================================================
+// SETUP REAL-TIME VALIDATION
+// ============================================================
+
+function setupValidation() {
+    // Profile form validation
+    setupFieldValidation('settingsFirstName', function(value) {
+        return validateRequired(value, 'First name');
+    });
+    
+    setupFieldValidation('settingsLastName', function(value) {
+        return validateRequired(value, 'Last name');
+    });
+    
+    setupFieldValidation('settingsEmail', function(value) {
+        return validateEmail(value);
+    });
+    
+    setupFieldValidation('settingsPhone', function(value) {
+        return validatePhone(value);
+    });
+    
+    // Password form validation
+    setupFieldValidation('settingsNewPassword', function(value) {
+        return validatePassword(value);
+    });
+    
+    // Password match validation
+    setupPasswordMatchValidation('settingsNewPassword', 'settingsConfirmPassword');
 }
 
 // ============================================================
@@ -168,7 +211,6 @@ function setupEventListeners() {
         });
     });
     
-    // Click outside modal to close
     document.querySelectorAll('.modal').forEach(function(modal) {
         modal.addEventListener('click', function(e) {
             if (e.target === modal) {
@@ -185,19 +227,51 @@ function setupEventListeners() {
 async function handleProfileUpdate(e) {
     e.preventDefault();
     
-    const saveBtn = document.getElementById('saveProfileBtn');
-    const successMsg = document.getElementById('profileSuccess');
+    // Clear previous errors
+    clearAllErrors('profileForm');
     
-    saveBtn.disabled = true;
-    saveBtn.textContent = 'Saving...';
-    successMsg.classList.add('hidden');
+    const firstName = document.getElementById('settingsFirstName').value.trim();
+    const lastName = document.getElementById('settingsLastName').value.trim();
+    const email = document.getElementById('settingsEmail').value.trim();
+    const phone = document.getElementById('settingsPhone').value.trim();
+    
+    let hasErrors = false;
+    
+    // Validate
+    const firstNameCheck = validateRequired(firstName, 'First name');
+    if (!firstNameCheck.valid) {
+        showFieldError('settingsFirstName', firstNameCheck.message);
+        hasErrors = true;
+    }
+    
+    const lastNameCheck = validateRequired(lastName, 'Last name');
+    if (!lastNameCheck.valid) {
+        showFieldError('settingsLastName', lastNameCheck.message);
+        hasErrors = true;
+    }
+    
+    const emailCheck = validateEmail(email);
+    if (!emailCheck.valid) {
+        showFieldError('settingsEmail', emailCheck.message);
+        hasErrors = true;
+    }
+    
+    if (phone) {
+        const phoneCheck = validatePhone(phone);
+        if (!phoneCheck.valid) {
+            showFieldError('settingsPhone', phoneCheck.message);
+            hasErrors = true;
+        }
+    }
+    
+    if (hasErrors) {
+        return;
+    }
+    
+    // Set loading state
+    setButtonLoading('saveProfileBtn', 'Saving...');
     
     try {
-        const firstName = document.getElementById('settingsFirstName').value.trim();
-        const lastName = document.getElementById('settingsLastName').value.trim();
-        const email = document.getElementById('settingsEmail').value.trim();
-        const phone = document.getElementById('settingsPhone').value.trim();
-        
         // Update email in Firebase Auth if changed
         if (email !== currentUser.email) {
             await updateEmail(currentUser, email);
@@ -218,27 +292,23 @@ async function handleProfileUpdate(e) {
         currentUserData.phone = phone;
         
         // Show success
-        successMsg.classList.remove('hidden');
-        setTimeout(function() {
-            successMsg.classList.add('hidden');
-        }, 3000);
+        resetButton('saveProfileBtn');
+        showSuccess('profileSuccess', 'Saved successfully');
         
     } catch (error) {
         console.error('Error updating profile:', error);
         
-        let message = 'Error updating profile. Please try again.';
-        if (error.code === 'auth/requires-recent-login') {
-            message = 'For security reasons, please sign out and sign back in before changing your email.';
-        } else if (error.code === 'auth/email-already-in-use') {
-            message = 'This email is already in use by another account.';
-        } else if (error.code === 'auth/invalid-email') {
-            message = 'Please enter a valid email address.';
-        }
+        resetButton('saveProfileBtn');
         
-        alert(message);
-    } finally {
-        saveBtn.disabled = false;
-        saveBtn.textContent = 'Save Changes';
+        if (error.code === 'auth/requires-recent-login') {
+            showFieldError('settingsEmail', 'For security, please sign out and sign back in before changing your email.');
+        } else if (error.code === 'auth/email-already-in-use') {
+            showFieldError('settingsEmail', 'This email is already in use by another account.');
+        } else if (error.code === 'auth/invalid-email') {
+            showFieldError('settingsEmail', 'Please enter a valid email address.');
+        } else {
+            alert('Error updating profile. Please try again.');
+        }
     }
 }
 
@@ -249,25 +319,33 @@ async function handleProfileUpdate(e) {
 async function handlePasswordUpdate(e) {
     e.preventDefault();
     
-    const updateBtn = document.getElementById('updatePasswordBtn');
-    const successMsg = document.getElementById('passwordSuccess');
+    // Clear previous errors
+    clearAllErrors('passwordForm');
     
     const newPassword = document.getElementById('settingsNewPassword').value;
     const confirmPassword = document.getElementById('settingsConfirmPassword').value;
     
+    let hasErrors = false;
+    
+    // Validate new password
+    const passwordCheck = validatePassword(newPassword);
+    if (!passwordCheck.valid) {
+        showFieldError('settingsNewPassword', passwordCheck.message);
+        hasErrors = true;
+    }
+    
+    // Check passwords match
     if (newPassword !== confirmPassword) {
-        alert('Passwords do not match. Please try again.');
+        showFieldError('settingsConfirmPassword', 'Passwords do not match');
+        hasErrors = true;
+    }
+    
+    if (hasErrors) {
         return;
     }
     
-    if (newPassword.length < 6) {
-        alert('Password must be at least 6 characters.');
-        return;
-    }
-    
-    updateBtn.disabled = true;
-    updateBtn.textContent = 'Updating...';
-    successMsg.classList.add('hidden');
+    // Set loading state
+    setButtonLoading('updatePasswordBtn', 'Updating...');
     
     try {
         await updatePassword(currentUser, newPassword);
@@ -277,25 +355,21 @@ async function handlePasswordUpdate(e) {
         document.getElementById('settingsConfirmPassword').value = '';
         
         // Show success
-        successMsg.classList.remove('hidden');
-        setTimeout(function() {
-            successMsg.classList.add('hidden');
-        }, 3000);
+        resetButton('updatePasswordBtn');
+        showSuccess('passwordSuccess', 'Password updated');
         
     } catch (error) {
         console.error('Error updating password:', error);
         
-        let message = 'Error updating password. Please try again.';
-        if (error.code === 'auth/requires-recent-login') {
-            message = 'For security reasons, please sign out and sign back in before changing your password.';
-        } else if (error.code === 'auth/weak-password') {
-            message = 'Password is too weak. Please use a stronger password.';
-        }
+        resetButton('updatePasswordBtn');
         
-        alert(message);
-    } finally {
-        updateBtn.disabled = false;
-        updateBtn.textContent = 'Update Password';
+        if (error.code === 'auth/requires-recent-login') {
+            showFieldError('settingsNewPassword', 'For security, please sign out and sign back in before changing your password.');
+        } else if (error.code === 'auth/weak-password') {
+            showFieldError('settingsNewPassword', 'Password is too weak. Please use a stronger password.');
+        } else {
+            alert('Error updating password. Please try again.');
+        }
     }
 }
 
@@ -304,7 +378,6 @@ async function handlePasswordUpdate(e) {
 // ============================================================
 
 function showCancelSubscriptionModal() {
-    // Calculate end date for display
     if (currentUserData.nextBillingDate) {
         const endDate = new Date(currentUserData.nextBillingDate);
         const endDateStr = endDate.toLocaleDateString('en-GB', { 
@@ -319,12 +392,9 @@ function showCancelSubscriptionModal() {
 }
 
 async function handleCancelSubscription() {
-    const confirmBtn = document.getElementById('confirmCancelBtn');
-    confirmBtn.disabled = true;
-    confirmBtn.textContent = 'Cancelling...';
+    setButtonLoading('confirmCancelBtn', 'Cancelling...');
     
     try {
-        // Call Netlify function to cancel Stripe subscription
         const response = await fetch('/.netlify/functions/cancel-subscription', {
             method: 'POST',
             headers: {
@@ -340,21 +410,20 @@ async function handleCancelSubscription() {
             throw new Error('Failed to cancel subscription');
         }
         
-        const result = await response.json();
-        
         // Close modal
         document.getElementById('cancelSubscriptionModal').classList.add('hidden');
         
-        // Reload data to show updated status
+        // Reload data
         await loadUserData();
+        
+        resetButton('confirmCancelBtn');
         
         alert('Your subscription has been cancelled. You will keep access until your billing period ends.');
         
     } catch (error) {
         console.error('Error cancelling subscription:', error);
+        resetButton('confirmCancelBtn');
         alert('Error cancelling subscription. Please try again or contact support.');
-        confirmBtn.disabled = false;
-        confirmBtn.textContent = 'Yes, Cancel Subscription';
     }
 }
 
@@ -363,9 +432,7 @@ async function handleCancelSubscription() {
 // ============================================================
 
 async function handleReactivateSubscription() {
-    const reactivateBtn = document.getElementById('reactivateSubscriptionBtn');
-    reactivateBtn.disabled = true;
-    reactivateBtn.textContent = 'Reactivating...';
+    setButtonLoading('reactivateSubscriptionBtn', 'Reactivating...');
     
     try {
         const response = await fetch('/.netlify/functions/reactivate-subscription', {
@@ -385,13 +452,14 @@ async function handleReactivateSubscription() {
         
         await loadUserData();
         
+        resetButton('reactivateSubscriptionBtn');
+        
         alert('Your subscription has been reactivated. Welcome back!');
         
     } catch (error) {
         console.error('Error reactivating subscription:', error);
+        resetButton('reactivateSubscriptionBtn');
         alert('Error reactivating subscription. Please try again or contact support.');
-        reactivateBtn.disabled = false;
-        reactivateBtn.textContent = 'Reactivate Subscription';
     }
 }
 
@@ -400,12 +468,9 @@ async function handleReactivateSubscription() {
 // ============================================================
 
 async function handleDeleteAccount() {
-    const deleteBtn = document.getElementById('confirmDeleteBtn');
-    deleteBtn.disabled = true;
-    deleteBtn.textContent = 'Deleting...';
+    setButtonLoading('confirmDeleteBtn', 'Deleting...');
     
     try {
-        // Call Netlify function to delete account (handles Stripe + Firestore cleanup)
         const response = await fetch('/.netlify/functions/delete-account', {
             method: 'POST',
             headers: {
@@ -420,7 +485,7 @@ async function handleDeleteAccount() {
             throw new Error('Failed to delete account data');
         }
         
-        // Delete Firebase Auth user (must be done from client)
+        // Delete Firebase Auth user
         await deleteUser(currentUser);
         
         alert('Your account has been deleted. We are sorry to see you go.');
@@ -429,13 +494,12 @@ async function handleDeleteAccount() {
     } catch (error) {
         console.error('Error deleting account:', error);
         
-        let message = 'Error deleting account. Please try again or contact support.';
-        if (error.code === 'auth/requires-recent-login') {
-            message = 'For security, please sign out and sign back in, then try deleting your account.';
-        }
+        resetButton('confirmDeleteBtn');
         
-        alert(message);
-        deleteBtn.disabled = false;
-        deleteBtn.textContent = 'Delete My Account Permanently';
+        if (error.code === 'auth/requires-recent-login') {
+            alert('For security, please sign out and sign back in, then try deleting your account.');
+        } else {
+            alert('Error deleting account. Please try again or contact support.');
+        }
     }
 }
