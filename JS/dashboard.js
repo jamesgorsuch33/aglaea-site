@@ -28,6 +28,8 @@ import {
     setupFieldValidation
 } from './form-validation.js';
 
+import { checkAndShowOnboarding } from './onboarding.js';
+
 // Get Firebase instances
 const auth = window.firebaseAuth;
 
@@ -45,6 +47,9 @@ auth.onAuthStateChanged(function(user) {
         document.getElementById('userName').textContent = user.email.split('@')[0];
         loadDashboard();
         setupEventListeners();
+        
+        // Check if onboarding needs to be shown
+        checkAndShowOnboarding(user);
     } else {
         window.location.href = 'signin.html';
     }
