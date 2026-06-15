@@ -1,0 +1,286 @@
+/* ============================================================
+   ONBOARDING FLOW STYLES
+   Welcome modal + tour tooltips + completion message
+   ============================================================ */
+
+/* ---------- Welcome Modal ---------- */
+
+.onboarding-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    padding: 1rem;
+}
+
+.onboarding-modal.visible {
+    opacity: 1;
+}
+
+.onboarding-modal-content {
+    background: white;
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.onboarding-modal.visible .onboarding-modal-content {
+    transform: scale(1);
+}
+
+.onboarding-welcome-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.onboarding-modal-content h2 {
+    font-family: var(--font-display);
+    font-size: 1.875rem;
+    font-weight: 500;
+    color: var(--charcoal);
+    margin: 0 0 1rem 0;
+}
+
+.onboarding-modal-content p {
+    color: var(--slate);
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+}
+
+.onboarding-modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.onboarding-modal-actions .btn {
+    min-width: 130px;
+}
+
+/* ---------- Tour Overlay ---------- */
+
+.onboarding-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    pointer-events: none;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ---------- Element Highlight ---------- */
+
+.onboarding-highlight {
+    position: relative;
+    z-index: 9999;
+    box-shadow: 0 0 0 4px var(--gold), 0 0 0 8px rgba(201, 168, 112, 0.3), 0 0 40px rgba(201, 168, 112, 0.5);
+    border-radius: 12px;
+    animation: highlightPulse 2s ease-in-out infinite;
+    background: white;
+}
+
+@keyframes highlightPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 4px var(--gold), 0 0 0 8px rgba(201, 168, 112, 0.3), 0 0 40px rgba(201, 168, 112, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 0 4px var(--gold), 0 0 0 12px rgba(201, 168, 112, 0.4), 0 0 60px rgba(201, 168, 112, 0.7);
+    }
+}
+
+/* ---------- Tooltip ---------- */
+
+.onboarding-tooltip {
+    position: absolute;
+    z-index: 10001;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+    max-width: 340px;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.onboarding-tooltip.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Arrow pointing up (tooltip below target) */
+.onboarding-tooltip::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid white;
+}
+
+/* Arrow pointing down (tooltip above target) */
+.onboarding-tooltip.tooltip-above::before {
+    top: auto;
+    bottom: -10px;
+    border-bottom: none;
+    border-top: 10px solid white;
+}
+
+.onboarding-tooltip-content {
+    padding: 1.5rem;
+}
+
+.onboarding-step-indicator {
+    color: var(--gold);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.onboarding-tooltip h3 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--charcoal);
+    margin: 0 0 0.625rem 0;
+}
+
+.onboarding-tooltip p {
+    color: var(--slate);
+    font-size: 0.938rem;
+    line-height: 1.5;
+    margin-bottom: 1.25rem;
+}
+
+.onboarding-tooltip-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.btn-text {
+    background: transparent;
+    border: none;
+    color: var(--slate);
+    font-size: 0.875rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.btn-text:hover {
+    color: var(--charcoal);
+}
+
+.btn-small {
+    padding: 0.5rem 1.25rem;
+    font-size: 0.875rem;
+}
+
+/* ---------- Completion Message ---------- */
+
+.onboarding-completion {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: white;
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    z-index: 10002;
+    text-align: center;
+    min-width: 320px;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.onboarding-completion.visible {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.onboarding-completion-content {
+    text-align: center;
+}
+
+.onboarding-completion-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.onboarding-completion h3 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--charcoal);
+    margin: 0 0 0.5rem 0;
+}
+
+.onboarding-completion p {
+    color: var(--slate);
+    font-size: 0.938rem;
+    margin: 0;
+}
+
+/* ---------- Mobile Adjustments ---------- */
+
+@media (max-width: 768px) {
+    .onboarding-modal-content {
+        padding: 2rem 1.5rem;
+    }
+    
+    .onboarding-modal-content h2 {
+        font-size: 1.5rem;
+    }
+    
+    .onboarding-modal-actions {
+        flex-direction: column-reverse;
+    }
+    
+    .onboarding-modal-actions .btn {
+        width: 100%;
+    }
+    
+    .onboarding-tooltip {
+        max-width: calc(100vw - 40px);
+    }
+    
+    .onboarding-tooltip-content {
+        padding: 1.25rem;
+    }
+    
+    .onboarding-completion {
+        min-width: auto;
+        width: calc(100vw - 40px);
+    }
+}
