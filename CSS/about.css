@@ -1,0 +1,331 @@
+/* ============================================================
+   ABOUT PAGE STYLES
+   Editorial layout with founder narrative
+   ============================================================ */
+
+/* ---------- Hero Section ---------- */
+
+.about-hero {
+    background: linear-gradient(135deg, var(--cream) 0%, #fff 100%);
+    padding: 6rem 0 5rem 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.about-hero::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(201, 168, 112, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.about-hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.about-eyebrow {
+    display: inline-block;
+    color: var(--gold);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+}
+
+.about-hero-quote {
+    font-family: var(--font-display);
+    font-size: 4rem;
+    font-weight: 300;
+    line-height: 1.15;
+    color: var(--charcoal);
+    margin: 0 0 1.5rem 0;
+    font-style: italic;
+}
+
+.about-hero-attribution {
+    color: var(--slate);
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+/* ---------- Standard Section ---------- */
+
+.about-section {
+    padding: 5rem 0;
+    background: white;
+}
+
+.about-section-cream {
+    background: var(--cream);
+}
+
+.about-narrow {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.section-label {
+    display: inline-block;
+    color: var(--gold);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1.25rem;
+}
+
+.about-section h2 {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 400;
+    line-height: 1.25;
+    color: var(--charcoal);
+    margin: 0 0 2rem 0;
+}
+
+.about-section p {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--charcoal);
+    margin-bottom: 1.5rem;
+}
+
+.about-section p:last-child {
+    margin-bottom: 0;
+}
+
+.lead-paragraph {
+    font-size: 1.375rem !important;
+    line-height: 1.5 !important;
+    color: var(--charcoal);
+    font-weight: 400;
+}
+
+.about-section em {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--gold);
+    font-size: 1.1em;
+}
+
+/* ---------- Callout Text ---------- */
+
+.callout-text {
+    font-family: var(--font-display);
+    font-size: 1.625rem !important;
+    line-height: 1.4 !important;
+    color: var(--charcoal);
+    font-style: italic;
+    text-align: center;
+    border-left: none !important;
+    padding: 2rem 0 !important;
+    margin: 2.5rem 0 1rem 0 !important;
+    border-top: 1px solid rgba(201, 168, 112, 0.3);
+    border-bottom: 1px solid rgba(201, 168, 112, 0.3);
+    font-weight: 400 !important;
+}
+
+/* ---------- Philosophy Quote ---------- */
+
+.philosophy-quote {
+    margin: 2.5rem 0 0 0;
+    padding: 2rem;
+    background: var(--cream);
+    border-left: 4px solid var(--gold);
+    border-radius: 0 8px 8px 0;
+}
+
+.philosophy-quote blockquote {
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    line-height: 1.5;
+    color: var(--charcoal);
+    font-style: italic;
+    margin: 0;
+    padding: 0;
+}
+
+/* ---------- Founder Grid ---------- */
+
+.founder-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.founder-image {
+    position: relative;
+}
+
+.founder-photo-placeholder {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+    background: var(--stone);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.founder-photo-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.founder-placeholder-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--cream) 0%, var(--stone) 100%);
+    color: var(--slate);
+    text-align: center;
+    padding: 2rem;
+}
+
+.founder-placeholder-text span {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.founder-placeholder-text small {
+    font-size: 0.875rem;
+    opacity: 0.7;
+}
+
+/* Hide placeholder text when image loads */
+.founder-photo-placeholder:not(.no-image) img:not([src=""]) ~ .founder-placeholder-text {
+    display: none;
+}
+
+.founder-photo-placeholder.no-image {
+    background: linear-gradient(135deg, var(--cream) 0%, var(--stone) 100%);
+}
+
+.founder-content h2 {
+    margin-top: 0.5rem;
+}
+
+/* ---------- CTA Section ---------- */
+
+.about-cta-section {
+    background: var(--charcoal);
+    padding: 5rem 0;
+    text-align: center;
+    color: white;
+}
+
+.about-cta-content {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.about-cta-content h2 {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    font-weight: 400;
+    color: white;
+    margin: 0 0 1rem 0;
+}
+
+.about-cta-content p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.125rem;
+    margin-bottom: 2rem;
+}
+
+.about-cta-content .btn-primary {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: white;
+    padding: 1rem 2.5rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s ease;
+}
+
+.about-cta-content .btn-primary:hover {
+    background: #d4b78f;
+    border-color: #d4b78f;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(201, 168, 112, 0.4);
+}
+
+/* ---------- Mobile Adjustments ---------- */
+
+@media (max-width: 768px) {
+    .about-hero {
+        padding: 4rem 0 3rem 0;
+    }
+    
+    .about-hero-quote {
+        font-size: 2.5rem;
+        line-height: 1.2;
+    }
+    
+    .about-section {
+        padding: 3rem 0;
+    }
+    
+    .about-section h2 {
+        font-size: 1.875rem;
+    }
+    
+    .about-section p {
+        font-size: 1rem;
+    }
+    
+    .lead-paragraph {
+        font-size: 1.125rem !important;
+    }
+    
+    .callout-text {
+        font-size: 1.25rem !important;
+        padding: 1.5rem 0 !important;
+    }
+    
+    .philosophy-quote {
+        padding: 1.5rem;
+    }
+    
+    .philosophy-quote blockquote {
+        font-size: 1.125rem;
+    }
+    
+    .founder-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .founder-image {
+        max-width: 320px;
+        margin: 0 auto;
+    }
+    
+    .about-cta-content h2 {
+        font-size: 2rem;
+    }
+}
