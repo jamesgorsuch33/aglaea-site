@@ -446,39 +446,66 @@ function buildEmail({ preheader, content }) {
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="color-scheme" content="light only">
 <meta name="supported-color-schemes" content="light">
+<meta name="x-apple-disable-message-reformatting">
+<meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no">
 <title>AGLAEA</title>
 <style>
     :root {
         color-scheme: light only;
         supported-color-schemes: light;
     }
+    
+    /* CRITICAL: Force light mode on iOS Mail */
+    u + .body .gmail-blend-screen { background: #f5f0e8; mix-blend-mode: screen; }
+    u + .body .gmail-blend-difference { background: #ffffff; mix-blend-mode: difference; }
+    
     body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
     table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
     img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
     body { margin: 0 !important; padding: 0 !important; background-color: #f5f0e8 !important; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #2a2a2a !important; line-height: 1.6; }
     .email-container { max-width: 600px; margin: 0 auto; background-color: #ffffff !important; }
     
-    /* Force colors regardless of dark mode */
-    h1, h2, h3, p, td, span { color: #2a2a2a !important; }
-    .gold-text { color: #c9a870 !important; }
-    .gold-bg { background-color: #c9a870 !important; }
-    .cream-bg { background-color: #f5f0e8 !important; }
-    .charcoal-bg { background-color: #2a2a2a !important; }
-    .charcoal-bg h2, .charcoal-bg p { color: #ffffff !important; }
+    /* Force ALL text colors regardless of mode */
+    h1, h2, h3, p, td, span, a, div { -webkit-text-fill-color: inherit; }
     
-    /* Apple Mail dark mode overrides */
+    /* Force colors regardless of dark mode */
+    .text-charcoal { color: #2a2a2a !important; }
+    .text-slate { color: #6b6b6b !important; }
+    .text-gold { color: #c9a870 !important; }
+    .text-white { color: #ffffff !important; }
+    .bg-white { background-color: #ffffff !important; }
+    .bg-cream { background-color: #f5f0e8 !important; }
+    .bg-light-cream { background-color: #f9f5ed !important; }
+    .bg-charcoal { background-color: #2a2a2a !important; }
+    .bg-gold { background-color: #c9a870 !important; }
+    
+    /* iOS Mail dark mode override */
     @media (prefers-color-scheme: dark) {
-        body { background-color: #f5f0e8 !important; }
-        .email-container { background-color: #ffffff !important; }
-        h1, h2, h3, p, td, span { color: #2a2a2a !important; }
-        .gold-text { color: #c9a870 !important; }
-        .charcoal-bg { background-color: #2a2a2a !important; }
-        .charcoal-bg h2, .charcoal-bg p { color: #ffffff !important; }
+        body, .body, table, td { background-color: #f5f0e8 !important; }
+        .email-container, .bg-white { background-color: #ffffff !important; }
+        .bg-light-cream { background-color: #f9f5ed !important; }
+        .bg-cream { background-color: #f5f0e8 !important; }
+        .bg-charcoal { background-color: #2a2a2a !important; }
+        h1, h2, h3, .text-charcoal { color: #2a2a2a !important; }
+        p, span, td, div { color: #2a2a2a !important; }
+        .text-slate { color: #6b6b6b !important; }
+        .text-gold { color: #c9a870 !important; }
+        .text-white { color: #ffffff !important; }
+        .bg-charcoal h2, .bg-charcoal p, .bg-charcoal span { color: #ffffff !important; }
     }
     
     /* Force light mode on Outlook */
     [data-ogsc] body, [data-ogsb] body {
         background-color: #f5f0e8 !important;
+        color: #2a2a2a !important;
+    }
+    [data-ogsc] .email-container, [data-ogsb] .email-container {
+        background-color: #ffffff !important;
+    }
+    [data-ogsc] h1, [data-ogsc] h2, [data-ogsc] h3, [data-ogsc] p, [data-ogsc] td, [data-ogsc] span {
+        color: #2a2a2a !important;
+    }
+    [data-ogsb] h1, [data-ogsb] h2, [data-ogsb] h3, [data-ogsb] p, [data-ogsb] td, [data-ogsb] span {
         color: #2a2a2a !important;
     }
     
@@ -490,7 +517,7 @@ function buildEmail({ preheader, content }) {
     }
 </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f5f0e8;">
+<body class="body" style="margin: 0; padding: 0; background-color: #f5f0e8;">
 
 <div style="display: none; max-height: 0; overflow: hidden;">${escapeHtml(preheader)}</div>
 
@@ -500,7 +527,7 @@ function buildEmail({ preheader, content }) {
             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" class="email-container" style="max-width: 600px; background-color: #ffffff;">
                 
                 <tr>
-                    <td class="header" style="text-align: center; padding: 48px 32px 32px 32px; background-color: #2a2a2a;">
+                    <td class="header" style="text-align: center; padding: 48px 32px 32px 32px; background-color: #ffffff;">
                         <img src="${SITE_URL}/images/logo-gold.png" alt="AGLAEA" class="logo-img" style="max-width: 180px; height: auto; display: block; margin: 0 auto;">
                         <img src="${SITE_URL}/images/logo-head-gold.png" alt="" class="logo-head-img" style="max-width: 80px; height: auto; display: block; margin: 0 auto;">
                     </td>
