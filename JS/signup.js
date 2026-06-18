@@ -331,6 +331,9 @@ if (remindersForm) {
                 notes: ''
             });
             
+            // Step F: Send welcome email (don't block on this - fire and forget)
+            sendWelcomeEmail(accountData.email, accountData.firstName);
+            
             // Success! Redirect to dashboard
             window.location.href = 'dashboard.html';
             
@@ -376,4 +379,35 @@ if (backBtn) {
     backBtn.addEventListener('click', function() {
         showStep(1);
     });
+}
+
+// ============================================================
+// SEND WELCOME EMAIL
+// Fire-and-forget - doesn't block signup completion
+// ============================================================
+
+async function sendWelcomeEmail(email, firstName) {
+    try {
+        const response = await fetch('/.netlify/functions/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                emailType: 'welcome',
+                to: email,
+                data: { firstName: firstName }
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            console.log('Welcome email sent successfully');
+        } else {
+            console.warn('Welcome email failed:', result);
+        }
+        
+    } catch (error) {
+        // Don't block signup if email fails
+        console.error('Welcome email error:', error);
+    }
 }
