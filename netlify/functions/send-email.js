@@ -444,13 +444,44 @@ function buildEmail({ preheader, content }) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="color-scheme" content="light only">
+<meta name="supported-color-schemes" content="light">
 <title>AGLAEA</title>
 <style>
+    :root {
+        color-scheme: light only;
+        supported-color-schemes: light;
+    }
     body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
     table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
     img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
-    body { margin: 0 !important; padding: 0 !important; background-color: #f5f0e8; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #2a2a2a; line-height: 1.6; }
-    .email-container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+    body { margin: 0 !important; padding: 0 !important; background-color: #f5f0e8 !important; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #2a2a2a !important; line-height: 1.6; }
+    .email-container { max-width: 600px; margin: 0 auto; background-color: #ffffff !important; }
+    
+    /* Force colors regardless of dark mode */
+    h1, h2, h3, p, td, span { color: #2a2a2a !important; }
+    .gold-text { color: #c9a870 !important; }
+    .gold-bg { background-color: #c9a870 !important; }
+    .cream-bg { background-color: #f5f0e8 !important; }
+    .charcoal-bg { background-color: #2a2a2a !important; }
+    .charcoal-bg h2, .charcoal-bg p { color: #ffffff !important; }
+    
+    /* Apple Mail dark mode overrides */
+    @media (prefers-color-scheme: dark) {
+        body { background-color: #f5f0e8 !important; }
+        .email-container { background-color: #ffffff !important; }
+        h1, h2, h3, p, td, span { color: #2a2a2a !important; }
+        .gold-text { color: #c9a870 !important; }
+        .charcoal-bg { background-color: #2a2a2a !important; }
+        .charcoal-bg h2, .charcoal-bg p { color: #ffffff !important; }
+    }
+    
+    /* Force light mode on Outlook */
+    [data-ogsc] body, [data-ogsb] body {
+        background-color: #f5f0e8 !important;
+        color: #2a2a2a !important;
+    }
+    
     @media screen and (max-width: 600px) {
         .header { padding: 32px 20px 24px 20px !important; }
         .hero { padding: 0 20px 32px 20px !important; }
@@ -469,8 +500,8 @@ function buildEmail({ preheader, content }) {
             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" class="email-container" style="max-width: 600px; background-color: #ffffff;">
                 
                 <tr>
-                    <td class="header" style="text-align: center; padding: 48px 32px 32px 32px; background-color: #ffffff;">
-                        <img src="${SITE_URL}/images/logo-word.png" alt="AGLAEA" class="logo-img" style="max-width: 180px; height: auto; display: block; margin: 0 auto;">
+                    <td class="header" style="text-align: center; padding: 48px 32px 32px 32px; background-color: #2a2a2a;">
+                        <img src="${SITE_URL}/images/logo-gold.png" alt="AGLAEA" class="logo-img" style="max-width: 180px; height: auto; display: block; margin: 0 auto;">
                         <img src="${SITE_URL}/images/logo-head-gold.png" alt="" class="logo-head-img" style="max-width: 80px; height: auto; display: block; margin: 0 auto;">
                     </td>
                 </tr>
@@ -486,7 +517,7 @@ function buildEmail({ preheader, content }) {
                 <tr>
                     <td style="text-align: center; padding: 32px; background-color: #f5f0e8; font-size: 13px; color: #6b6b6b;">
                         <p style="margin: 0 0 16px 0;">
-                            <img src="${SITE_URL}/images/logo-word.png" alt="AGLAEA" style="max-width: 100px; height: auto;">
+                            <img src="${SITE_URL}/images/logo-gold.png" alt="AGLAEA" style="max-width: 100px; height: auto;">
                         </p>
                         <p style="margin: 0 0 16px 0;">Never miss another moment.</p>
                         <p style="margin: 0 0 8px 0;">
