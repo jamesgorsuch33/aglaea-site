@@ -1,132 +1,132 @@
 // ============================================================
-// FORGOT PASSWORD - Uses Firebase Auth directly
-// Firebase sends the email (customized in Firebase Console)
+// AGLAEA - FORGOT PASSWORD FUNCTION
+// Uses Firebase Admin SDK to generate reset link
+// Then sends branded email via send-email function
 // ============================================================
 
-import { auth } from './firebase-config-v2.js';
-import { 
-    sendPasswordResetEmail
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+const admin = require('firebase-admin');
 
-import {
-    showFieldError,
-    clearFieldError,
-    validateEmail,
-    setButtonLoading,
-    resetButton
-} from './form-validation.js';
-
-// ============================================================
-// SETUP REAL-TIME VALIDATION
-// ============================================================
-
-const emailInput = document.getElementById('email');
-emailInput.addEventListener('blur', function() {
-    const value = emailInput.value.trim();
-    if (!value) {
-        clearFieldError('email');
-    } else if (!validateEmail(value)) {
-        showFieldError('email', 'Please enter a valid email address');
-    } else {
-        clearFieldError('email');
-    }
-});
-
-emailInput.addEventListener('input', function() {
-    if (emailInput.value.trim() && validateEmail(emailInput.value.trim())) {
-        clearFieldError('email');
-    }
-});
-
-// ============================================================
-// HANDLE FORM SUBMISSION
-// ============================================================
-
-const form = document.getElementById('forgotPasswordForm');
-
-form.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const email = emailInput.value.trim();
-    
-    // Validate
-    if (!email) {
-        showFieldError('email', 'Please enter your email address');
-        emailInput.focus();
-        return;
-    }
-    
-    if (!validateEmail(email)) {
-        showFieldError('email', 'Please enter a valid email address');
-        emailInput.focus();
-        return;
-    }
-    
-    clearFieldError('email');
-    
-    // Set loading state
-    setButtonLoading('submitBtn', 'Sending...');
-    
+// Initialize Firebase Admin (only once across function invocations)
+if (!admin.apps.length) {
     try {
-        // Use Firebase to send password reset email
-        await sendPasswordResetEmail(auth, email);
-        
-        // Show success message
-        showSuccessMessage(email);
-        
-    } catch (error) {
-        console.error('Password reset error:', error);
-        
-        // For security: show success message even if email doesn't exist
-        // This prevents attackers from discovering valid user emails
-        if (error.code === 'auth/user-not-found') {
-            // Still show success - don't reveal that user doesn't exist
-            showSuccessMessage(email);
-        } else if (error.code === 'auth/invalid-email') {
-            showFieldError('email', 'Please enter a valid email address');
-            resetButton('submitBtn');
-            document.getElementById('submitBtn').textContent = 'Send Reset Link';
-        } else if (error.code === 'auth/too-many-requests') {
-            showFieldError('email', 'Too many requests. Please try again later.');
-            resetButton('submitBtn');
-            document.getElementById('submitBtn').textContent = 'Send Reset Link';
-        } else {
-            // For other errors, still show success for security
-            showSuccessMessage(email);
-        }
+        admin.initializeApp({
+            credential: admin.credential.cert({
+                projectId: process.env.FIREBASE_PROJECT_ID,
+                clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+                privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
+            })
+        });
+        console.log('Firebase Admin initialized');
+    } catch (initError) {
+        console.error('Firebase Admin init error:', initError);
     }
-});
-
-// ============================================================
-// SHOW SUCCESS MESSAGE
-// ============================================================
-
-function showSuccessMessage(email) {
-    const formView = document.getElementById('formView');
-    const successView = document.getElementById('successView');
-    const sentEmail = document.getElementById('sentEmail');
-    
-    sentEmail.textContent = email;
-    
-    formView.style.display = 'none';
-    successView.style.display = 'block';
 }
 
-// ============================================================
-// RESEND LINK HANDLER
-// ============================================================
+const SITE_URL = process.env.SITE_URL || 'https://aglaea.co.uk';
 
-document.getElementById('resendLink').addEventListener('click', function(e) {
-    e.preventDefault();
+exports.handler = async (event) => {
+    // Only allow POST
+    if (event.httpMethod !== 'POST') {
+        return {
+            statusCode: 405,
+            body: JSON.stringify({ error: 'Method not allowed' })
+        };
+    }
     
-    const formView = document.getElementById('formView');
-    const successView = document.getElementById('successView');
-    
-    successView.style.display = 'none';
-    formView.style.display = 'block';
-    
-    resetButton('submitBtn');
-    document.getElementById('submitBtn').textContent = 'Send Reset Link';
-    
-    emailInput.focus();
-});
+    try {
+        const { email } = JSON.parse(event.body);
+        
+        if (!email) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: 'Email required' })
+            };
+        }
+        
+        console.log('Password reset requested for:', email);
+        
+        // For security, we ALWAYS return success even if email doesn't exist
+        // This prevents attackers from discovering valid user emails
+        
+        try {
+            // Step 1: Check if user exists in Firebase Auth
+            const userRecord = await admin.auth().getUserByEmail(email);
+            console.log('User found:', userRecord.uid);
+            
+            // Step 2: Get user's first name from Firestore
+            let firstName = 'there';
+            try {
+                const userDoc = await admin.firestore()
+                    .collection('users')
+                    .doc(userRecord.uid)
+                    .get();
+                
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    firstName = userData.firstName || 'there';
+                }
+            } catch (firestoreError) {
+                console.warn('Could not fetch firstName:', firestoreError.message);
+            }
+            
+            // Step 3: Generate Firebase password reset link
+            const actionCodeSettings = {
+                url: `${SITE_URL}/signin.html`,
+                handleCodeInApp: false
+            };
+            
+            const resetUrl = await admin.auth().generatePasswordResetLink(
+                email, 
+                actionCodeSettings
+            );
+            
+            console.log('Reset link generated');
+            
+            // Step 4: Call send-email function to send branded email
+            const emailResponse = await fetch(`${SITE_URL}/.netlify/functions/send-email`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    emailType: 'passwordReset',
+                    to: email,
+                    data: {
+                        firstName: firstName,
+                        resetUrl: resetUrl
+                    }
+                })
+            });
+            
+            const emailResult = await emailResponse.json();
+            
+            if (emailResult.success) {
+                console.log('Branded password reset email sent successfully');
+            } else {
+                console.error('Email send failed:', emailResult);
+            }
+            
+        } catch (userError) {
+            // User doesn't exist or other Firebase error
+            console.log('Password reset attempt - user may not exist:', userError.code || userError.message);
+        }
+        
+        // Always return success (security best practice)
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ 
+                success: true,
+                message: 'If an account exists, a reset email has been sent.'
+            })
+        };
+        
+    } catch (error) {
+        console.error('Forgot password error:', error);
+        // Even on error, return success for security
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ 
+                success: true,
+                message: 'If an account exists, a reset email has been sent.'
+            })
+        };
+    }
+};
