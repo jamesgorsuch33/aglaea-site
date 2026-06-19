@@ -331,10 +331,10 @@ if (remindersForm) {
                 notes: ''
             });
             
-            // Step F: Send welcome email (await to ensure it sends before redirect)
-            await sendWelcomeEmail(accountData.email, accountData.firstName);
+            // Step F: Send welcome email (uses keepalive - fast and reliable)
+            sendWelcomeEmail(accountData.email, accountData.firstName);
             
-            // Success! Redirect to dashboard
+            // Success! Redirect to dashboard immediately
             window.location.href = 'dashboard.html';
             
         } catch (error) {
@@ -383,34 +383,37 @@ if (backBtn) {
 
 // ============================================================
 // SEND WELCOME EMAIL
-// Awaited - but never blocks signup if it fails
+// Uses keepalive flag - guarantees request completes 
+// even if page is unloading. Modern browser feature.
 // ============================================================
 
-async function sendWelcomeEmail(email, firstName) {
+function sendWelcomeEmail(email, firstName) {
     try {
-        const response = await fetch('/.netlify/functions/send-email', {
+        // keepalive: true tells browser to complete this request
+        // even if the page is navigating away
+        fetch('/.netlify/functions/send-email', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            keepalive: true,  // ⭐ KEY: Request survives page navigation
             body: JSON.stringify({
                 emailType: 'welcome',
                 to: email,
                 data: { firstName: firstName }
             })
+        }).then(function(response) {
+            return response.json();
+        }).then(function(result) {
+            if (result && result.success) {
+                console.log('Welcome email sent successfully');
+            } else {
+                console.warn('Welcome email failed (non-blocking):', result);
+            }
+        }).catch(function(error) {
+            console.error('Welcome email error (non-blocking):', error);
         });
         
-        const result = await response.json();
-        
-        if (result.success) {
-            console.log('Welcome email sent successfully');
-        } else {
-            console.warn('Welcome email failed (non-blocking):', result);
-        }
-        
     } catch (error) {
-        // Email failure should never block signup completion
-        console.error('Welcome email error (non-blocking):', error);
+        // Email failure should never block signup
+        console.error('Welcome email setup error (non-blocking):', error);
     }
-    
-    // Always resolve - email is not critical to signup success
-    return true;
 }
