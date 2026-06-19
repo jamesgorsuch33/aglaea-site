@@ -1,12 +1,7 @@
 // ============================================================
-// FORGOT PASSWORD - Uses Firebase Auth directly
-// Firebase sends the email (customized in Firebase Console)
+// FORGOT PASSWORD - Uses our custom Netlify function
+// for fully branded AGLAEA email via Resend
 // ============================================================
-
-import { auth } from './firebase-config-v2.js';
-import { 
-    sendPasswordResetEmail
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
 import {
     showFieldError,
@@ -68,32 +63,23 @@ form.addEventListener('submit', async function(e) {
     setButtonLoading('submitBtn', 'Sending...');
     
     try {
-        // Use Firebase to send password reset email
-        await sendPasswordResetEmail(auth, email);
+        // Call our Netlify function to send branded email
+        const response = await fetch('/.netlify/functions/forgot-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email })
+        });
         
-        // Show success message
+        const result = await response.json();
+        
+        // Always show success message (security best practice)
+        // Function returns success even if email doesn't exist
         showSuccessMessage(email);
         
     } catch (error) {
         console.error('Password reset error:', error);
-        
-        // For security: show success message even if email doesn't exist
-        // This prevents attackers from discovering valid user emails
-        if (error.code === 'auth/user-not-found') {
-            // Still show success - don't reveal that user doesn't exist
-            showSuccessMessage(email);
-        } else if (error.code === 'auth/invalid-email') {
-            showFieldError('email', 'Please enter a valid email address');
-            resetButton('submitBtn');
-            document.getElementById('submitBtn').textContent = 'Send Reset Link';
-        } else if (error.code === 'auth/too-many-requests') {
-            showFieldError('email', 'Too many requests. Please try again later.');
-            resetButton('submitBtn');
-            document.getElementById('submitBtn').textContent = 'Send Reset Link';
-        } else {
-            // For other errors, still show success for security
-            showSuccessMessage(email);
-        }
+        // For security, show success even on errors
+        showSuccessMessage(email);
     }
 });
 
