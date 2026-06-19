@@ -331,8 +331,8 @@ if (remindersForm) {
                 notes: ''
             });
             
-            // Step F: Send welcome email (don't block on this - fire and forget)
-            sendWelcomeEmail(accountData.email, accountData.firstName);
+            // Step F: Send welcome email (await to ensure it sends before redirect)
+            await sendWelcomeEmail(accountData.email, accountData.firstName);
             
             // Success! Redirect to dashboard
             window.location.href = 'dashboard.html';
@@ -383,7 +383,7 @@ if (backBtn) {
 
 // ============================================================
 // SEND WELCOME EMAIL
-// Fire-and-forget - doesn't block signup completion
+// Awaited - but never blocks signup if it fails
 // ============================================================
 
 async function sendWelcomeEmail(email, firstName) {
@@ -403,11 +403,14 @@ async function sendWelcomeEmail(email, firstName) {
         if (result.success) {
             console.log('Welcome email sent successfully');
         } else {
-            console.warn('Welcome email failed:', result);
+            console.warn('Welcome email failed (non-blocking):', result);
         }
         
     } catch (error) {
-        // Don't block signup if email fails
-        console.error('Welcome email error:', error);
+        // Email failure should never block signup completion
+        console.error('Welcome email error (non-blocking):', error);
     }
+    
+    // Always resolve - email is not critical to signup success
+    return true;
 }
