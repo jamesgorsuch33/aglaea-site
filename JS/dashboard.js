@@ -400,6 +400,16 @@ function setupEventListeners() {
     const addBtn = document.getElementById('addReminderBtn');
     if (addBtn) {
         addBtn.addEventListener('click', function() {
+            // Check reminder limit for free tier
+            if (currentUserTier === 'free') {
+                const dateBasedCount = countDateBasedReminders();
+                if (dateBasedCount >= 5) {
+                    if (confirm('You\'ve reached the free tier limit of 5 reminders. Upgrade to Essential for unlimited reminders?')) {
+                        window.location.href = 'upgrade.html';
+                    }
+                    return;
+                }
+            }
             document.getElementById('addReminderModal').classList.remove('hidden');
         });
     }
