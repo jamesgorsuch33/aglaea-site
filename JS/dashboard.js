@@ -37,6 +37,18 @@ let currentUser = null;
 let currentUserTier = 'free';
 
 // ============================================================
+// COUNT DATE-BASED REMINDERS (for limit checking)
+// ============================================================
+function countDateBasedReminders() {
+    let count = 0;
+    document.querySelectorAll('.person-card').forEach(function(card) {
+        const dateReminders = card.querySelectorAll('[data-reminder-type="date-based"]');
+        count += dateReminders.length;
+    });
+    return count;
+}
+
+// ============================================================
 // INITIALIZATION
 // ============================================================
 
