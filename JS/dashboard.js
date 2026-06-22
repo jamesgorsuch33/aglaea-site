@@ -576,6 +576,17 @@ async function handleFormSubmit(e) {
     // Clear previous errors
     clearAllErrors('newReminderForm');
     
+    // Check reminder limit for free tier
+    if (currentUserTier === 'free') {
+        const dateBasedCount = countDateBasedReminders();
+        if (dateBasedCount >= 5) {
+            alert('You\'ve reached the free tier limit of 5 reminders. Please upgrade to Essential to add more.');
+            document.getElementById('addReminderModal').classList.add('hidden');
+            window.location.href = 'upgrade.html';
+            return;
+        }
+    }
+    
     const enableJB = document.getElementById('enableJustBecause').checked;
     
     if (enableJB && currentUserTier === 'free') {
