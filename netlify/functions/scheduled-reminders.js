@@ -303,6 +303,80 @@ async function processJustBecauseReminders(today, stats) {
 }
 
 // ============================================================
+// PROCESS UPGRADE NUDGE EMAILS
+// Sends nudge to free users who signed up exactly 3 days ago
+// ============================================================
+async function processUpgradeNudges(today, stats) {
+    console.log('Processing upgrade nudge emails...');
+    
+    // Calculate the target signup date (3 days ago)
+    const threeDaysAgo = new Date(today);
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+    threeDaysAgo.setHours(0, 0, 0, 0);
+    
+    const endOfThreeDaysAgo = new Date(threeDaysAgo);
+    endOfThreeDaysAgo.setHours(23, 59, 59, 999);
+    
+    console.log(`Looking for free users who signed up between ${threeDaysAgo.toISOString()} and ${endOfThreeDaysAgo.toISOString()}`);
+    
+    // Get all free tier users who signed up 3 days ago
+    const usersSnapshot = await db.collection('users')
+        .where('tier', '==', 'free')
+        .get();
+    
+    for (const userDoc of usersSnapshot.docs) {
+        const user = { id: userDoc.id, ...userDoc.data() };
+        
+        // Skip if already received the nudge
+        if (user.upgradeNudgeSent) {
+            continue;
+        }
+        
+        // Skip if no email
+        if (!user.email) {
+            continue;
+        }
+        
+        // Check signup date - we want users who signed up exactly 3 days ago
+        let signupDate;
+        if (user.createdAt) {
+            // Firestore timestamp
+            signupDate = user.createdAt.toDate ? user.createdAt.toDate() : new Date(user.createdAt);
+        } else if (user.signupDate) {
+            signupDate = new Date(user.signupDate);
+        } else {
+            // No signup date - skip
+            continue;
+        }
+        
+        // Check if signup was on the target day
+        if (signupDate >= threeDaysAgo && signupDate <= endOfThreeDaysAgo) {
+            console.log(`Sending upgrade nudge to ${user.email} (signed up ${signupDate.toISOString()})`);
+            
+            const sent = await sendEmail('upgradeNudge', user.email, {
+                firstName: user.firstName || 'there'
+            });
+            
+            if (sent) {
+                stats.nudgesSent++;
+                
+                // Mark as sent
+                try {
+                    await db.collection('users').doc(user.id).update({
+                        upgradeNudgeSent: true,
+                        upgradeNudgeSentAt: admin.firestore.FieldValue.serverTimestamp()
+                    });
+                } catch (updateError) {
+                    console.error(`Failed to mark nudge as sent for ${user.id}:`, updateError);
+                }
+            } else {
+                stats.nudgeFailed++;
+            }
+        }
+    }
+}
+
+// ============================================================
 // HELPER: Calculate next Just Because date based on frequency
 // ============================================================
 function calculateNextJBDate(reminder, fromDate) {
@@ -358,6 +432,8 @@ exports.handler = async (event) => {
         sent: 0,
         failed: 0,
         justBecauseSent: 0,
+        nudgesSent: 0,
+        nudgeFailed: 0,
         byType: {}
     };
     
@@ -368,12 +444,16 @@ exports.handler = async (event) => {
         // Process Just Because reminders
         await processJustBecauseReminders(today, stats);
         
+        // Process upgrade nudge emails (3 days post-signup)
+        await processUpgradeNudges(today, stats);
+        
         const duration = (Date.now() - startTime) / 1000;
         
         console.log('=== Scheduled Reminders Complete ===');
         console.log(`Duration: ${duration}s`);
-        console.log(`Emails sent: ${stats.sent}`);
+        console.log(`Reminders sent: ${stats.sent}`);
         console.log(`Just Because sent: ${stats.justBecauseSent}`);
+        console.log(`Upgrade nudges sent: ${stats.nudgesSent}`);
         console.log(`Failed: ${stats.failed}`);
         console.log(`By type:`, stats.byType);
         
