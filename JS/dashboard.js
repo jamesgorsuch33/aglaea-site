@@ -39,11 +39,13 @@ let currentUserTier = 'free';
 // ============================================================
 // COUNT DATE-BASED REMINDERS (for limit checking)
 // ============================================================
+
 function countDateBasedReminders() {
+    // Count reminder items with 'date-based' class
+    // Exclude past reminders (in past gifts section)
     let count = 0;
-    document.querySelectorAll('.person-card').forEach(function(card) {
-        const dateReminders = card.querySelectorAll('[data-reminder-type="date-based"]');
-        count += dateReminders.length;
+    document.querySelectorAll('#peopleList .reminder-item.date-based').forEach(function(item) {
+        count++;
     });
     return count;
 }
