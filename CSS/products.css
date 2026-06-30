@@ -184,7 +184,7 @@
 }
 
 /* ============================================================
-   BRAND CARDS GRID - 3 PER ROW (ORIGINAL DESIGN)
+   BRAND / PRODUCT CARDS GRID - 3 PER ROW
    ============================================================ */
 
 .brands-grid {
@@ -211,25 +211,29 @@
     border-color: var(--gold);
 }
 
+/* ------------------------------------------------------------
+   PRODUCT IMAGE
+   Square crop area, image fills it edge-to-edge with no
+   cropping (object-fit: contain) and no inner padding, so
+   portrait, landscape, and square source photos all display
+   consistently without being cut off or shrunk down.
+------------------------------------------------------------ */
 .brand-image {
     position: relative;
     width: 100%;
-    padding-top: 75%; /* 4:3 Aspect Ratio - ORIGINAL */
+    aspect-ratio: 1 / 1;
     background: linear-gradient(135deg, var(--stone) 0%, var(--cream) 100%);
     overflow: hidden;
 }
 
-/* For actual brand logo images - centered like original text */
 .brand-image > img {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    max-width: 60%;
-    max-height: 60%;
-    width: auto;
-    height: auto;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
+    object-position: center;
 }
 
 /* For text placeholders (if used) */
@@ -254,7 +258,7 @@
 }
 
 .brand-info {
-    padding: 1.5rem;
+    padding: 1.25rem 1.5rem 1.5rem;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -277,6 +281,9 @@
     margin-bottom: 0.75rem;
 }
 
+/* Product descriptions are hidden on the Specific Products page
+   for consistent card heights — see the page's own <style> block.
+   Left intact here in case other pages still use them. */
 .brand-description {
     font-size: 0.938rem;
     color: var(--slate);
