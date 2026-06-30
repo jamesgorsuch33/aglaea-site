@@ -33,6 +33,41 @@
             color: var(--color-muted, #888);
             margin-bottom: 4px;
         }
+
+        /* =============================================
+           LARGER PRODUCT IMAGES
+           Overrides products.css sizing so every image
+           fills more of the card, with consistent
+           proportions regardless of the source image's
+           original dimensions.
+        ============================================= */
+        .brand-card .brand-image {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f7f5f1;
+        }
+
+        .brand-card .brand-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        /* =============================================
+           HIDE PRODUCT DESCRIPTIONS
+           Descriptions varied wildly in length, which
+           made card heights inconsistent. Hidden rather
+           than deleted so they're easy to restore later
+           if needed — just remove this rule.
+        ============================================= */
+        .brand-card .brand-description {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -212,6 +247,8 @@
                                 <option value="default">Featured</option>
                                 <option value="name-asc">Name (A-Z)</option>
                                 <option value="name-desc">Name (Z-A)</option>
+                                <option value="price-asc">Price (Low to High)</option>
+                                <option value="price-desc">Price (High to Low)</option>
                             </select>
                         </div>
                     </div>
@@ -2853,6 +2890,58 @@ The Milou Bezel Set Tennis Necklace boasts hexagonal and princess-cut Swarovski 
 
     <script src="js/products.js"></script>
     <script src="js/mobile-menu.js"></script>
+
+    <!-- ============================================================
+         PRICE SORT PATCH
+         Adds "Price (Low to High)" / "Price (High to Low)" handling
+         on top of the existing sortProducts() function from
+         products.js, without needing to edit that file directly.
+         If price-asc / price-desc is selected, this runs instead.
+         Any other option falls back to the original function.
+    ============================================================ -->
+    <script>
+        (function () {
+            // Reads a price string like "£1,250.00" or "£19.95" and
+            // returns a plain number for comparison.
+            function parsePrice(card) {
+                const priceEl = card.querySelector('.brand-price');
+                if (!priceEl) return 0;
+                const cleaned = priceEl.textContent.replace(/[^0-9.]/g, '');
+                const value = parseFloat(cleaned);
+                return isNaN(value) ? 0 : value;
+            }
+
+            const originalSortProducts = window.sortProducts;
+
+            window.sortProducts = function () {
+                const sortValue = document.getElementById('sort-select').value;
+
+                if (sortValue === 'price-asc' || sortValue === 'price-desc') {
+                    const grid = document.getElementById('brands-grid');
+                    const cards = Array.from(document.querySelectorAll('.brand-card'));
+
+                    const sortedCards = cards.sort((a, b) => {
+                        const priceA = parsePrice(a);
+                        const priceB = parsePrice(b);
+                        return sortValue === 'price-asc' ? priceA - priceB : priceB - priceA;
+                    });
+
+                    sortedCards.forEach(card => grid.appendChild(card));
+
+                    // Re-apply filters/pagination if that function exists
+                    if (typeof window.filterProducts === 'function') {
+                        window.filterProducts();
+                    }
+                    return;
+                }
+
+                // Fall back to the original sort logic for all other options
+                if (typeof originalSortProducts === 'function') {
+                    originalSortProducts();
+                }
+            };
+        })();
+    </script>
 
 </body>
 </html>
