@@ -30,7 +30,8 @@ const db = admin.firestore();
 const SITE_URL = process.env.SITE_URL || 'https://aglaea.co.uk';
 
 // Reminder cadences (days before occasion) → email type
-const CADENCES = {
+// Different cadences for different tiers
+const CADENCES_CURATE = {
     21: 'reminder21Days',
     14: 'reminder14Days',
     10: 'reminder10Days',
@@ -38,6 +39,21 @@ const CADENCES = {
     3: 'reminder3Days',
     0: 'reminderDayOf'  // Day-of
 };
+
+const CADENCES_DISCOVER = {
+    7: 'reminder7Days',
+    3: 'reminder3Days'
+};
+
+// Helper: Determine cadences based on user tier
+// Handles both old tier names (free/essential) and new ones (discover/curate)
+function getCadencesForTier(tier) {
+    if (tier === 'curate' || tier === 'essential') {
+        return CADENCES_CURATE;
+    }
+    // Default to Discover cadence for 'discover', 'free', or unknown
+    return CADENCES_DISCOVER;
+}
 
 // ============================================================
 // HELPER: Calculate days between two dates (ignoring time)
@@ -139,11 +155,15 @@ async function processDateBasedReminders(today, stats) {
         
         const userEmail = userData.email;
         const firstName = userData.firstName || 'there';
+        const userTier = userData.tier || 'discover';
         
         if (!userEmail) {
             console.warn(`User ${person.userId} has no email, skipping`);
             continue;
         }
+        
+        // Get cadences based on user tier
+        const userCadences = getCadencesForTier(userTier);
         
         // Get all reminders for this person
         const remindersSnapshot = await db.collection('people')
@@ -163,8 +183,8 @@ async function processDateBasedReminders(today, stats) {
             // Calculate days until occasion
             const days = daysBetween(today, reminder.date);
             
-            // Only process valid cadence days
-            if (!(days in CADENCES)) continue;
+            // Only process valid cadence days for this user's tier
+            if (!(days in userCadences)) continue;
             
             // Skip if purchased AND it's not day-of
             // (Day-of always sends so they don't forget the actual day)
@@ -183,7 +203,7 @@ async function processDateBasedReminders(today, stats) {
             }
             
             // Build email data
-            const emailType = CADENCES[days];
+            const emailType = userCadences[days];
             const emailData = {
                 firstName: firstName,
                 recipientName: person.personName || 'someone',
@@ -191,7 +211,7 @@ async function processDateBasedReminders(today, stats) {
                 occasionDate: formatOccasionDate(reminder.date)
             };
             
-            console.log(`Sending ${emailType} to ${userEmail} for ${person.personName}`);
+            console.log(`Sending ${emailType} to ${userEmail} (${userTier} tier) for ${person.personName}`);
             
             // Send the email
             const sent = await sendEmail(emailType, userEmail, emailData);
@@ -245,8 +265,8 @@ async function processJustBecauseReminders(today, stats) {
             continue;
         }
         
-        // Only Essential users get Just Because emails
-        if (userData.tier !== 'essential') continue;
+        // Only Curate/Essential users get Just Because emails
+        if (userData.tier !== 'essential' && userData.tier !== 'curate') continue;
         
         const userEmail = userData.email;
         const firstName = userData.firstName || 'there';
@@ -317,15 +337,18 @@ async function processUpgradeNudges(today, stats) {
     const endOfThreeDaysAgo = new Date(threeDaysAgo);
     endOfThreeDaysAgo.setHours(23, 59, 59, 999);
     
-    console.log(`Looking for free users who signed up between ${threeDaysAgo.toISOString()} and ${endOfThreeDaysAgo.toISOString()}`);
+    console.log(`Looking for free/discover users who signed up between ${threeDaysAgo.toISOString()} and ${endOfThreeDaysAgo.toISOString()}`);
     
-    // Get all free tier users who signed up 3 days ago
-    const usersSnapshot = await db.collection('users')
-        .where('tier', '==', 'free')
-        .get();
+    // Get all users (we'll filter for free/discover tier in code)
+    const usersSnapshot = await db.collection('users').get();
     
     for (const userDoc of usersSnapshot.docs) {
         const user = { id: userDoc.id, ...userDoc.data() };
+        
+        // Only nudge free/discover users (paid users don't need upgrade nudges)
+        if (user.tier !== 'free' && user.tier !== 'discover') {
+            continue;
+        }
         
         // Skip if already received the nudge
         if (user.upgradeNudgeSent) {
