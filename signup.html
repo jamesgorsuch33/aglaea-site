@@ -1,197 +1,419 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up — Aglaea</title>
-    <meta name="description" content="Create your free AGLAEA account and never miss another special moment.">
+// ============================================================
+// SIGNUP FLOW - With Inline Validation + Loading States
+// Step 1: Account Details
+// Step 2: First Reminder
+// ============================================================
+
+import { auth } from './firebase-config-v2.js';
+import { 
+    createUserWithEmailAndPassword,
+    updateProfile
+} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+import {
+    createOrUpdateUser,
+    createPerson,
+    createDateBasedReminder
+} from './firebase-config-v2.js';
+
+import {
+    showFieldError,
+    clearFieldError,
+    clearAllErrors,
+    validateEmail,
+    validatePassword,
+    validateRequired,
+    validatePhone,
+    validateFutureDate,
+    setButtonLoading,
+    resetButton,
+    setupFieldValidation
+} from './form-validation.js';
+
+// ============================================================
+// STEP NAVIGATION
+// ============================================================
+
+function showStep(step) {
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const successStep = document.getElementById('successStep');
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    if (step1) step1.classList.toggle('hidden', step !== 1);
+    if (step2) step2.classList.toggle('hidden', step !== 2);
+    if (successStep) successStep.classList.add('hidden');
     
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/signup.css">
-    <link rel="stylesheet" href="css/form-validation.css">
-</head>
-<body>
+    // Update progress indicator
+    const progressSteps = document.querySelectorAll('.progress-step');
+    progressSteps.forEach(function(progressStep) {
+        const stepNum = parseInt(progressStep.dataset.step);
+        progressStep.classList.toggle('active', stepNum === step);
+        progressStep.classList.toggle('completed', stepNum < step);
+    });
     
-    <!-- Header -->
-    <header class="header">
-    <div class="container header-content">
-        <a href="index.html" class="logo">AGLAEA</a>
-        <nav class="nav">
-            <a href="index.html">← Back to Home</a>
-        </nav>
-    </div>
-</header>
+    window.scrollTo(0, 0);
+}
 
-    <!-- Signup Section -->
-    <section class="signup-section">
-        <div class="container">
-            <div class="signup-container">
-                
-                <!-- Progress Indicator -->
-                <div class="progress-bar">
-                    <div class="progress-step active" data-step="1">
-                        <div class="progress-circle">1</div>
-                        <span>Your Details</span>
-                    </div>
-                    <div class="progress-line"></div>
-                    <div class="progress-step" data-step="2">
-                        <div class="progress-circle">2</div>
-                        <span>Add Reminders</span>
-                    </div>
-                </div>
+// ============================================================
+// STEP 1 - REAL-TIME VALIDATION
+// ============================================================
 
-                <!-- Step 1: Account Details -->
-                <div class="signup-step" id="step1">
-                    <h1 class="signup-title">Create Your Account</h1>
-                    <p class="signup-subtitle">Start remembering the moments that matter</p>
-                    
-                    <form id="accountForm" class="signup-form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="firstName">First Name</label>
-                                <input type="text" id="firstName" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="lastName">Last Name</label>
-                                <input type="text" id="lastName" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" id="email" required>
-                            <span class="form-helper">We'll send your reminder notifications here</span>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <input type="password" id="password" required minlength="6">
-                            <span class="form-helper">Minimum 6 characters</span>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="phone">Phone Number (Optional)</label>
-                            <input type="tel" id="phone" placeholder="+44 7XXX XXXXXX">
-                            <span class="form-helper">For SMS reminders (Essential plan only)</span>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary btn-full">Next: Add Reminders</button>
-                    </form>
-                </div>
+// Set up real-time validation for all step 1 fields
+setupFieldValidation('firstName', function(value) {
+    return validateRequired(value, 'First name');
+});
 
-                <!-- Step 2: Add Reminders -->
-                <div class="signup-step hidden" id="step2">
-                    <h1 class="signup-title">Add Your First Reminders</h1>
-                    <p class="signup-subtitle">Set up 1-5 free reminders to get started</p>
-                    
-                    <form id="remindersForm" class="signup-form">
-                        
-                        <div id="remindersContainer">
-                            <!-- Reminder 1 (Required) -->
-                            <div class="reminder-input" data-reminder="1">
-                                <div class="reminder-header">
-                                    <h3>Reminder 1 <span class="required-badge">Required</span></h3>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="name1">Person's Name</label>
-                                    <input type="text" id="name1" placeholder="e.g. Mum, Sarah, Best Friend" required>
-                                </div>
-                                
-                                <!-- Relationship -->
-                                <div class="form-group">
-                                    <label for="signupRelationship">Relationship</label>
-                                    <select id="signupRelationship" required>
-                                        <option value="">Select relationship...</option>
-                                        <option value="Partner">Partner</option>
-                                        <option value="Spouse">Spouse</option>
-                                        <option value="Mum">Mum</option>
-                                        <option value="Dad">Dad</option>
-                                        <option value="Sister">Sister</option>
-                                        <option value="Brother">Brother</option>
-                                        <option value="Daughter">Daughter</option>
-                                        <option value="Son">Son</option>
-                                        <option value="Grandmother">Grandmother</option>
-                                        <option value="Grandfather">Grandfather</option>
-                                        <option value="Aunt">Aunt</option>
-                                        <option value="Uncle">Uncle</option>
-                                        <option value="Cousin">Cousin</option>
-                                        <option value="Friend">Friend</option>
-                                        <option value="Best Friend">Best Friend</option>
-                                        <option value="Colleague">Colleague</option>
-                                        <option value="Boss">Boss</option>
-                                        <option value="Neighbour">Neighbour</option>
-                                        <option value="Other">Other</option>
-                                     </select>
-                                </div>
+setupFieldValidation('lastName', function(value) {
+    return validateRequired(value, 'Last name');
+});
 
-                                <!-- Custom Relationship (shown when Other selected) -->
-                                <div id="signupCustomRelationship" class="form-group hidden">
-                                    <label for="signupCustomRelationshipName">Specify relationship</label>
-                                    <input type="text" id="signupCustomRelationshipName" placeholder="e.g. Mentor, Godparent">
-                                </div>
-                                
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="occasion1">Occasion</label>
-                                        <select id="occasion1" required>
-                                            <option value="">Select occasion</option>
-                                            <option value="birthday">Birthday</option>
-                                            <option value="anniversary">Anniversary</option>
-                                            <option value="valentines">Valentine's Day</option>
-                                            <option value="mothers-day">Mother's Day</option>
-                                            <option value="fathers-day">Father's Day</option>
-                                            <option value="christmas">Christmas</option>
-                                            <option value="just-because">Just Because</option>
-                                            <option value="other">Other (type your own)</option>
-                                        </select>
-                                        <input type="text" id="customOccasion1" class="custom-occasion hidden" placeholder="Enter occasion name">
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="date1">Date</label>
-                                        <input type="date" id="date1" required>
-                                    </div>
-                                </div>
-                                
-                                <p class="date-helper">💡 Enter the actual date of the occasion (we'll remind you 10 days before)</p>
-                            </div>
-                        </div>
-                        
-                        <p class="form-helper" style="text-align: center; margin: 1rem 0;">
-                            💡 You can add more reminders from your dashboard after signing up
-                        </p>
-                        
-                        <div class="form-actions">
-                            <button type="button" id="backBtn" class="btn btn-secondary">← Back</button>
-                            <button type="submit" class="btn btn-primary" id="createAccountBtn">Create My Account</button>
-                        </div>
-                    </form>
-                </div>
+setupFieldValidation('email', function(value) {
+    return validateEmail(value);
+});
 
-                <!-- Success Message (hidden initially) -->
-                <div class="signup-step hidden" id="successStep">
-                    <div class="success-message">
-                        <div class="success-icon">✓</div>
-                        <h1 class="signup-title">Welcome to AGLAEA!</h1>
-                        <p class="signup-subtitle">Your account has been created successfully</p>
-                        <p style="margin-bottom: 2rem;">Check your email for a welcome message and your first reminder confirmations.</p>
-                        <a href="index.html" class="btn btn-primary btn-large">Back to Home</a>
-                    </div>
-                </div>
+setupFieldValidation('password', function(value) {
+    return validatePassword(value);
+});
 
-            </div>
-        </div>
-    </section>
+setupFieldValidation('phone', function(value) {
+    return validatePhone(value);
+});
 
-    <!-- Signup Logic -->
-    <script type="module" src="js/signup.js"></script>
-    <script src="js/mobile-menu.js"></script>
+// ============================================================
+// STEP 1 - ACCOUNT DETAILS FORM SUBMIT
+// ============================================================
 
-</body>
-</html>
+const accountForm = document.getElementById('accountForm');
+if (accountForm) {
+    accountForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Clear previous errors
+        clearAllErrors('accountForm');
+        
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const phone = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
+        
+        let hasErrors = false;
+        
+        // Validate each field
+        const firstNameCheck = validateRequired(firstName, 'First name');
+        if (!firstNameCheck.valid) {
+            showFieldError('firstName', firstNameCheck.message);
+            hasErrors = true;
+        }
+        
+        const lastNameCheck = validateRequired(lastName, 'Last name');
+        if (!lastNameCheck.valid) {
+            showFieldError('lastName', lastNameCheck.message);
+            hasErrors = true;
+        }
+        
+        const emailCheck = validateEmail(email);
+        if (!emailCheck.valid) {
+            showFieldError('email', emailCheck.message);
+            hasErrors = true;
+        }
+        
+        const passwordCheck = validatePassword(password);
+        if (!passwordCheck.valid) {
+            showFieldError('password', passwordCheck.message);
+            hasErrors = true;
+        }
+        
+        if (phone) {
+            const phoneCheck = validatePhone(phone);
+            if (!phoneCheck.valid) {
+                showFieldError('phone', phoneCheck.message);
+                hasErrors = true;
+            }
+        }
+        
+        if (hasErrors) {
+            // Scroll to first error
+            const firstError = document.querySelector('.field-error');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstError.focus();
+            }
+            return;
+        }
+        
+        // Store data for Step 2
+        window.signupData = {
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            password: password,
+            phone: phone
+        };
+        
+        // Move to Step 2
+        showStep(2);
+    });
+}
+
+// ============================================================
+// STEP 2 - REAL-TIME VALIDATION
+// ============================================================
+
+setupFieldValidation('name1', function(value) {
+    return validateRequired(value, 'Name');
+});
+
+setupFieldValidation('date1', function(value) {
+    return validateFutureDate(value, true);
+});
+
+// ============================================================
+// RELATIONSHIP DROPDOWN HANDLER
+// ============================================================
+
+const relationshipSelect = document.getElementById('signupRelationship');
+if (relationshipSelect) {
+    relationshipSelect.addEventListener('change', function(e) {
+        clearFieldError('signupRelationship');
+        
+        const customGroup = document.getElementById('signupCustomRelationship');
+        if (customGroup) {
+            if (e.target.value === 'Other') {
+                customGroup.classList.remove('hidden');
+            } else {
+                customGroup.classList.add('hidden');
+            }
+        }
+    });
+}
+
+// ============================================================
+// OCCASION DROPDOWN HANDLER (custom occasion)
+// ============================================================
+
+const occasionSelect = document.getElementById('occasion1');
+if (occasionSelect) {
+    occasionSelect.addEventListener('change', function(e) {
+        clearFieldError('occasion1');
+        
+        const customInput = document.getElementById('customOccasion1');
+        if (customInput) {
+            if (e.target.value === 'other') {
+                customInput.classList.remove('hidden');
+                customInput.required = true;
+            } else {
+                customInput.classList.add('hidden');
+                customInput.required = false;
+                clearFieldError('customOccasion1');
+            }
+        }
+    });
+}
+
+// ============================================================
+// STEP 2 - CREATE ACCOUNT + FIRST REMINDER
+// ============================================================
+
+const remindersForm = document.getElementById('remindersForm');
+if (remindersForm) {
+    remindersForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Clear previous errors
+        clearAllErrors('remindersForm');
+        
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const btnId = submitBtn.id || 'createAccountBtn';
+        if (!submitBtn.id) submitBtn.id = btnId;
+        
+        // Get values
+        const personName = document.getElementById('name1').value.trim();
+        const relationshipValue = relationshipSelect ? relationshipSelect.value : '';
+        const customRelationshipInput = document.getElementById('signupCustomRelationshipName');
+        const customRelationship = customRelationshipInput ? customRelationshipInput.value.trim() : '';
+        const relationship = relationshipValue === 'Other' ? customRelationship : relationshipValue;
+        
+        const occasion = document.getElementById('occasion1').value;
+        const customOccasionInput = document.getElementById('customOccasion1');
+        const customOccasionName = customOccasionInput ? customOccasionInput.value.trim() : '';
+        const occasionDate = document.getElementById('date1').value;
+        
+        let hasErrors = false;
+        
+        // Validate person name
+        const nameCheck = validateRequired(personName, 'Name');
+        if (!nameCheck.valid) {
+            showFieldError('name1', nameCheck.message);
+            hasErrors = true;
+        }
+        
+        // Validate relationship
+        if (!relationshipValue) {
+            showFieldError('signupRelationship', 'Please select a relationship');
+            hasErrors = true;
+        } else if (relationshipValue === 'Other' && !customRelationship) {
+            showFieldError('signupCustomRelationshipName', 'Please specify the relationship');
+            hasErrors = true;
+        }
+        
+        // Validate occasion
+        if (!occasion) {
+            showFieldError('occasion1', 'Please select an occasion');
+            hasErrors = true;
+        } else if (occasion === 'other' && !customOccasionName) {
+            showFieldError('customOccasion1', 'Please specify the occasion');
+            hasErrors = true;
+        }
+        
+        // Validate date
+        const dateCheck = validateFutureDate(occasionDate, true);
+        if (!dateCheck.valid) {
+            showFieldError('date1', dateCheck.message);
+            hasErrors = true;
+        }
+        
+        if (hasErrors) {
+            const firstError = document.querySelector('.field-error');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstError.focus();
+            }
+            return;
+        }
+        
+        // Get account data from Step 1
+        const accountData = window.signupData;
+        
+        if (!accountData) {
+            alert('Account details missing. Please go back to Step 1.');
+            showStep(1);
+            return;
+        }
+        
+        // Set loading state
+        setButtonLoading(btnId, 'Creating your account...');
+        
+        try {
+            // Step A: Create Firebase Auth user
+            const userCredential = await createUserWithEmailAndPassword(
+                auth, 
+                accountData.email, 
+                accountData.password
+            );
+            const user = userCredential.user;
+            
+            // Step B: Update display name in Auth
+            await updateProfile(user, {
+                displayName: accountData.firstName + ' ' + accountData.lastName
+            });
+            
+            // Step C: Create user document in Firestore
+            await createOrUpdateUser(user.uid, {
+                firstName: accountData.firstName,
+                lastName: accountData.lastName,
+                email: accountData.email,
+                phone: accountData.phone || '',
+                tier: 'discover',
+                createdAt: new Date().toISOString()
+            });
+            
+            // Step D: Create the person (recipient)
+            const personId = await createPerson(user.uid, personName, relationship);
+            
+            // Step E: Create the date-based reminder
+            const occasionType = occasion === 'other' ? 'custom' : occasion;
+            
+            await createDateBasedReminder(personId, {
+                occasion: occasionType,
+                customOccasionName: occasion === 'other' ? customOccasionName : null,
+                date: occasionDate,
+                notes: ''
+            });
+            
+            // Step F: Send welcome email (uses keepalive - fast and reliable)
+            sendWelcomeEmail(accountData.email, accountData.firstName);
+            
+            // Success! Redirect to dashboard immediately
+            window.location.href = 'dashboard.html';
+            
+        } catch (error) {
+            console.error('Signup error:', error);
+            
+            resetButton(btnId);
+            
+            // Show error on appropriate field
+            if (error.code === 'auth/email-already-in-use') {
+                showStep(1);
+                setTimeout(function() {
+                    showFieldError('email', 'An account with this email already exists. Please sign in instead.');
+                    document.getElementById('email').focus();
+                }, 100);
+            } else if (error.code === 'auth/invalid-email') {
+                showStep(1);
+                setTimeout(function() {
+                    showFieldError('email', 'Please enter a valid email address');
+                    document.getElementById('email').focus();
+                }, 100);
+            } else if (error.code === 'auth/weak-password') {
+                showStep(1);
+                setTimeout(function() {
+                    showFieldError('password', 'Password is too weak. Please use at least 6 characters');
+                    document.getElementById('password').focus();
+                }, 100);
+            } else if (error.code === 'auth/network-request-failed') {
+                alert('Network error. Please check your connection and try again.');
+            } else {
+                alert('Error creating account. Please try again or contact support.');
+            }
+        }
+    });
+}
+
+// ============================================================
+// BACK BUTTON (Step 2 to Step 1)
+// ============================================================
+
+const backBtn = document.getElementById('backBtn');
+if (backBtn) {
+    backBtn.addEventListener('click', function() {
+        showStep(1);
+    });
+}
+
+// ============================================================
+// SEND WELCOME EMAIL
+// Uses keepalive flag - guarantees request completes 
+// even if page is unloading. Modern browser feature.
+// ============================================================
+
+function sendWelcomeEmail(email, firstName) {
+    try {
+        // keepalive: true tells browser to complete this request
+        // even if the page is navigating away
+        fetch('/.netlify/functions/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            keepalive: true,  // ⭐ KEY: Request survives page navigation
+            body: JSON.stringify({
+                emailType: 'welcome',
+                to: email,
+                data: { firstName: firstName }
+            })
+        }).then(function(response) {
+            return response.json();
+        }).then(function(result) {
+            if (result && result.success) {
+                console.log('Welcome email sent successfully');
+            } else {
+                console.warn('Welcome email failed (non-blocking):', result);
+            }
+        }).catch(function(error) {
+            console.error('Welcome email error (non-blocking):', error);
+        });
+        
+    } catch (error) {
+        // Email failure should never block signup
+        console.error('Welcome email setup error (non-blocking):', error);
+    }
+}
