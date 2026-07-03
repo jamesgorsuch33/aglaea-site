@@ -4,13 +4,13 @@
 
 // Stripe Publishable Key (safe to expose in client-side code)
 // TODO: Replace with your actual Stripe Publishable Key
-const STRIPE_PUBLISHABLE_KEY = 'pk_test_51TOYGgR1KZpwXwShJWiAldqS1lviLdZt24pZLzkspDYONgr1M8jyTu0QneUBHYpDYnAI7xPsN3RT7ec86YbMFpqg00zpFIdihG';
+const STRIPE_PUBLISHABLE_KEY = 'pk_test_REPLACE_WITH_YOUR_KEY';
 const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
 
 // TODO: Replace with your Stripe Price IDs (from Stripe Dashboard → Products)
 const STRIPE_PRICES = {
-    monthly: 'price_1TOYP9R1KZpwXwSh4PB0pQy6',  // Essential Monthly: £4.99/month
-    annual: 'price_1TOYTcR1KZpwXwShbmzcvLF9'     // Essential Annual: £49.99/year
+    monthly: 'price_MONTHLY_ID',  // Curate Monthly: £4.99/month
+    annual: 'price_ANNUAL_ID'     // Curate Annual: £49.99/year
 };
 
 // State
@@ -19,10 +19,10 @@ let currentUser = null;
 
 // DOM Elements
 const billingToggle = document.getElementById('billingToggle');
-const essentialPrice = document.getElementById('essentialPrice');
-const essentialPeriod = document.getElementById('essentialPeriod');
-const essentialAnnual = document.getElementById('essentialAnnual');
-const upgradeToEssentialBtn = document.getElementById('upgradeToEssential');
+const curatePrice = document.getElementById('curatePrice');
+const curatePeriod = document.getElementById('curatePeriod');
+const curateAnnual = document.getElementById('curateAnnual');
+const upgradeToCurateBtn = document.getElementById('upgradeToCurate');
 const premiumWaitlistBtn = document.getElementById('premiumWaitlistBtn');
 const premiumWaitlistModal = document.getElementById('premiumWaitlistModal');
 const premiumWaitlistFormModal = document.getElementById('premiumWaitlistFormModal');
@@ -46,13 +46,13 @@ billingToggle.addEventListener('change', (e) => {
 // Update Pricing Display
 function updatePricing() {
     if (isAnnual) {
-        essentialPrice.textContent = '£49.99';
-        essentialPeriod.textContent = '/year';
-        essentialAnnual.textContent = 'Just £4.17/month — Save £10';
+        curatePrice.textContent = '£49.99';
+        curatePeriod.textContent = '/year';
+        curateAnnual.textContent = 'Just £4.17/month — Save £10';
     } else {
-        essentialPrice.textContent = '£4.99';
-        essentialPeriod.textContent = '/month';
-        essentialAnnual.textContent = '';
+        curatePrice.textContent = '£4.99';
+        curatePeriod.textContent = '/month';
+        curateAnnual.textContent = '';
     }
 }
 
@@ -65,15 +65,16 @@ async function checkUserPlan() {
             .get();
         
         if (userDoc.exists) {
-            const plan = userDoc.data().plan || 'free';
+            const userData = userDoc.data();
+            const tier = userData.tier || userData.plan || 'discover';
             
-            if (plan === 'essential') {
-                upgradeToEssentialBtn.textContent = 'Current Plan';
-                upgradeToEssentialBtn.disabled = true;
+            if (tier === 'essential' || tier === 'curate') {
+                upgradeToCurateBtn.textContent = 'Current Plan';
+                upgradeToCurateBtn.disabled = true;
             }
             
             // Check Premium waitlist status
-            if (userDoc.data().premiumWaitlist) {
+            if (userData.premiumWaitlist) {
                 premiumWaitlistBtn.textContent = 'On Waitlist';
                 premiumWaitlistBtn.disabled = true;
             }
@@ -83,8 +84,8 @@ async function checkUserPlan() {
     }
 }
 
-// Upgrade to Essential
-upgradeToEssentialBtn.addEventListener('click', async () => {
+// Upgrade to Curate
+upgradeToCurateBtn.addEventListener('click', async () => {
     console.log('=== UPGRADE BUTTON CLICKED ===');
     
     if (!currentUser) {
@@ -97,8 +98,8 @@ upgradeToEssentialBtn.addEventListener('click', async () => {
     console.log('User Email:', currentUser.email);
     console.log('Is Annual:', isAnnual);
     
-    upgradeToEssentialBtn.disabled = true;
-    upgradeToEssentialBtn.textContent = 'Loading...';
+    upgradeToCurateBtn.disabled = true;
+    upgradeToCurateBtn.textContent = 'Loading...';
     
     try {
         // Select price based on billing period
@@ -106,7 +107,7 @@ upgradeToEssentialBtn.addEventListener('click', async () => {
         console.log('Selected Price ID:', priceId);
         
         // Call Netlify Function to create checkout session
-        console.log('Creating checkout session...');
+        console.log('Calling function at: /.netlify/functions/create-checkout-session');
         const response = await fetch('/.netlify/functions/create-checkout-session', {
             method: 'POST',
             headers: {
@@ -119,11 +120,18 @@ upgradeToEssentialBtn.addEventListener('click', async () => {
             })
         });
         
+        console.log('Response status:', response.status);
+        
         if (!response.ok) {
-            throw new Error('Failed to create checkout session');
+            const errorData = await response.json();
+            console.error('Function error:', errorData);
+            throw new Error(errorData.error || 'Failed to create checkout session');
         }
         
-        const { sessionId } = await response.json();
+        const data = await response.json();
+        console.log('Session created:', data);
+        
+        const { sessionId } = data;
         console.log('Session ID:', sessionId);
         
         // Redirect to Stripe Checkout (opens as overlay/popup)
@@ -137,10 +145,12 @@ upgradeToEssentialBtn.addEventListener('click', async () => {
         
     } catch (error) {
         console.error('=== CHECKOUT ERROR ===');
-        console.error('Error:', error);
+        console.error('Error type:', error.name);
+        console.error('Error message:', error.message);
+        console.error('Full error:', error);
         alert('Payment setup failed: ' + error.message);
-        upgradeToEssentialBtn.disabled = false;
-        upgradeToEssentialBtn.textContent = 'Upgrade to Essential';
+        upgradeToCurateBtn.disabled = false;
+        upgradeToCurateBtn.textContent = 'Upgrade to Curate';
     }
 });
 
@@ -219,5 +229,5 @@ const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('upgraded') === 'true') {
     // TODO: Update user plan in Firestore
     // This should be done by a webhook from Stripe when payment succeeds
-    alert('✅ Welcome to Essential! Your upgrade is complete.');
+    alert('✅ Welcome to Curate! Your upgrade is complete.');
 }
