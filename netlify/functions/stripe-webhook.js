@@ -58,13 +58,13 @@ exports.handler = async (event, context) => {
         // Update user plan in Firestore
         if (userId) {
           await db.collection('users').doc(userId).set({
-            plan: 'essential',
+            tier: 'curate',
             stripeCustomerId: session.customer,
             stripeSubscriptionId: session.subscription,
             upgradedAt: admin.firestore.FieldValue.serverTimestamp()
           }, { merge: true });
           
-          console.log('User plan updated to Essential');
+          console.log('User plan updated to Curate');
           
           // Send upgrade confirmation email
           try {
@@ -129,11 +129,11 @@ exports.handler = async (event, context) => {
         if (!snapshot.empty) {
           const userDoc = snapshot.docs[0];
           await userDoc.ref.set({
-            plan: 'free',
+            tier: 'discover',
             cancelledAt: admin.firestore.FieldValue.serverTimestamp()
           }, { merge: true });
           
-          console.log('User downgraded to Free');
+          console.log('User downgraded to Discover');
         }
         break;
       }
