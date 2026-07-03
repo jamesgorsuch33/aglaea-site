@@ -142,14 +142,14 @@ const templates = {
     // UPGRADE CONFIRMATION EMAIL
     // ============================================================
     upgradeConfirmation: (data) => ({
-        subject: `Welcome to AGLAEA Essential, ${data.firstName || 'there'}`,
+        subject: `Welcome to AGLAEA Curate, ${data.firstName || 'there'}`,
         html: buildEmail({
             preheader: 'Unlimited reminders, Just Because moments, and more.',
             content: `
                 <tr>
                     <td class="hero" style="text-align: center; padding: 0 32px 48px 32px;">
                         <p style="font-size: 12px; color: #c9a870; letter-spacing: 0.3em; text-transform: uppercase; margin: 0 0 16px 0; font-weight: 600;">
-                            Welcome to Essential
+                            Welcome to Curate
                         </p>
                         <h1 style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 36px; font-weight: 400; color: #2a2a2a; line-height: 1.2; margin: 0;">
                             Thank you, ${escapeHtml(data.firstName || 'friend')}.
@@ -159,7 +159,7 @@ const templates = {
                 <tr>
                     <td style="padding: 0 32px 0 32px;">
                         <p style="font-size: 16px; line-height: 1.7; color: #2a2a2a; margin: 0 0 20px 0;">
-                            We're delighted to welcome you to AGLAEA Essential. Your upgrade is now active, and the full experience is yours to enjoy.
+                            We're delighted to welcome you to AGLAEA Curate. Your upgrade is now active, and the full experience is yours to enjoy.
                         </p>
                         <div style="background-color: #f9f5ed; padding: 32px; margin: 32px 0; border-radius: 4px;">
                             <p style="font-size: 14px; color: #c9a870; letter-spacing: 0.2em; text-transform: uppercase; margin: 0 0 16px 0; font-weight: 600;">
@@ -252,7 +252,7 @@ const templates = {
                             That's why we built Just Because moments — gentle, scheduled reminders to do something kind, simply because you can. No occasion. No expectation. Just a quiet nudge to send a thoughtful gift, write a note, or pick up the phone.
                         </p>
                         <p style="font-size: 16px; line-height: 1.7; color: #2a2a2a; margin: 0 0 20px 0;">
-                            It's one of the small touches that makes AGLAEA Essential feel different. Alongside unlimited reminders, SMS notifications, and priority access to our partner brands.
+                            It's one of the small touches that makes AGLAEA Curate feel different. Alongside unlimited reminders, SMS notifications, and priority access to our partner brands.
                         </p>
                     </td>
                 </tr>
@@ -260,7 +260,7 @@ const templates = {
                     <td style="padding: 0 32px 32px 32px;">
                         <div style="background-color: #f9f5ed; padding: 32px; border-radius: 4px;">
                             <p style="font-size: 14px; color: #c9a870; letter-spacing: 0.2em; text-transform: uppercase; margin: 0 0 16px 0; font-weight: 600;">
-                                AGLAEA Essential
+                                AGLAEA Curate
                             </p>
                             <div style="padding: 12px 0; border-bottom: 1px solid rgba(201, 168, 112, 0.15);">
                                 <span style="display: inline-block; font-size: 20px; margin-right: 12px; vertical-align: middle; color: #c9a870;">✦</span>
@@ -284,7 +284,7 @@ const templates = {
                 <tr>
                     <td style="padding: 0 32px 32px 32px;">
                         <p style="font-size: 16px; line-height: 1.7; color: #2a2a2a; margin: 0 0 0 0;">
-                            Essential is £4.99 per month. No pressure, no rush — but if it sounds like something you'd love, we'd be delighted to welcome you.
+                            Curate is £4.99 per month. No pressure, no rush — but if it sounds like something you'd love, we'd be delighted to welcome you.
                         </p>
                     </td>
                 </tr>
@@ -294,10 +294,10 @@ const templates = {
                             Make every moment count.
                         </h2>
                         <p style="color: rgba(255, 255, 255, 0.85); font-size: 15px; margin: 0 0 24px 0;">
-                            Explore everything AGLAEA Essential offers.
+                            Explore everything AGLAEA Curate offers.
                         </p>
                         <a href="${SITE_URL}/upgrade.html" style="display: inline-block; background-color: #c9a870; color: #ffffff; text-decoration: none; padding: 14px 40px; font-size: 15px; font-weight: 500; letter-spacing: 0.05em; border-radius: 2px;">
-                            Discover Essential
+                            Discover Curate
                         </a>
                     </td>
                 </tr>
