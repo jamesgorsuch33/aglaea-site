@@ -94,7 +94,14 @@ async function loadUserData() {
         
         const planEl = document.getElementById('planType');
         if (planEl) {
-            planEl.textContent = currentUserTier.charAt(0).toUpperCase() + currentUserTier.slice(1);
+            // Display friendly tier names (handle both old and new tier values)
+            const tierDisplayNames = {
+                'free': 'Discover',
+                'discover': 'Discover',
+                'essential': 'Curate',
+                'curate': 'Curate'
+            };
+            planEl.textContent = tierDisplayNames[currentUserTier] || 'Discover';
         }
         
     } catch (error) {
@@ -140,10 +147,12 @@ function updateStats(peopleWithReminders) {
         }).length;
     }, 0);
     
-    const limit = currentUserTier === 'free' ? 5 : '∞';
+    // Both free and discover have 5-reminder limit
+    const limit = (currentUserTier === 'free' || currentUserTier === 'discover') ? 5 : '∞';
     document.getElementById('reminderCount').textContent = dateBasedReminders + '/' + limit;
     
-    if (currentUserTier === 'free' && dateBasedReminders >= 5) {
+    // Free tier users (free or discover) have 5-reminder limit
+    if ((currentUserTier === 'free' || currentUserTier === 'discover') && dateBasedReminders >= 5) {
         document.getElementById('upgradeBanner').classList.remove('hidden');
     }
     
@@ -414,11 +423,11 @@ function setupEventListeners() {
     const addBtn = document.getElementById('addReminderBtn');
     if (addBtn) {
         addBtn.addEventListener('click', function() {
-            // Check reminder limit for free tier
-            if (currentUserTier === 'free') {
+            // Check reminder limit for free tier (free or discover)
+            if (currentUserTier === 'free' || currentUserTier === 'discover') {
                 const dateBasedCount = countDateBasedReminders();
                 if (dateBasedCount >= 5) {
-                    if (confirm('You\'ve reached the free tier limit of 5 reminders. Upgrade to Essential for unlimited reminders?')) {
+                    if (confirm('You\'ve reached the Discover tier limit of 5 reminders. Upgrade to Curate for unlimited reminders?')) {
                         window.location.href = 'upgrade.html';
                     }
                     return;
@@ -527,7 +536,7 @@ function setupEventListeners() {
             if (e.target.checked) {
                 options.classList.remove('hidden');
                 
-                if (currentUserTier === 'free') {
+                if (currentUserTier === 'free' || currentUserTier === 'discover') {
                     upgradePrompt.classList.remove('hidden');
                     configSection.classList.add('disabled');
                 } else {
@@ -590,11 +599,11 @@ async function handleFormSubmit(e) {
     // Clear previous errors
     clearAllErrors('newReminderForm');
     
-    // Check reminder limit for free tier
-    if (currentUserTier === 'free') {
+    // Check reminder limit for free tier (free or discover)
+    if (currentUserTier === 'free' || currentUserTier === 'discover') {
         const dateBasedCount = countDateBasedReminders();
         if (dateBasedCount >= 5) {
-            alert('You\'ve reached the free tier limit of 5 reminders. Please upgrade to Essential to add more.');
+            alert('You\'ve reached the Discover tier limit of 5 reminders. Please upgrade to Curate to add more.');
             document.getElementById('addReminderModal').classList.add('hidden');
             window.location.href = 'upgrade.html';
             return;
@@ -603,8 +612,8 @@ async function handleFormSubmit(e) {
     
     const enableJB = document.getElementById('enableJustBecause').checked;
     
-    if (enableJB && currentUserTier === 'free') {
-        alert('Just Because reminders require Essential tier. Please upgrade or uncheck the Just Because option.');
+    if (enableJB && (currentUserTier === 'free' || currentUserTier === 'discover')) {
+        alert('Just Because reminders require Curate tier. Please upgrade or uncheck the Just Because option.');
         return;
     }
     
@@ -729,7 +738,7 @@ async function handleFormSubmit(e) {
                 randomPerYear: randomPerYear,
                 startImmediately: startImmediately,
                 startDate: startDate,
-                smsEnabled: currentUserTier !== 'free'
+                smsEnabled: currentUserTier !== 'free' && currentUserTier !== 'discover'
             });
         }
         
