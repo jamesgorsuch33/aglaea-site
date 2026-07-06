@@ -314,7 +314,7 @@ if (remindersForm) {
                 lastName: accountData.lastName,
                 email: accountData.email,
                 phone: accountData.phone || '',
-                tier: 'free',
+                tier: 'discover',
                 createdAt: new Date().toISOString()
             });
             
