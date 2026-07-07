@@ -55,7 +55,7 @@ const templates = {
                             </div>
                         </div>
                         <p style="font-size: 16px; line-height: 1.7; color: #2a2a2a; margin: 0 0 20px 0;">
-                            Your first reminder is already in place. We'll be in touch three weeks before the occasion — quietly, considerately, with everything you need to make it feel effortless.
+                            Your first reminder is already in place. We'll be in touch before the occasion — quietly, considerately, with everything you need to make it feel effortless.
                         </p>
                     </td>
                 </tr>
@@ -404,7 +404,7 @@ const templates = {
                                 With Curate, you'd have received this reminder 3 weeks ago — giving you real time to find something truly worthy.
                             </p>
                             <p style="font-size: 14px; color: #6b6b6b; margin: 0 0 16px 0; font-style: italic;">
-                                Just £4.99 per month. Unlimited reminders, 21-day advance notice, full partner brand collection, and free delivery.
+                                Just £4.99 per month. Unlimited reminders, 21-day advance notice, full partner brand collection, SMS notifications, and priority support.
                             </p>
                             <a href="${SITE_URL}/upgrade.html" style="color: #c9a870; font-weight: 600; text-decoration: none; font-size: 14px; letter-spacing: 0.05em;">
                                 Discover Curate →
@@ -498,7 +498,7 @@ const templates = {
                                 With Curate, you'd have had <em style="color: #c9a870;">3 weeks</em> to find the perfect gift.
                             </p>
                             <p style="font-size: 15px; line-height: 1.7; color: #2a2a2a; margin: 0 0 16px 0;">
-                                Unlimited reminders. 21-day advance notice. Full partner brand collection. Free delivery on all orders. Gift wrapping and personal notes included.
+                                Unlimited reminders. 21-day advance notice. Full partner brand collection. SMS notifications. Priority support.
                             </p>
                             <p style="font-size: 14px; color: #6b6b6b; margin: 0 0 20px 0; font-style: italic;">
                                 All for £4.99 per month. Cancel anytime.
