@@ -30,19 +30,19 @@ const db = admin.firestore();
 const SITE_URL = process.env.SITE_URL || 'https://aglaea.co.uk';
 
 // Reminder cadences (days before occasion) → email type
-// Different cadences for different tiers
+// Different cadences AND different templates for different tiers
 const CADENCES_CURATE = {
     21: 'reminder21Days',
     14: 'reminder14Days',
     10: 'reminder10Days',
-    7: 'reminder7Days',
-    3: 'reminder3Days',
+    7: 'reminder7DaysCurate',
+    3: 'reminder3DaysCurate',
     0: 'reminderDayOf'  // Day-of
 };
 
 const CADENCES_DISCOVER = {
-    7: 'reminder7Days',
-    3: 'reminder3Days'
+    7: 'reminder7DaysDiscover',
+    3: 'reminder3DaysDiscover'
 };
 
 // Helper: Determine cadences based on user tier
