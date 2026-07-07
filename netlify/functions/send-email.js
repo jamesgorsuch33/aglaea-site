@@ -338,7 +338,8 @@ const templates = {
         ctaText: 'Browse Gifts'
     }),
     
-    reminder7Days: (data) => buildReminderEmail({
+    // 7-day reminder for Curate users (no upgrade prompt)
+    reminder7DaysCurate: (data) => buildReminderEmail({
         ...data,
         eyebrow: 'One week away',
         daysText: '7 days away',
@@ -348,7 +349,88 @@ const templates = {
         ctaText: 'Browse Gifts'
     }),
     
-    reminder3Days: (data) => buildReminderEmail({
+    // 7-day reminder for Discover users (includes upgrade nudge)
+    reminder7DaysDiscover: (data) => ({
+        subject: `${data.recipientName}'s ${data.occasion} is in one week`,
+        html: buildEmail({
+            preheader: 'A friendly nudge from AGLAEA.',
+            content: `
+                <tr>
+                    <td class="hero" style="text-align: center; padding: 0 32px 48px 32px;">
+                        <p style="font-size: 12px; color: #c9a870; letter-spacing: 0.3em; text-transform: uppercase; margin: 0 0 16px 0; font-weight: 600;">
+                            One week away
+                        </p>
+                        <h1 style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 36px; font-weight: 400; color: #2a2a2a; line-height: 1.2; margin: 0;">
+                            ${escapeHtml(data.recipientName)}'s ${escapeHtml(data.occasion)}<br>is in <em style="color: #c9a870;">7 days</em>.
+                        </h1>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 0 32px;">
+                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f9f5ed; border-radius: 4px;">
+                            <tr>
+                                <td style="padding: 40px 32px; text-align: center;">
+                                    <p style="font-size: 14px; color: #6b6b6b; margin: 0 0 12px 0; letter-spacing: 0.05em;">
+                                        ${escapeHtml(data.recipientName)}
+                                    </p>
+                                    <p style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 40px; color: #2a2a2a; margin: 0 0 8px 0; font-weight: 400; line-height: 1.1;">
+                                        ${escapeHtml(data.occasionDate)}
+                                    </p>
+                                    <p style="font-size: 14px; color: #6b6b6b; margin: 0; font-style: italic; font-family: 'Cormorant Garamond', Georgia, serif;">
+                                        ${escapeHtml(data.occasion)}
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 48px 32px 32px 32px;">
+                        <p style="font-size: 16px; line-height: 1.7; color: #2a2a2a; margin: 0 0 20px 0;">
+                            ${escapeHtml(data.firstName || 'Hello')},
+                        </p>
+                        <p style="font-size: 16px; line-height: 1.7; color: #2a2a2a; margin: 0 0 20px 0;">
+                            Just one week to go. If you've already found the perfect gift, wonderful. If not, there's still time to browse our starter collection.
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 0 32px 32px 32px;">
+                        <div style="background-color: #f9f5ed; padding: 28px 32px; border-radius: 4px; border-left: 3px solid #c9a870;">
+                            <p style="font-size: 12px; color: #c9a870; letter-spacing: 0.2em; text-transform: uppercase; margin: 0 0 12px 0; font-weight: 600;">
+                                ✦ Upgrade to Curate
+                            </p>
+                            <p style="font-size: 15px; line-height: 1.6; color: #2a2a2a; margin: 0 0 12px 0;">
+                                With Curate, you'd have received this reminder 3 weeks ago — giving you real time to find something truly worthy.
+                            </p>
+                            <p style="font-size: 14px; color: #6b6b6b; margin: 0 0 16px 0; font-style: italic;">
+                                Just £4.99 per month. Unlimited reminders, 21-day advance notice, full partner brand collection, and free delivery.
+                            </p>
+                            <a href="${SITE_URL}/upgrade.html" style="color: #c9a870; font-weight: 600; text-decoration: none; font-size: 14px; letter-spacing: 0.05em;">
+                                Discover Curate →
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; padding: 48px 32px; background-color: #2a2a2a;">
+                        <h2 style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 28px; font-weight: 400; color: #ffffff; margin: 0 0 12px 0;">
+                            Find the perfect gift.
+                        </h2>
+                        <p style="color: rgba(255, 255, 255, 0.85); font-size: 15px; margin: 0 0 24px 0;">
+                            Browse our starter gift collection.
+                        </p>
+                        <a href="${SITE_URL}/products.html" style="display: inline-block; background-color: #c9a870; color: #ffffff; text-decoration: none; padding: 14px 40px; font-size: 15px; font-weight: 500; letter-spacing: 0.05em; border-radius: 2px;">
+                            Browse Gifts
+                        </a>
+                    </td>
+                </tr>
+            `
+        })
+    }),
+    
+    // 3-day reminder for Curate users (gentle final reminder)
+    reminder3DaysCurate: (data) => buildReminderEmail({
         ...data,
         eyebrow: 'Three days left',
         daysText: '3 days',
@@ -356,6 +438,92 @@ const templates = {
         copy2: `Many of our partner brands offer express delivery. We've made it easy to find something beautiful in time.`,
         ctaTitle: 'Make it happen.',
         ctaText: 'Browse Gifts'
+    }),
+    
+    // 3-day reminder for Discover users (stronger upgrade nudge)
+    reminder3DaysDiscover: (data) => ({
+        subject: `Just 3 days — ${data.recipientName}'s ${data.occasion}`,
+        html: buildEmail({
+            preheader: 'The final stretch. Something beautiful is still within reach.',
+            content: `
+                <tr>
+                    <td class="hero" style="text-align: center; padding: 0 32px 48px 32px;">
+                        <p style="font-size: 12px; color: #c9a870; letter-spacing: 0.3em; text-transform: uppercase; margin: 0 0 16px 0; font-weight: 600;">
+                            Three days left
+                        </p>
+                        <h1 style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 36px; font-weight: 400; color: #2a2a2a; line-height: 1.2; margin: 0;">
+                            ${escapeHtml(data.recipientName)}'s ${escapeHtml(data.occasion)}<br>is in <em style="color: #c9a870;">3 days</em>.
+                        </h1>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 0 32px;">
+                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f9f5ed; border-radius: 4px;">
+                            <tr>
+                                <td style="padding: 40px 32px; text-align: center;">
+                                    <p style="font-size: 14px; color: #6b6b6b; margin: 0 0 12px 0; letter-spacing: 0.05em;">
+                                        ${escapeHtml(data.recipientName)}
+                                    </p>
+                                    <p style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 40px; color: #2a2a2a; margin: 0 0 8px 0; font-weight: 400; line-height: 1.1;">
+                                        ${escapeHtml(data.occasionDate)}
+                                    </p>
+                                    <p style="font-size: 14px; color: #6b6b6b; margin: 0; font-style: italic; font-family: 'Cormorant Garamond', Georgia, serif;">
+                                        ${escapeHtml(data.occasion)}
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 48px 32px 32px 32px;">
+                        <p style="font-size: 16px; line-height: 1.7; color: #2a2a2a; margin: 0 0 20px 0;">
+                            ${escapeHtml(data.firstName || 'Hello')},
+                        </p>
+                        <p style="font-size: 16px; line-height: 1.7; color: #2a2a2a; margin: 0 0 20px 0;">
+                            The final stretch. Just three days until ${escapeHtml(data.recipientName)}'s ${escapeHtml(data.occasion)}. If you haven't yet found something worthy, our starter collection is here to help.
+                        </p>
+                        <p style="font-size: 16px; line-height: 1.7; color: #2a2a2a; margin: 0 0 20px 0;">
+                            Many partner brands offer express delivery — something beautiful is still within reach.
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 0 32px 32px 32px;">
+                        <div style="background-color: #f9f5ed; padding: 32px; border-radius: 4px; border-left: 3px solid #c9a870;">
+                            <p style="font-size: 12px; color: #c9a870; letter-spacing: 0.2em; text-transform: uppercase; margin: 0 0 16px 0; font-weight: 600;">
+                                ✦ Never feel this rushed again
+                            </p>
+                            <p style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 24px; color: #2a2a2a; margin: 0 0 16px 0; line-height: 1.3;">
+                                With Curate, you'd have had <em style="color: #c9a870;">3 weeks</em> to find the perfect gift.
+                            </p>
+                            <p style="font-size: 15px; line-height: 1.7; color: #2a2a2a; margin: 0 0 16px 0;">
+                                Unlimited reminders. 21-day advance notice. Full partner brand collection. Free delivery on all orders. Gift wrapping and personal notes included.
+                            </p>
+                            <p style="font-size: 14px; color: #6b6b6b; margin: 0 0 20px 0; font-style: italic;">
+                                All for £4.99 per month. Cancel anytime.
+                            </p>
+                            <a href="${SITE_URL}/upgrade.html" style="display: inline-block; background-color: #c9a870; color: #ffffff; text-decoration: none; padding: 12px 32px; font-size: 14px; font-weight: 500; letter-spacing: 0.05em; border-radius: 2px;">
+                                Upgrade to Curate
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; padding: 48px 32px; background-color: #2a2a2a;">
+                        <h2 style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 28px; font-weight: 400; color: #ffffff; margin: 0 0 12px 0;">
+                            Make it happen.
+                        </h2>
+                        <p style="color: rgba(255, 255, 255, 0.85); font-size: 15px; margin: 0 0 24px 0;">
+                            Beautiful gifts with express delivery.
+                        </p>
+                        <a href="${SITE_URL}/products.html" style="display: inline-block; background-color: #c9a870; color: #ffffff; text-decoration: none; padding: 14px 40px; font-size: 15px; font-weight: 500; letter-spacing: 0.05em; border-radius: 2px;">
+                            Browse Gifts
+                        </a>
+                    </td>
+                </tr>
+            `
+        })
     }),
     
     reminderDayOf: (data) => ({
