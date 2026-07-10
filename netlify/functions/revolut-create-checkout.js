@@ -47,6 +47,29 @@ exports.handler = async (event, context) => {
         console.log('Subscription created:', subscription.id);
         console.log('Full response:', JSON.stringify(subscription));
 
+        // Save pending subscription ID to Firebase so we can check its status later
+        try {
+            const admin = require('firebase-admin');
+            if (!admin.apps.length) {
+                admin.initializeApp({
+                    credential: admin.credential.cert({
+                        projectId: process.env.FIREBASE_PROJECT_ID,
+                        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+                        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
+                    })
+                });
+            }
+            const db = admin.firestore();
+            await db.collection('users').doc(userId).set({
+                pendingSubscriptionId: subscription.id,
+                pendingSubscriptionCreatedAt: admin.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+            console.log('Saved pending subscription ID to Firebase');
+        } catch (firebaseErr) {
+            console.error('Failed to save pending subscription:', firebaseErr);
+            // Don't fail the whole request - checkout can still proceed
+        }
+
         // Try multiple possible field names for the checkout URL
         const checkoutUrl = 
             subscription.setup_order_checkout_url ||  // Revolut Subscriptions API
