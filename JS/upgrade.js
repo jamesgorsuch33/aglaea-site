@@ -1,17 +1,6 @@
 /* ============================================================
-   UPGRADE PAGE LOGIC
+   UPGRADE PAGE LOGIC - REVOLUT MERCHANT
    ============================================================ */
-
-// Stripe Publishable Key (safe to expose in client-side code)
-// TODO: Replace with your actual Stripe Publishable Key
-const STRIPE_PUBLISHABLE_KEY = 'pk_test_REPLACE_WITH_YOUR_KEY';
-const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
-
-// TODO: Replace with your Stripe Price IDs (from Stripe Dashboard → Products)
-const STRIPE_PRICES = {
-    monthly: 'price_MONTHLY_ID',  // Curate Monthly: £4.99/month
-    annual: 'price_ANNUAL_ID'     // Curate Annual: £49.99/year
-};
 
 // State
 let isAnnual = false;
@@ -38,10 +27,12 @@ firebase.auth().onAuthStateChanged((user) => {
 });
 
 // Billing Toggle
-billingToggle.addEventListener('change', (e) => {
-    isAnnual = e.target.checked;
-    updatePricing();
-});
+if (billingToggle) {
+    billingToggle.addEventListener('change', (e) => {
+        isAnnual = e.target.checked;
+        updatePricing();
+    });
+}
 
 // Update Pricing Display
 function updatePricing() {
@@ -84,150 +75,118 @@ async function checkUserPlan() {
     }
 }
 
-// Upgrade to Curate
+// Upgrade to Curate via Revolut
 upgradeToCurateBtn.addEventListener('click', async () => {
-    console.log('=== UPGRADE BUTTON CLICKED ===');
+    console.log('=== UPGRADE BUTTON CLICKED (Revolut) ===');
     
     if (!currentUser) {
-        alert('Please sign in to upgrade');
-        window.location.href = 'signin.html?redirect=upgrade';
+        alert('Please sign in first to upgrade');
+        window.location.href = 'signin.html';
         return;
     }
     
-    console.log('User ID:', currentUser.uid);
-    console.log('User Email:', currentUser.email);
-    console.log('Is Annual:', isAnnual);
-    
+    // Disable button and show loading state
     upgradeToCurateBtn.disabled = true;
-    upgradeToCurateBtn.textContent = 'Loading...';
+    upgradeToCurateBtn.textContent = 'Preparing checkout...';
     
     try {
-        // Select price based on billing period
-        const priceId = isAnnual ? STRIPE_PRICES.annual : STRIPE_PRICES.monthly;
-        console.log('Selected Price ID:', priceId);
+        // Get user info for personalized checkout
+        const userDoc = await firebase.firestore()
+            .collection('users')
+            .doc(currentUser.uid)
+            .get();
         
-        // Call Netlify Function to create checkout session
-        console.log('Calling function at: /.netlify/functions/create-checkout-session');
-        const response = await fetch('/.netlify/functions/create-checkout-session', {
+        const userData = userDoc.exists ? userDoc.data() : {};
+        const userName = userData.firstName 
+            ? `${userData.firstName} ${userData.lastName || ''}`.trim()
+            : currentUser.email.split('@')[0];
+        
+        // Call Netlify function to create Revolut checkout
+        console.log('Creating Revolut checkout session...');
+        const response = await fetch('/.netlify/functions/revolut-create-checkout', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                priceId: priceId,
-                customerId: currentUser.uid,
-                userEmail: currentUser.email
+                userId: currentUser.uid,
+                userEmail: currentUser.email,
+                userName: userName
             })
         });
         
-        console.log('Response status:', response.status);
-        
         if (!response.ok) {
             const errorData = await response.json();
-            console.error('Function error:', errorData);
-            throw new Error(errorData.error || 'Failed to create checkout session');
+            throw new Error(errorData.message || 'Failed to create checkout');
         }
         
         const data = await response.json();
-        console.log('Session created:', data);
+        console.log('Checkout URL received');
         
-        const { sessionId } = data;
-        console.log('Session ID:', sessionId);
-        
-        // Redirect to Stripe Checkout (opens as overlay/popup)
-        console.log('Redirecting to Stripe Checkout...');
-        const { error } = await stripe.redirectToCheckout({ sessionId });
-        
-        if (error) {
-            console.error('Stripe redirect error:', error);
-            throw new Error(error.message);
+        if (data.checkoutUrl) {
+            // Redirect to Revolut hosted checkout
+            console.log('Redirecting to Revolut checkout...');
+            window.location.href = data.checkoutUrl;
+        } else {
+            throw new Error('No checkout URL received');
         }
         
     } catch (error) {
-        console.error('=== CHECKOUT ERROR ===');
-        console.error('Error type:', error.name);
-        console.error('Error message:', error.message);
-        console.error('Full error:', error);
-        alert('Payment setup failed: ' + error.message);
+        console.error('Upgrade error:', error);
+        alert('Sorry, we couldn\'t start the upgrade process. Please try again or contact support.');
         upgradeToCurateBtn.disabled = false;
         upgradeToCurateBtn.textContent = 'Upgrade to Curate';
     }
 });
 
-// Premium Waitlist Modal
-premiumWaitlistBtn.addEventListener('click', () => {
-    if (!currentUser) {
-        alert('Please sign in to join the waitlist');
-        window.location.href = 'signin.html?redirect=upgrade';
-        return;
-    }
-    
-    premiumWaitlistModal.classList.remove('hidden');
-});
+// Premium Waitlist
+if (premiumWaitlistBtn) {
+    premiumWaitlistBtn.addEventListener('click', () => {
+        if (!currentUser) {
+            alert('Please sign in first');
+            window.location.href = 'signin.html';
+            return;
+        }
+        premiumWaitlistFormModal.classList.remove('hidden');
+    });
+}
 
-// Close Modal
-document.querySelectorAll('.modal-close').forEach(btn => {
-    btn.addEventListener('click', () => {
-        premiumWaitlistModal.classList.add('hidden');
-        waitlistModalMessage.classList.add('hidden');
+if (joinWaitlistModalBtn) {
+    joinWaitlistModalBtn.addEventListener('click', async () => {
+        if (!currentUser) return;
+        
+        try {
+            await firebase.firestore()
+                .collection('users')
+                .doc(currentUser.uid)
+                .set({
+                    premiumWaitlist: true,
+                    premiumWaitlistAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            
+            waitlistModalMessage.textContent = 'You\'re on the list! We\'ll be in touch soon.';
+            premiumWaitlistBtn.textContent = 'On Waitlist';
+            premiumWaitlistBtn.disabled = true;
+            
+            setTimeout(() => {
+                premiumWaitlistFormModal.classList.add('hidden');
+            }, 2000);
+        } catch (error) {
+            console.error('Waitlist error:', error);
+            waitlistModalMessage.textContent = 'Something went wrong. Please try again.';
+        }
+    });
+}
+
+// Close modals
+document.querySelectorAll('.close-modal').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        e.target.closest('.modal').classList.add('hidden');
     });
 });
 
-// Close modal on outside click
-premiumWaitlistModal.addEventListener('click', (e) => {
-    if (e.target === premiumWaitlistModal) {
-        premiumWaitlistModal.classList.add('hidden');
-        waitlistModalMessage.classList.add('hidden');
-    }
-});
-
-// Premium Waitlist Form
-premiumWaitlistFormModal.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    if (!currentUser) {
-        showWaitlistModalMessage('Please sign in to join the waitlist', 'error');
-        return;
-    }
-    
-    joinWaitlistModalBtn.disabled = true;
-    joinWaitlistModalBtn.textContent = 'Joining...';
-    
-    try {
-        await firebase.firestore()
-            .collection('users')
-            .doc(currentUser.uid)
-            .set({
-                premiumWaitlist: true,
-                premiumWaitlistDate: firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true });
-        
-        showWaitlistModalMessage('✅ You\'re on the list! We\'ll notify you when Premium launches.', 'success');
-        
-        setTimeout(() => {
-            premiumWaitlistModal.classList.add('hidden');
-            premiumWaitlistBtn.textContent = 'On Waitlist';
-            premiumWaitlistBtn.disabled = true;
-        }, 2000);
-        
-    } catch (error) {
-        console.error('Waitlist error:', error);
-        showWaitlistModalMessage('Failed to join waitlist. Please try again.', 'error');
-        joinWaitlistModalBtn.disabled = false;
-        joinWaitlistModalBtn.textContent = 'Join Waitlist';
-    }
-});
-
-function showWaitlistModalMessage(message, type) {
-    waitlistModalMessage.textContent = message;
-    waitlistModalMessage.className = `waitlist-message ${type}`;
-    waitlistModalMessage.classList.remove('hidden');
-}
-
-// Handle successful upgrade redirect
+// Check URL for upgrade success
 const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.get('upgraded') === 'true') {
-    // TODO: Update user plan in Firestore
-    // This should be done by a webhook from Stripe when payment succeeds
-    alert('✅ Welcome to Curate! Your upgrade is complete.');
+if (urlParams.get('upgrade') === 'success') {
+    alert('✅ Welcome to Curate! Your upgrade is being processed. You\'ll receive confirmation shortly.');
+    // Remove the URL parameter
+    window.history.replaceState({}, document.title, window.location.pathname);
 }
