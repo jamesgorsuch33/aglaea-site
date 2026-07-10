@@ -52,12 +52,12 @@
             <!-- Pricing Grid -->
             <div class="pricing-grid">
                 
-                <!-- Free Tier -->
+                <!-- Discover Tier -->
                 <div class="pricing-card">
                     <div class="pricing-header">
-                        <h2>Discover</h2>
+                        <h2>Remind</h2>
                         <div class="pricing-price">
-                            <span class="price-amount">Free</span>
+                            <span class="price-amount">Discover</span>
                             <span class="price-period">forever</span>
                         </div>
                     </div>
@@ -90,15 +90,16 @@
                         <li>Email + SMS notifications</li>
                         <li>Full gift catalogue</li>
                         <li>Priority support</li>
+                        <li>Export reminders</li>
                     </ul>
                     
                     <button class="btn btn-primary" id="upgradeToCurate">Upgrade to Curate</button>
-                    <p class="pricing-note">Credit card required to start</p>
+                    <p class="pricing-note">No credit card required to start</p>
                 </div>
 
                 <!-- Atelier Tier -->
-                <div class="pricing-card pricing-card-atelier">
-                    <div class="pricing-badge atelier-badge">Coming Soon</div>
+                <div class="pricing-card pricing-card-premium">
+                    <div class="pricing-badge premium-badge">Coming Soon</div>
                     <div class="pricing-header">
                         <h2>Atelier</h2>
                         <div class="pricing-price">
@@ -115,7 +116,7 @@
                         <li>Multi-user access</li>
                     </ul>
                     
-                    <button class="btn btn-outline" id="atelierWaitlistBtn">Join Waitlist</button>
+                    <button class="btn btn-outline" id="premiumWaitlistBtn">Join Waitlist</button>
                 </div>
 
             </div>
@@ -205,7 +206,7 @@
                     
                     <div class="faq-item">
                         <h3>When will Atelier launch?</h3>
-                        <p>The Atelier tier is launching later this year. Join the waitlist to be notified first.</p>
+                        <p>Atelier tier is launching later this year. Join the waitlist to be notified first.</p>
                     </div>
                     
                     <div class="faq-item">
@@ -219,7 +220,7 @@
     </section>
 
     <!-- Atelier Waitlist Modal -->
-    <div id="atelierWaitlistModal" class="modal hidden">
+    <div id="premiumWaitlistModal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Join Atelier Waitlist</h2>
@@ -230,7 +231,7 @@
             
             <div id="waitlistModalMessage" class="waitlist-message hidden"></div>
             
-            <form id="atelierWaitlistFormModal">
+            <form id="premiumWaitlistFormModal">
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary modal-close">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="joinWaitlistModalBtn">Join Waitlist</button>
