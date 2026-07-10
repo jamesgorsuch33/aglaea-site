@@ -64,7 +64,7 @@ async function checkUserPlan() {
                 upgradeToCurateBtn.disabled = true;
             }
             
-            // Check Premium waitlist status
+            // Check Atelier waitlist status
             if (userData.premiumWaitlist) {
                 premiumWaitlistBtn.textContent = 'On Waitlist';
                 premiumWaitlistBtn.disabled = true;
@@ -137,7 +137,7 @@ upgradeToCurateBtn.addEventListener('click', async () => {
     }
 });
 
-// Premium Waitlist
+// Atelier Waitlist
 if (premiumWaitlistBtn) {
     premiumWaitlistBtn.addEventListener('click', () => {
         if (!currentUser) {
