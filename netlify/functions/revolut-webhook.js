@@ -59,23 +59,20 @@ exports.handler = async (event, context) => {
         // Handle different event types
         switch (webhookEvent.event) {
             
-            case 'SUBSCRIPTION_ACTIVATED':
+            case 'SUBSCRIPTION_INITIATED':
             case 'ORDER_COMPLETED':
                 await handleSubscriptionActivated(webhookEvent);
                 break;
 
+            case 'SUBSCRIPTION_FINISHED':
             case 'SUBSCRIPTION_CANCELLED':
-            case 'SUBSCRIPTION_EXPIRED':
                 await handleSubscriptionCancelled(webhookEvent);
                 break;
 
+            case 'SUBSCRIPTION_OVERDUE':
             case 'ORDER_PAYMENT_DECLINED':
             case 'ORDER_PAYMENT_FAILED':
                 await handlePaymentFailed(webhookEvent);
-                break;
-
-            case 'SUBSCRIPTION_PLAN_CHANGED':
-                console.log('Subscription plan changed - no action needed');
                 break;
 
             default:
@@ -103,13 +100,42 @@ exports.handler = async (event, context) => {
 // Handle subscription activation (user upgraded to Curate)
 // ============================================================
 async function handleSubscriptionActivated(webhookEvent) {
-    const subscription = webhookEvent.data || webhookEvent;
-    const userId = subscription.external_reference || subscription.metadata?.userId;
-    const customerId = subscription.customer_id;
-    const subscriptionId = subscription.id;
+    // Revolut sends subscription_id at top level for subscription events
+    const subscriptionId = webhookEvent.subscription_id || webhookEvent.data?.id;
+    const orderId = webhookEvent.order_id;
+    
+    console.log('Processing activation - subscription_id:', subscriptionId, 'order_id:', orderId);
+
+    // Fetch full subscription details from Revolut API
+    let subscription = webhookEvent.data;
+    
+    if (subscriptionId && !subscription) {
+        try {
+            const apiUrl = process.env.REVOLUT_ENV === 'production'
+                ? 'https://merchant.revolut.com/api'
+                : 'https://sandbox-merchant.revolut.com/api';
+                
+            const response = await fetch(`${apiUrl}/subscriptions/${subscriptionId}`, {
+                headers: {
+                    'Authorization': `Bearer ${process.env.REVOLUT_SECRET_KEY}`,
+                    'Revolut-Api-Version': '2024-09-01'
+                }
+            });
+            
+            if (response.ok) {
+                subscription = await response.json();
+                console.log('Fetched subscription details');
+            }
+        } catch (err) {
+            console.error('Failed to fetch subscription:', err);
+        }
+    }
+    
+    const userId = subscription?.external_reference || subscription?.metadata?.userId;
+    const customerId = subscription?.customer_id;
 
     if (!userId) {
-        console.error('No userId in webhook payload');
+        console.error('No userId in webhook or subscription data');
         return;
     }
 
@@ -119,7 +145,7 @@ async function handleSubscriptionActivated(webhookEvent) {
     await db.collection('users').doc(userId).set({
         tier: 'curate',
         revolutCustomerId: customerId,
-        revolutSubscriptionId: subscriptionId,
+        revolutSubscriptionId: subscriptionId || subscription?.id,
         upgradedAt: admin.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
