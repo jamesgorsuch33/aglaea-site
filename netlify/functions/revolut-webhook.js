@@ -1,0 +1,205 @@
+// ============================================================
+// REVOLUT MERCHANT WEBHOOK HANDLER
+// ============================================================
+// Handles subscription lifecycle events from Revolut
+// Updates user tier in Firestore
+// Sends confirmation emails via Resend
+// ============================================================
+
+const crypto = require('crypto');
+const admin = require('firebase-admin');
+
+// Initialize Firebase Admin (only once)
+if (!admin.apps.length) {
+    admin.initializeApp({
+        credential: admin.credential.cert({
+            projectId: process.env.FIREBASE_PROJECT_ID,
+            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+            privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
+        })
+    });
+}
+
+const db = admin.firestore();
+const SITE_URL = process.env.SITE_URL || 'https://aglaea.co.uk';
+
+exports.handler = async (event, context) => {
+    // Only allow POST
+    if (event.httpMethod !== 'POST') {
+        return {
+            statusCode: 405,
+            body: JSON.stringify({ error: 'Method not allowed' })
+        };
+    }
+
+    try {
+        // Verify webhook signature (production security)
+        const signature = event.headers['revolut-signature'] || event.headers['Revolut-Signature'];
+        const webhookSecret = process.env.REVOLUT_WEBHOOK_SECRET;
+
+        if (webhookSecret && signature) {
+            const expectedSignature = crypto
+                .createHmac('sha256', webhookSecret)
+                .update(event.body)
+                .digest('hex');
+
+            if (signature !== `sha256=${expectedSignature}`) {
+                console.warn('Invalid webhook signature');
+                return {
+                    statusCode: 401,
+                    body: JSON.stringify({ error: 'Invalid signature' })
+                };
+            }
+        }
+
+        // Parse webhook payload
+        const webhookEvent = JSON.parse(event.body);
+        console.log('Revolut webhook received:', webhookEvent.event);
+
+        // Handle different event types
+        switch (webhookEvent.event) {
+            
+            case 'SUBSCRIPTION_ACTIVATED':
+            case 'ORDER_COMPLETED':
+                await handleSubscriptionActivated(webhookEvent);
+                break;
+
+            case 'SUBSCRIPTION_CANCELLED':
+            case 'SUBSCRIPTION_EXPIRED':
+                await handleSubscriptionCancelled(webhookEvent);
+                break;
+
+            case 'ORDER_PAYMENT_DECLINED':
+            case 'ORDER_PAYMENT_FAILED':
+                await handlePaymentFailed(webhookEvent);
+                break;
+
+            case 'SUBSCRIPTION_PLAN_CHANGED':
+                console.log('Subscription plan changed - no action needed');
+                break;
+
+            default:
+                console.log('Unhandled event type:', webhookEvent.event);
+        }
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ received: true })
+        };
+
+    } catch (error) {
+        console.error('Webhook processing error:', error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                error: 'Webhook processing failed',
+                message: error.message
+            })
+        };
+    }
+};
+
+// ============================================================
+// Handle subscription activation (user upgraded to Curate)
+// ============================================================
+async function handleSubscriptionActivated(webhookEvent) {
+    const subscription = webhookEvent.data || webhookEvent;
+    const userId = subscription.external_reference || subscription.metadata?.userId;
+    const customerId = subscription.customer_id;
+    const subscriptionId = subscription.id;
+
+    if (!userId) {
+        console.error('No userId in webhook payload');
+        return;
+    }
+
+    console.log('Activating Curate subscription for user:', userId);
+
+    // Update Firestore - upgrade user to Curate
+    await db.collection('users').doc(userId).set({
+        tier: 'curate',
+        revolutCustomerId: customerId,
+        revolutSubscriptionId: subscriptionId,
+        upgradedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    console.log('User tier updated to Curate');
+
+    // Send upgrade confirmation email
+    try {
+        const userDoc = await db.collection('users').doc(userId).get();
+        
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            
+            await fetch(`${SITE_URL}/.netlify/functions/send-email`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    emailType: 'upgradeConfirmation',
+                    to: userData.email,
+                    data: {
+                        firstName: userData.firstName || 'there'
+                    }
+                })
+            });
+            
+            console.log('Upgrade confirmation email sent');
+        }
+    } catch (emailError) {
+        console.error('Failed to send upgrade email:', emailError);
+        // Don't fail webhook - upgrade already succeeded
+    }
+}
+
+// ============================================================
+// Handle subscription cancellation
+// ============================================================
+async function handleSubscriptionCancelled(webhookEvent) {
+    const subscription = webhookEvent.data || webhookEvent;
+    const userId = subscription.external_reference || subscription.metadata?.userId;
+    const customerId = subscription.customer_id;
+
+    console.log('Handling subscription cancellation');
+
+    // Find user by external reference or customer ID
+    let userDoc;
+    if (userId) {
+        userDoc = await db.collection('users').doc(userId).get();
+    } else if (customerId) {
+        const snapshot = await db.collection('users')
+            .where('revolutCustomerId', '==', customerId)
+            .get();
+        
+        if (!snapshot.empty) {
+            userDoc = snapshot.docs[0];
+        }
+    }
+
+    if (!userDoc || !userDoc.exists) {
+        console.error('User not found for cancellation');
+        return;
+    }
+
+    // Downgrade to Discover
+    await userDoc.ref.set({
+        tier: 'discover',
+        cancelledAt: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    console.log('User downgraded to Discover');
+}
+
+// ============================================================
+// Handle failed payment
+// ============================================================
+async function handlePaymentFailed(webhookEvent) {
+    const order = webhookEvent.data || webhookEvent;
+    const customerId = order.customer_id;
+
+    console.log('Payment failed for customer:', customerId);
+
+    // Optional: Send email to user about failed payment
+    // Optional: Log to admin dashboard
+    // Revolut handles retry logic automatically
+}
