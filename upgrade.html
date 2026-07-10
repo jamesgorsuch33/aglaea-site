@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upgrade — Aglaea</title>
-    <meta name="description" content="Upgrade to AGLAEA Curate for unlimited reminders and SMS alerts. Premium tier coming soon.">
+    <meta name="description" content="Upgrade to AGLAEA Curate for unlimited reminders and SMS alerts. Atelier tier coming soon.">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,7 +55,7 @@
                 <!-- Free Tier -->
                 <div class="pricing-card">
                     <div class="pricing-header">
-                        <h2>Remind</h2>
+                        <h2>Discover</h2>
                         <div class="pricing-price">
                             <span class="price-amount">Free</span>
                             <span class="price-period">forever</span>
@@ -90,18 +90,17 @@
                         <li>Email + SMS notifications</li>
                         <li>Full gift catalogue</li>
                         <li>Priority support</li>
-                        <li>Export reminders</li>
                     </ul>
                     
                     <button class="btn btn-primary" id="upgradeToCurate">Upgrade to Curate</button>
-                    <p class="pricing-note">No credit card required to start</p>
+                    <p class="pricing-note">Credit card required to start</p>
                 </div>
 
-                <!-- Premium Tier -->
-                <div class="pricing-card pricing-card-premium">
-                    <div class="pricing-badge premium-badge">Coming Soon</div>
+                <!-- Atelier Tier -->
+                <div class="pricing-card pricing-card-atelier">
+                    <div class="pricing-badge atelier-badge">Coming Soon</div>
                     <div class="pricing-header">
-                        <h2>Premium</h2>
+                        <h2>Atelier</h2>
                         <div class="pricing-price">
                             <span class="price-amount">Launching Soon</span>
                         </div>
@@ -116,7 +115,7 @@
                         <li>Multi-user access</li>
                     </ul>
                     
-                    <button class="btn btn-outline" id="premiumWaitlistBtn">Join Waitlist</button>
+                    <button class="btn btn-outline" id="atelierWaitlistBtn">Join Waitlist</button>
                 </div>
 
             </div>
@@ -130,9 +129,9 @@
                         <thead>
                             <tr>
                                 <th>Features</th>
-                                <th>Free</th>
+                                <th>Discover</th>
                                 <th>Curate</th>
-                                <th>Premium</th>
+                                <th>Atelier</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -201,17 +200,17 @@
                     
                     <div class="faq-item">
                         <h3>What payment methods do you accept?</h3>
-                        <p>We accept all major credit and debit cards via Stripe secure payment processing.</p>
+                        <p>We accept all major credit and debit cards via Revolut, our secure payment processor.</p>
                     </div>
                     
                     <div class="faq-item">
-                        <h3>When will Premium launch?</h3>
-                        <p>Premium tier is launching later this year. Join the waitlist to be notified first.</p>
+                        <h3>When will Atelier launch?</h3>
+                        <p>The Atelier tier is launching later this year. Join the waitlist to be notified first.</p>
                     </div>
                     
                     <div class="faq-item">
-                        <h3>Can I upgrade from Curate to Premium later?</h3>
-                        <p>Yes! When Premium launches, Curate members can upgrade seamlessly.</p>
+                        <h3>Can I upgrade from Curate to Atelier later?</h3>
+                        <p>Yes! When Atelier launches, Curate members can upgrade seamlessly.</p>
                     </div>
                 </div>
             </div>
@@ -219,19 +218,19 @@
         </div>
     </section>
 
-    <!-- Premium Waitlist Modal -->
-    <div id="premiumWaitlistModal" class="modal hidden">
+    <!-- Atelier Waitlist Modal -->
+    <div id="atelierWaitlistModal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Join Premium Waitlist</h2>
+                <h2>Join Atelier Waitlist</h2>
                 <button class="modal-close">&times;</button>
             </div>
             
-            <p style="margin-bottom: 1.5rem; color: var(--slate);">Be the first to know when Premium launches with exclusive luxury brands and VIP features.</p>
+            <p style="margin-bottom: 1.5rem; color: var(--slate);">Be the first to know when Atelier launches with exclusive luxury brands and VIP features.</p>
             
             <div id="waitlistModalMessage" class="waitlist-message hidden"></div>
             
-            <form id="premiumWaitlistFormModal">
+            <form id="atelierWaitlistFormModal">
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary modal-close">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="joinWaitlistModalBtn">Join Waitlist</button>
@@ -245,8 +244,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     
-    <!-- Stripe.js -->
-    <script src="https://js.stripe.com/v3/"></script>
+    <!-- Firebase Auth -->
     
     <!-- Firebase Config -->
     <script src="js/firebase-config.js"></script>
