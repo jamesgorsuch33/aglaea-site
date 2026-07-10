@@ -49,6 +49,7 @@ exports.handler = async (event, context) => {
 
         // Try multiple possible field names for the checkout URL
         const checkoutUrl = 
+            subscription.setup_order_checkout_url ||  // Revolut Subscriptions API
             subscription.checkout_url ||
             subscription.payment_url ||
             subscription.hosted_checkout_url ||
