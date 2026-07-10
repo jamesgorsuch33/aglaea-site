@@ -45,12 +45,34 @@ exports.handler = async (event, context) => {
         );
 
         console.log('Subscription created:', subscription.id);
+        console.log('Full response:', JSON.stringify(subscription));
+
+        // Try multiple possible field names for the checkout URL
+        const checkoutUrl = 
+            subscription.checkout_url ||
+            subscription.payment_url ||
+            subscription.hosted_checkout_url ||
+            subscription.checkout?.url ||
+            subscription.payment?.url ||
+            subscription.public_checkout_url;
+
+        if (!checkoutUrl) {
+            console.error('No checkout URL in response. Available fields:', Object.keys(subscription));
+            return {
+                statusCode: 500,
+                body: JSON.stringify({
+                    error: 'No checkout URL in response',
+                    availableFields: Object.keys(subscription),
+                    fullResponse: subscription
+                })
+            };
+        }
 
         return {
             statusCode: 200,
             body: JSON.stringify({
                 success: true,
-                checkoutUrl: subscription.checkout_url,
+                checkoutUrl: checkoutUrl,
                 subscriptionId: subscription.id
             })
         };
