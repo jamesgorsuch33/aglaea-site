@@ -9,12 +9,13 @@ import { getFirestore, initializeFirestore, collection, doc, addDoc, getDoc, get
 
 // Firebase configuration
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyDhHVm4sfnPcmdIykm6uTBdbi3SyRMvB8Q",
+    authDomain: "agleae-remind-app.firebaseapp.com",
+    databaseURL: "https://agleae-remind-app-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "agleae-remind-app",
+    storageBucket: "agleae-remind-app.firebasestorage.app",
+    messagingSenderId: "608220667658",
+    appId: "1:608220667658:web:d7676e96c2838b8b3464f3"
 };
 
 // Initialize Firebase
