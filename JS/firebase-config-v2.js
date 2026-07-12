@@ -5,23 +5,28 @@
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getFirestore, collection, doc, addDoc, getDoc, getDocs, updateDoc, deleteDoc, setDoc, query, where, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getFirestore, initializeFirestore, collection, doc, addDoc, getDoc, getDocs, updateDoc, deleteDoc, query, where, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 // Firebase configuration
 const firebaseConfig = {
- 		apiKey: "AIzaSyDhHVm4sfnPcmdIykm6uTBdbi3SyRMvB8Q",
-  		authDomain: "agleae-remind-app.firebaseapp.com",
-  		databaseURL: "https://agleae-remind-app-default-rtdb.europe-west1.firebasedatabase.app",
-  		projectId: "agleae-remind-app",
-  		storageBucket: "agleae-remind-app.firebasestorage.app",
-  		messagingSenderId: "608220667658",
-  		appId: "1:608220667658:web:d7676e96c2838b8b3464f3"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+
+// Use initializeFirestore with auto-detect long polling
+// This fixes Safari's aggressive connection closing on WebSocket streams
+export const db = initializeFirestore(app, {
+    experimentalAutoDetectLongPolling: true,
+    useFetchStreams: false
+});
 
 // Collection references
 export const peopleCollection = collection(db, 'people');
@@ -572,102 +577,6 @@ function formatDate(date) {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
-}
-// ============================================================
-// USER MANAGEMENT FUNCTIONS
-// ============================================================
-
-/**
- * Create or update user document in Firestore
- * @param {string} userId - Firebase Auth user ID
- * @param {Object} userData - User data to save
- * @returns {Promise<void>}
- */
-export async function createOrUpdateUser(userId, userData) {
-    try {
-        const userRef = doc(db, 'users', userId);
-        const userDoc = await getDoc(userRef);
-        
-        if (userDoc.exists()) {
-            // Update existing user
-            await updateDoc(userRef, {
-                ...userData,
-                updatedAt: Timestamp.now()
-            });
-        } else {
-            // Create new user
-            await setDoc(userRef, {
-                tier: 'free',
-                ...userData,
-                createdAt: Timestamp.now(),
-                updatedAt: Timestamp.now()
-            });
-        }
-    } catch (error) {
-        console.error('Error creating/updating user:', error);
-        throw error;
-    }
-}
-
-/**
- * Get user document from Firestore
- * @param {string} userId - Firebase Auth user ID
- * @returns {Promise<Object|null>} - User data or null if not found
- */
-export async function getUser(userId) {
-    try {
-        const userRef = doc(db, 'users', userId);
-        const userDoc = await getDoc(userRef);
-        
-        if (userDoc.exists()) {
-            return {
-                id: userDoc.id,
-                ...userDoc.data()
-            };
-        }
-        return null;
-    } catch (error) {
-        console.error('Error getting user:', error);
-        throw error;
-    }
-}
-
-/**
- * Update user tier
- * @param {string} userId - Firebase Auth user ID
- * @param {string} tier - New tier ('free', 'essential', 'premium')
- * @returns {Promise<void>}
- */
-export async function updateUserTier(userId, tier) {
-    try {
-        const userRef = doc(db, 'users', userId);
-        await updateDoc(userRef, {
-            tier,
-            updatedAt: Timestamp.now()
-        });
-    } catch (error) {
-        console.error('Error updating user tier:', error);
-        throw error;
-    }
-}
-
-/**
- * Update user Stripe information
- * @param {string} userId - Firebase Auth user ID
- * @param {Object} stripeData - Stripe customer and subscription data
- * @returns {Promise<void>}
- */
-export async function updateUserStripeInfo(userId, stripeData) {
-    try {
-        const userRef = doc(db, 'users', userId);
-        await updateDoc(userRef, {
-            ...stripeData,
-            updatedAt: Timestamp.now()
-        });
-    } catch (error) {
-        console.error('Error updating user Stripe info:', error);
-        throw error;
-    }
 }
 
 // Export helper functions for use in UI
