@@ -208,7 +208,10 @@ function renderPeopleList(peopleWithReminders) {
         html += '<div class="person-card" data-person-id="' + person.id + '">';
         html += '<div class="person-header">';
         html += '<h3>' + person.personName + ' ' + jbBadge + '</h3>';
+        html += '<div class="person-header-actions">';
+        html += '<button class="btn-icon add-reminder-for-person" data-person-id="' + person.id + '" data-person-name="' + person.personName + '" title="Add reminder for this person">➕</button>';
         html += '<button class="btn-icon delete-person" data-person-id="' + person.id + '" title="Delete person">🗑️</button>';
+        html += '</div>';
         html += '</div>';
         
         if (person.reminders.length === 0) {
@@ -241,6 +244,46 @@ function renderPeopleList(peopleWithReminders) {
     document.querySelectorAll('.delete-reminder').forEach(function(btn) {
         btn.addEventListener('click', handleDeleteReminder);
     });
+    
+    // NEW: Add reminder for specific person
+    document.querySelectorAll('.add-reminder-for-person').forEach(function(btn) {
+        btn.addEventListener('click', handleAddReminderForPerson);
+    });
+}
+
+// ============================================================
+// HANDLE ADD REMINDER FOR SPECIFIC PERSON
+// ============================================================
+function handleAddReminderForPerson(e) {
+    const personName = e.currentTarget.dataset.personName;
+    const personId = e.currentTarget.dataset.personId;
+    
+    // Check reminder limit for free/discover tier
+    if (currentUserTier === 'free' || currentUserTier === 'discover') {
+        const dateBasedCount = countDateBasedReminders();
+        if (dateBasedCount >= 5) {
+            if (confirm('You\'ve reached the Discover tier limit of 5 reminders. Upgrade to Curate for unlimited reminders?')) {
+                window.location.href = 'upgrade.html';
+            }
+            return;
+        }
+    }
+    
+    // Open the add reminder modal
+    const modal = document.getElementById('addReminderModal');
+    if (modal) {
+        // Pre-fill the person name and mark as existing person
+        document.getElementById('newName').value = personName;
+        document.getElementById('newName').readOnly = true;
+        document.getElementById('newName').dataset.existingPersonId = personId;
+        
+        // Reset other fields
+        document.getElementById('newOccasion').value = '';
+        document.getElementById('newDate').value = '';
+        document.getElementById('newNotes').value = '';
+        
+        modal.classList.remove('hidden');
+    }
 }
 
 // ============================================================
@@ -349,13 +392,17 @@ function setupEventListeners() {
     const addBtn = document.getElementById('addReminderBtn');
     if (addBtn) {
         addBtn.addEventListener('click', function() {
-            // Check reminder limit for free tier
-            if (currentUserTier === 'free' && currentDateBasedCount >= 5) {
-                if (confirm('You\'ve reached the free tier limit of 5 reminders. Upgrade to Essential for unlimited reminders?')) {
+            // Check reminder limit for free/discover tier
+            if ((currentUserTier === 'free' || currentUserTier === 'discover') && currentDateBasedCount >= 5) {
+                if (confirm('You\'ve reached the Discover tier limit of 5 reminders. Upgrade to Curate for unlimited reminders?')) {
                     window.location.href = 'upgrade.html';
                 }
                 return;
             }
+            // Reset form for new person
+            document.getElementById('newName').value = '';
+            document.getElementById('newName').readOnly = false;
+            delete document.getElementById('newName').dataset.existingPersonId;
             document.getElementById('addReminderModal').classList.remove('hidden');
         });
     }
@@ -431,7 +478,7 @@ function setupEventListeners() {
             if (e.target.checked) {
                 options.classList.remove('hidden');
                 
-                if (currentUserTier === 'free') {
+                if (currentUserTier === 'free' || currentUserTier === 'discover') {
                     upgradePrompt.classList.remove('hidden');
                     configSection.classList.add('disabled');
                 } else {
@@ -501,8 +548,8 @@ async function handleFormSubmit(e) {
     
     const enableJB = document.getElementById('enableJustBecause').checked;
     
-    if (enableJB && currentUserTier === 'free') {
-        alert('Just Because reminders require Essential tier. Please upgrade or uncheck the Just Because option.');
+    if (enableJB && (currentUserTier === 'free' || currentUserTier === 'discover')) {
+        alert('Just Because reminders require Curate tier. Please upgrade or uncheck the Just Because option.');
         return;
     }
     
@@ -517,9 +564,13 @@ async function handleFormSubmit(e) {
         const occasionDate = document.getElementById('newDate').value;
         const notes = document.getElementById('newNotes').value.trim();
         
-        const personId = await createPerson(currentUser.uid, personName);
+        // Check if we're adding to an existing person (from the + button on their card)
+        const existingPersonId = document.getElementById('newName').dataset.existingPersonId;
+        const personId = existingPersonId 
+            ? existingPersonId 
+            : await createPerson(currentUser.uid, personName);
         
-        if (enableJB && currentUserTier !== 'free') {
+        if (enableJB && currentUserTier !== 'free' && currentUserTier !== 'discover') {
             await updatePerson(personId, { hasJustBecause: true });
         }
         
@@ -530,7 +581,7 @@ async function handleFormSubmit(e) {
             notes: notes
         });
         
-        if (enableJB && currentUserTier !== 'free') {
+        if (enableJB && currentUserTier !== 'free' && currentUserTier !== 'discover') {
             const frequencyRadio = document.querySelector('input[name="jbFrequency"]:checked');
             const frequency = frequencyRadio ? frequencyRadio.value : 'every_6_weeks';
             
@@ -722,6 +773,10 @@ function resetForm() {
     document.getElementById('jbUpgradePrompt').classList.add('hidden');
     document.getElementById('jbConfigSection').classList.remove('disabled');
     document.getElementById('justBecausePersonName').textContent = 'this person';
+    
+    // Clear readonly and existing person tracking
+    document.getElementById('newName').readOnly = false;
+    delete document.getElementById('newName').dataset.existingPersonId;
     
     const defaultRadio = document.querySelector('input[name="jbFrequency"][value="every_6_weeks"]');
     if (defaultRadio) {
