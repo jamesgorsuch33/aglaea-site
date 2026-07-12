@@ -579,5 +579,62 @@ function formatDate(date) {
     return `${year}-${month}-${day}`;
 }
 
+// ============================================================
+// USER FUNCTIONS
+// ============================================================
+
+/**
+ * Create or update a user document in Firestore
+ * @param {string} userId - User's Firebase Auth UID
+ * @param {object} data - User data to save
+ */
+export async function createOrUpdateUser(userId, data) {
+    try {
+        const userRef = doc(db, 'users', userId);
+        const existingDoc = await getDoc(userRef);
+        
+        if (existingDoc.exists()) {
+            // Update existing user
+            await updateDoc(userRef, {
+                ...data,
+                updatedAt: Timestamp.now()
+            });
+        } else {
+            // Create new user
+            const { setDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+            await setDoc(userRef, {
+                ...data,
+                createdAt: Timestamp.now(),
+                updatedAt: Timestamp.now()
+            });
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('Error creating/updating user:', error);
+        throw error;
+    }
+}
+
+/**
+ * Get a user document by ID
+ * @param {string} userId - User's Firebase Auth UID
+ * @returns {object|null} - User data or null if not found
+ */
+export async function getUser(userId) {
+    try {
+        const userRef = doc(db, 'users', userId);
+        const userDoc = await getDoc(userRef);
+        
+        if (userDoc.exists()) {
+            return { id: userDoc.id, ...userDoc.data() };
+        }
+        return null;
+    } catch (error) {
+        console.error('Error getting user:', error);
+        throw error;
+    }
+}
+
 // Export helper functions for use in UI
 export { formatDate, addWeeks, addMonths };
