@@ -14,11 +14,9 @@ import {
     deletePerson,
     deleteReminder,
     getUser,
-    createOrUpdateUser
+    createOrUpdateUser,
+    auth
 } from './firebase-config-v2.js';
-
-// Get Firebase instances
-const auth = window.firebaseAuth;
 
 let currentUser = null;
 let currentUserTier = 'free';
