@@ -128,7 +128,7 @@
                     <input type="text" id="newName" placeholder="e.g. Mum, Sarah, Best Friend" required>
                 </div>
                 
-                <div class="form-group">
+                <div class="form-group" id="newRelationshipGroup">
                     <label for="newRelationship">Your Relationship</label>
                     <select id="newRelationship">
                         <option value="">Select relationship</option>
@@ -295,6 +295,18 @@
                     <div class="form-group">
                         <label for="editNotes">Notes (optional)</label>
                         <textarea id="editNotes" rows="3"></textarea>
+                    </div>
+                </div>
+                
+                <div id="editJBFields" class="hidden">
+                    <div class="form-group">
+                        <label for="editJBFrequency">Frequency</label>
+                        <select id="editJBFrequency">
+                            <option value="every_6_weeks">Every 6 weeks</option>
+                            <option value="every_3_months">Every 3 months</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="every_2_months">Every 2 months</option>
+                        </select>
                     </div>
                 </div>
                 
