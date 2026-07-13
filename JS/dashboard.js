@@ -354,9 +354,12 @@ function renderDateReminder(reminder, personId) {
     let html = '<div class="reminder-item date-based" data-reminder-id="' + reminder.id + '">';
     html += '<div class="reminder-info">';
     html += '<span class="reminder-icon">' + icon + '</span>';
-    html += '<div>';
+    html += '<div class="reminder-text">';
     html += '<strong>' + capitalize(occasionLabel) + '</strong>';
-    html += '<small>' + dateStr + ' • ' + daysText + '</small>';
+    html += '<span class="reminder-separator"> • </span>';
+    html += '<span class="reminder-date-text">' + dateStr + '</span>';
+    html += '<span class="reminder-separator"> • </span>';
+    html += daysText;
     html += '</div>';
     html += '</div>';
     html += '<div class="reminder-actions">';
