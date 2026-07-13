@@ -589,6 +589,28 @@ form {
     justify-content: flex-end;
     padding-top: 1.5rem;
     border-top: 1px solid var(--stone);
+    align-items: center;
+}
+
+/* Cancel button in modals - smaller, less prominent than primary action */
+.modal-actions .btn.btn-secondary,
+.modal-actions .modal-close {
+    padding: 0.5rem 1.25rem;
+    font-size: 0.875rem;
+    background: transparent;
+    border: 1px solid var(--stone);
+    color: var(--slate);
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: normal;
+    min-height: auto;
+    width: auto;
+}
+
+.modal-actions .btn.btn-secondary:hover,
+.modal-actions .modal-close:hover {
+    background: var(--cream);
+    color: var(--charcoal);
 }
 
 /* ============================================================
