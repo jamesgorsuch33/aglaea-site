@@ -32,7 +32,10 @@ auth.onAuthStateChanged(function(user) {
     if (user) {
         currentUser = user;
         document.getElementById('userEmail').textContent = user.email;
-        document.getElementById('userName').textContent = user.displayName || user.email.split('@')[0];
+        // Use first name only for welcome message
+        const displayName = user.displayName || user.email.split('@')[0];
+        const firstName = displayName.split(' ')[0];
+        document.getElementById('userName').textContent = firstName;
         loadDashboard();
         setupEventListeners();
     } else {
@@ -50,6 +53,11 @@ async function loadUserData() {
         
         if (userData) {
             currentUserTier = userData.tier || 'discover';
+            
+            // Update welcome message with Firestore firstName (more reliable than displayName)
+            if (userData.firstName) {
+                document.getElementById('userName').textContent = userData.firstName;
+            }
             
             // Check if there's a pending subscription (user just returned from Revolut)
             if (userData.pendingSubscriptionId && currentUserTier !== 'curate' && currentUserTier !== 'essential') {
