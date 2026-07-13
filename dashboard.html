@@ -3,59 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard — Aglaea</title>
+    <title>Dashboard — AGLAEA</title>
     <meta name="description" content="Manage your gift reminders and never miss another special moment.">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/dashboard-v2.css">
 </head>
 <body>
     
-    <!-- Header -->
     <header class="header">
         <div class="container header-content">
             <a href="index.html" class="logo">AGLAEA</a>
-            <nav class="nav">
+            
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Open menu">
+                <span></span>
+            </button>
+            
+            <nav class="nav" id="mainNav">
+                <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu">×</button>
                 <a href="dashboard.html">Dashboard</a>
                 <a href="products.html">Gifts</a>
-                <a href="upgrade.html">Upgrade</a>
-                <span id="userEmail" style="margin-left: auto;"></span>
-                <button class="btn-nav" id="logoutBtn">Sign Out</button>
+                <a href="settings.html">Settings</a>
+                <a href="#" id="signOutBtn">Sign Out</a>
             </nav>
         </div>
+        <div class="mobile-menu-backdrop" id="mobileMenuBackdrop"></div>
     </header>
 
-    <!-- Dashboard Content -->
-    <section class="dashboard-section">
+    <section class="dashboard">
         <div class="container">
-            
             <!-- Welcome Header -->
             <div class="welcome-header">
                 <h1>Welcome back, <span id="userName">there</span>!</h1>
-                <p>Your reminders are ready</p>
+                <p class="user-email" id="userEmail"></p>
             </div>
 
-            <!-- Stats Overview -->
+            <!-- Stats Card -->
             <div class="stats-card">
                 <div class="stat">
-                    <span class="stat-number" id="reminderCount">0/5</span>
-                    <span class="stat-label">Reminders Used</span>
+                    <p class="stat-label">Plan</p>
+                    <p class="stat-value" id="planType">Discover</p>
                 </div>
                 <div class="stat">
-                    <span class="stat-number" id="nextReminder">-</span>
-                    <span class="stat-label">Next Reminder</span>
+                    <p class="stat-label">Reminders</p>
+                    <p class="stat-value" id="reminderCount">0/5</p>
                 </div>
                 <div class="stat">
-                    <span class="stat-number" id="planType">Free</span>
-                    <span class="stat-label">Current Plan</span>
+                    <p class="stat-label">Next Reminder</p>
+                    <p class="stat-value" id="nextReminder">-</p>
                 </div>
             </div>
 
-            <!-- Main Content Grid -->
             <div class="dashboard-grid">
                 
                 <!-- Your Reminders -->
@@ -73,7 +75,6 @@
                 <!-- Quick Actions -->
                 <div class="dashboard-card">
                     <h2>Quick Actions</h2>
-                    
                     <div class="quick-actions">
                         <a href="products.html" class="action-card">
                             <span class="action-icon">🎁</span>
@@ -137,10 +138,10 @@
                         <option value="mothers-day">Mother's Day</option>
                         <option value="fathers-day">Father's Day</option>
                         <option value="christmas">Christmas</option>
-                        <option value="just-because">Just Because</option>
-                        <option value="other">Other</option>
+                        <option value="custom">Custom / Other</option>
                     </select>
-                    <input type="text" id="newCustomOccasion" class="custom-occasion hidden" placeholder="Enter occasion name">
+                    <input type="text" id="newCustomOccasion" class="custom-occasion hidden" placeholder="Enter occasion name (e.g. Wedding, Graduation)">
+                    <input type="text" id="newCustomOccasionName" class="custom-occasion hidden" placeholder="Name of the occasion">
                 </div>
                 
                 <div class="form-group">
@@ -149,9 +150,107 @@
                     <span class="form-helper">💡 Enter the actual date of the occasion</span>
                 </div>
                 
+                <div class="form-group">
+                    <label for="newNotes">Notes (optional)</label>
+                    <textarea id="newNotes" rows="3" placeholder="Any gift ideas or preferences..."></textarea>
+                </div>
+                
+                <!-- Just Because Section -->
+                <div class="form-group jb-section">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="enableJustBecause">
+                        <span>✨ Add "Just Because" reminders for <span id="justBecousePersonNameLabel">this person</span></span>
+                    </label>
+                    <p class="form-helper">Random gentle nudges to surprise them for no reason at all</p>
+                    
+                    <!-- Upgrade Prompt (shows for Discover users) -->
+                    <div id="jbUpgradePrompt" class="jb-upgrade-prompt hidden">
+                        <p><strong>✨ Just Because is a Curate feature</strong></p>
+                        <p>Upgrade to Curate to enable surprise reminders for the people you love — for no reason at all.</p>
+                        <a href="upgrade.html" class="btn-text-link gold">Upgrade to Curate →</a>
+                    </div>
+                    
+                    <!-- JB Config Section -->
+                    <div id="jbConfigSection" class="jb-config-section">
+                        <div id="justBecauseOptions" class="hidden">
+                            <div class="form-group">
+                                <label>How often?</label>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="jbFrequency" value="every_6_weeks" checked> Every 6 weeks</label>
+                                    <label><input type="radio" name="jbFrequency" value="every_3_months"> Every 3 months</label>
+                                    <label><input type="radio" name="jbFrequency" value="custom"> Custom interval</label>
+                                    <label><input type="radio" name="jbFrequency" value="random"> Random per year</label>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group hidden" id="customMonthsGroup">
+                                <label for="customMonths">Every X months</label>
+                                <input type="number" id="customMonths" min="1" max="24" value="3">
+                            </div>
+                            
+                            <div class="form-group hidden" id="randomPerYearGroup">
+                                <label for="randomPerYear">Times per year</label>
+                                <input type="number" id="randomPerYear" min="1" max="12" value="4">
+                            </div>
+                            
+                            <div class="form-group hidden" id="jbStartDateGroup">
+                                <label for="jbStartDate">Start date</label>
+                                <input type="date" id="jbStartDate">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary modal-close">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add Reminder</button>
+                    <button type="submit" class="btn btn-primary" id="submitReminderBtn">Add Reminder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Reminder Modal -->
+    <div id="editReminderModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Reminder</h2>
+                <button class="modal-close" data-modal="editReminderModal">&times;</button>
+            </div>
+            
+            <form id="editReminderForm">
+                <input type="hidden" id="editReminderId">
+                <input type="hidden" id="editReminderType">
+                
+                <div id="editDateFields">
+                    <div class="form-group">
+                        <label for="editOccasion">Occasion</label>
+                        <select id="editOccasion">
+                            <option value="birthday">Birthday</option>
+                            <option value="anniversary">Anniversary</option>
+                            <option value="valentines">Valentine's Day</option>
+                            <option value="mothers-day">Mother's Day</option>
+                            <option value="fathers-day">Father's Day</option>
+                            <option value="christmas">Christmas</option>
+                            <option value="custom">Custom / Other</option>
+                        </select>
+                        <input type="text" id="editCustomOccasion" class="custom-occasion hidden" placeholder="Enter occasion name">
+                        <input type="text" id="editCustomOccasionName" class="custom-occasion hidden" placeholder="Name of the occasion">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editDate">Date</label>
+                        <input type="date" id="editDate">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editNotes">Notes (optional)</label>
+                        <textarea id="editNotes" rows="3"></textarea>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-close" data-modal="editReminderModal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
                 </div>
             </form>
         </div>
@@ -162,11 +261,11 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     
-    <!-- Firebase Config -->
-    <script src="js/firebase-config.js"></script>
-    
     <!-- Dashboard Logic -->
     <script type="module" src="js/dashboard.js"></script>
+    
+    <!-- Mobile Menu -->
+    <script src="js/mobile-menu.js"></script>
 
 </body>
 </html>
