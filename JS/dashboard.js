@@ -163,7 +163,7 @@ function updateStats(peopleWithReminders) {
     // Save count globally for limit checks
     currentDateBasedCount = dateBasedReminders;
     
-    const limit = currentUserTier === 'free' ? 5 : '∞';
+    const limit = (currentUserTier === 'free' || currentUserTier === 'discover') ? 5 : '∞';
     document.getElementById('reminderCount').textContent = dateBasedReminders + '/' + limit;
     
     if (currentUserTier === 'free' && dateBasedReminders >= 5) {
@@ -408,13 +408,14 @@ function renderJustBecauseReminder(reminder, personId) {
     let html = '<div class="reminder-item just-because" data-reminder-id="' + reminder.id + '">';
     html += '<div class="reminder-info">';
     html += '<span class="reminder-icon">✨</span>';
-    html += '<div>';
+    html += '<div class="reminder-text">';
     html += '<strong>Just Because</strong>';
-    html += '<small>' + frequencyText;
+    html += '<span class="reminder-separator"> • </span>';
+    html += '<span class="reminder-date-text">' + frequencyText + '</span>';
     if (nextDateText) {
-        html += ' • Next: ' + nextDateText;
+        html += '<span class="reminder-separator"> • </span>';
+        html += '<span class="reminder-date-text">Next: ' + nextDateText + '</span>';
     }
-    html += '</small>';
     html += '</div>';
     html += '</div>';
     html += '<div class="reminder-actions">';
@@ -703,6 +704,12 @@ async function handleEditReminder(e) {
         document.getElementById('editPersonId').value = personId;
         document.getElementById('editReminderType').value = reminder.reminderType;
         document.getElementById('editName').value = person ? person.personName : '';
+        
+        // Hide relationship field in edit modal (already set when person was created)
+        const editRelationshipGroup = document.getElementById('editRelationshipGroup');
+        if (editRelationshipGroup) {
+            editRelationshipGroup.style.display = 'none';
+        }
         
         if (reminder.reminderType === 'date-based') {
             document.getElementById('editDateFields').classList.remove('hidden');
