@@ -258,6 +258,30 @@ function renderPeopleList(peopleWithReminders) {
 }
 
 // ============================================================
+// HELPER: Set up JB section based on user tier
+// ============================================================
+function setupJustBecauseForTier() {
+    const upgradePrompt = document.getElementById('jbUpgradePrompt');
+    const configSection = document.getElementById('jbConfigSection');
+    const checkbox = document.getElementById('enableJustBecause');
+    
+    if (!upgradePrompt || !configSection || !checkbox) return;
+    
+    if (currentUserTier === 'free' || currentUserTier === 'discover') {
+        // Discover user - show upgrade prompt and disable
+        upgradePrompt.classList.remove('hidden');
+        configSection.classList.add('disabled');
+        checkbox.disabled = true;
+        checkbox.checked = false;
+    } else {
+        // Curate user - all enabled
+        upgradePrompt.classList.add('hidden');
+        configSection.classList.remove('disabled');
+        checkbox.disabled = false;
+    }
+}
+
+// ============================================================
 // HANDLE ADD REMINDER FOR SPECIFIC PERSON
 // ============================================================
 function handleAddReminderForPerson(e) {
@@ -285,6 +309,7 @@ function handleAddReminderForPerson(e) {
         document.getElementById('newDate').value = '';
         document.getElementById('newNotes').value = '';
         
+        setupJustBecauseForTier();
         modal.classList.remove('hidden');
     }
 }
@@ -406,6 +431,7 @@ function setupEventListeners() {
             document.getElementById('newName').value = '';
             document.getElementById('newName').readOnly = false;
             delete document.getElementById('newName').dataset.existingPersonId;
+            setupJustBecauseForTier();
             document.getElementById('addReminderModal').classList.remove('hidden');
         });
     }
