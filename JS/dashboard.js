@@ -259,14 +259,11 @@ function handleAddReminderForPerson(e) {
     const personId = e.currentTarget.dataset.personId;
     
     // Check reminder limit for free/discover tier
-    if (currentUserTier === 'free' || currentUserTier === 'discover') {
-        const dateBasedCount = countDateBasedReminders();
-        if (dateBasedCount >= 5) {
-            if (confirm('You\'ve reached the Discover tier limit of 5 reminders. Upgrade to Curate for unlimited reminders?')) {
-                window.location.href = 'upgrade.html';
-            }
-            return;
+    if ((currentUserTier === 'free' || currentUserTier === 'discover') && currentDateBasedCount >= 5) {
+        if (confirm('You\'ve reached the Discover tier limit of 5 reminders. Upgrade to Curate for unlimited reminders?')) {
+            window.location.href = 'upgrade.html';
         }
+        return;
     }
     
     // Open the add reminder modal
@@ -538,9 +535,9 @@ function setupEventListeners() {
 async function handleFormSubmit(e) {
     e.preventDefault();
     
-    // Check reminder limit for free tier (defense in depth)
-    if (currentUserTier === 'free' && currentDateBasedCount >= 5) {
-        alert('You\'ve reached the free tier limit of 5 reminders. Please upgrade to Essential to add more.');
+    // Check reminder limit for free/discover tier (defense in depth)
+    if ((currentUserTier === 'free' || currentUserTier === 'discover') && currentDateBasedCount >= 5) {
+        alert('You\'ve reached the Discover tier limit of 5 reminders. Please upgrade to Curate to add more.');
         document.getElementById('addReminderModal').classList.add('hidden');
         window.location.href = 'upgrade.html';
         return;
