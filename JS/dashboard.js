@@ -213,7 +213,12 @@ function renderPeopleList(peopleWithReminders) {
         
         html += '<div class="person-card" data-person-id="' + person.id + '">';
         html += '<div class="person-header">';
+        html += '<div class="person-name-wrapper">';
         html += '<h3>' + person.personName + ' ' + jbBadge + '</h3>';
+        if (person.relationship) {
+            html += '<span class="person-relationship">' + person.relationship + '</span>';
+        }
+        html += '</div>';
         html += '<div class="person-header-actions">';
         html += '<button class="btn-icon add-reminder-for-person" data-person-id="' + person.id + '" data-person-name="' + person.personName + '" title="Add reminder for this person">➕</button>';
         html += '<button class="btn-icon delete-person" data-person-id="' + person.id + '" title="Delete person">🗑️</button>';
@@ -303,6 +308,12 @@ function handleAddReminderForPerson(e) {
         document.getElementById('newName').value = personName;
         document.getElementById('newName').readOnly = true;
         document.getElementById('newName').dataset.existingPersonId = personId;
+        
+        // Hide relationship field for existing person
+        const relationshipGroup = document.getElementById('newRelationshipGroup');
+        if (relationshipGroup) {
+            relationshipGroup.style.display = 'none';
+        }
         
         // Reset other fields
         document.getElementById('newOccasion').value = '';
@@ -434,6 +445,13 @@ function setupEventListeners() {
             document.getElementById('newName').value = '';
             document.getElementById('newName').readOnly = false;
             delete document.getElementById('newName').dataset.existingPersonId;
+            
+            // Show relationship field for new person
+            const relationshipGroup = document.getElementById('newRelationshipGroup');
+            if (relationshipGroup) {
+                relationshipGroup.style.display = '';
+            }
+            
             setupJustBecauseForTier();
             document.getElementById('addReminderModal').classList.remove('hidden');
         });
@@ -591,6 +609,7 @@ async function handleFormSubmit(e) {
     
     try {
         const personName = document.getElementById('newName').value.trim();
+        const relationship = document.getElementById('newRelationship').value;
         const occasion = document.getElementById('newOccasion').value;
         const customOccasionName = document.getElementById('newCustomOccasionName').value.trim();
         const occasionDate = document.getElementById('newDate').value;
@@ -598,9 +617,16 @@ async function handleFormSubmit(e) {
         
         // Check if we're adding to an existing person (from the + button on their card)
         const existingPersonId = document.getElementById('newName').dataset.existingPersonId;
-        const personId = existingPersonId 
-            ? existingPersonId 
-            : await createPerson(currentUser.uid, personName);
+        let personId;
+        if (existingPersonId) {
+            personId = existingPersonId;
+        } else {
+            personId = await createPerson(currentUser.uid, personName);
+            // Save relationship if provided (only for new people)
+            if (relationship) {
+                await updatePerson(personId, { relationship: relationship });
+            }
+        }
         
         if (enableJB && currentUserTier !== 'free' && currentUserTier !== 'discover') {
             await updatePerson(personId, { hasJustBecause: true });
