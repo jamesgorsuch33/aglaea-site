@@ -163,10 +163,53 @@ export async function createDateBasedReminder(personId, reminderData) {
         };
         
         const docRef = await addDoc(remindersRef, reminder);
+        
+        // If this person has an active Just Because reminder, re-check
+        // its next date against this newly added reminder — shift it
+        // forward (never earlier) if it now falls within the buffer.
+        await recheckJustBecauseForPerson(personId);
+        
         return docRef.id;
     } catch (error) {
         console.error('Error creating date-based reminder:', error);
         throw error;
+    }
+}
+
+/**
+ * Re-run the Just Because conflict check for a person, e.g. after a
+ * new date-based reminder is added. Only ever pushes the Just Because
+ * date later, never earlier — matches avoidConflictingDates behaviour.
+ * @param {string} personId - Person document ID
+ * @returns {Promise<void>}
+ */
+export async function recheckJustBecauseForPerson(personId) {
+    try {
+        const reminders = await getRemindersForPerson(personId);
+        const jbReminder = reminders.find(
+            r => r.reminderType === 'just-because' && r.active && !r.paused
+        );
+        
+        if (!jbReminder) return;
+        
+        const dateBasedReminders = reminders.filter(r => r.reminderType === 'date-based');
+        const currentNextDate = new Date(jbReminder.nextReminderDate);
+        
+        // Random-frequency Just Because dates are generated avoiding
+        // conflicts at creation time; re-running avoidConflictingDates
+        // on them is still safe (it only shifts if there's now a clash).
+        const adjustedDate = avoidConflictingDates(currentNextDate, dateBasedReminders);
+        
+        // Only write if the date actually changed
+        if (formatDate(adjustedDate) !== formatDate(currentNextDate)) {
+            await updateReminder(personId, jbReminder.id, {
+                nextReminderDate: formatDate(adjustedDate)
+            });
+        }
+    } catch (error) {
+        console.error('Error re-checking Just Because date:', error);
+        // Don't throw — this is a background consistency check and
+        // shouldn't block the reminder that was just successfully created.
     }
 }
 
@@ -180,8 +223,10 @@ export async function createJustBecauseReminder(personId, jbData) {
     try {
         const remindersRef = collection(db, 'people', personId, 'reminders');
         
-        // Calculate first reminder date
-        const startDate = jbData.startImmediately ? new Date() : new Date(jbData.startDate);
+        // Just Because always starts from the moment it's created —
+        // it runs annually from this anchor date, shifting around
+        // existing reminders as needed.
+        const startDate = new Date();
         const nextReminderDate = await calculateNextJustBecauseDate(
             personId,
             jbData.frequency,
