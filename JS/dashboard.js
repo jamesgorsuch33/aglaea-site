@@ -9,6 +9,8 @@ import {
     createPerson,
     createDateBasedReminder,
     createJustBecauseReminder,
+    calculateNextJustBecauseDate,
+    formatDate,
     updatePerson,
     updateReminder,
     deletePerson,
@@ -500,7 +502,6 @@ function setupEventListeners() {
                 relationshipGroup.style.display = '';
             }
             
-            setupJustBecauseForTier();
             document.getElementById('addReminderModal').classList.remove('hidden');
         });
     }
@@ -797,8 +798,13 @@ async function handleEditSubmit(e) {
         } else if (reminderType === 'just-because') {
             const frequency = document.getElementById('editJBFrequency').value;
             
+            // Recalculate the next date for the new frequency, anchored
+            // from today, applying the same conflict-avoidance as creation.
+            const nextDate = await calculateNextJustBecauseDate(personId, frequency, new Date());
+            
             await updateReminder(personId, reminderId, {
-                frequency: frequency
+                frequency: frequency,
+                nextReminderDate: formatDate(nextDate)
             });
         }
         
