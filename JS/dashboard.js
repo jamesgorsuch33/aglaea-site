@@ -29,7 +29,8 @@ let currentDateBasedCount = 0;  // Track count for limit checks
 auth.onAuthStateChanged(function(user) {
     if (user) {
         currentUser = user;
-        document.getElementById('userEmail').textContent = user.email;
+        const emailEl = document.getElementById('userEmail');
+        if (emailEl) emailEl.textContent = user.email;
         // Use first name only for welcome message
         const displayName = user.displayName || user.email.split('@')[0];
         const firstName = displayName.split(' ')[0];
@@ -713,7 +714,8 @@ async function handleEditReminder(e) {
         
         if (reminder.reminderType === 'date-based') {
             document.getElementById('editDateFields').classList.remove('hidden');
-            document.getElementById('editJBFields').classList.add('hidden');
+            const editJBFields = document.getElementById('editJBFields');
+            if (editJBFields) editJBFields.classList.add('hidden');
             
             document.getElementById('editOccasion').value = reminder.occasion || 'birthday';
             document.getElementById('editDate').value = reminder.date || '';
@@ -727,8 +729,12 @@ async function handleEditReminder(e) {
             }
         } else if (reminder.reminderType === 'just-because') {
             document.getElementById('editDateFields').classList.add('hidden');
-            document.getElementById('editJBFields').classList.remove('hidden');
-            document.getElementById('editJBFrequency').value = reminder.frequency || 'every_6_weeks';
+            const editJBFields = document.getElementById('editJBFields');
+            if (editJBFields) {
+                editJBFields.classList.remove('hidden');
+                const freqEl = document.getElementById('editJBFrequency');
+                if (freqEl) freqEl.value = reminder.frequency || 'every_6_weeks';
+            }
         }
         
         document.getElementById('editReminderModal').classList.remove('hidden');
