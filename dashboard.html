@@ -63,7 +63,10 @@
                 <div class="dashboard-card">
                     <div class="card-header">
                         <h2>Your Reminders</h2>
-                        <button class="btn btn-primary" id="addReminderBtn" style="padding: 0.625rem 1.25rem; font-size: 0.875rem;">+ Add Reminder</button>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-secondary" id="addJustBecauseBtn" style="padding: 0.625rem 1.25rem; font-size: 0.875rem;">✨ Just Because</button>
+                            <button class="btn btn-primary" id="addReminderBtn" style="padding: 0.625rem 1.25rem; font-size: 0.875rem;">+ Add Reminder</button>
+                        </div>
                     </div>
                     
                     <div id="peopleList" class="reminders-list">
@@ -176,55 +179,54 @@
                     <textarea id="newNotes" rows="3" placeholder="Any gift ideas or preferences..."></textarea>
                 </div>
                 
-                <!-- Just Because Section -->
-                <div class="form-group jb-section">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="enableJustBecause">
-                        <span>✨ Add "Just Because" reminders for <span id="justBecausePersonName">this person</span></span>
-                    </label>
-                    <p class="form-helper">Random gentle nudges to surprise them for no reason at all</p>
-                    
-                    <!-- Upgrade Prompt (shows for Discover users) -->
-                    <div id="jbUpgradePrompt" class="jb-upgrade-prompt hidden">
-                        <p><strong>✨ Just Because is a Curate feature</strong></p>
-                        <p>Upgrade to Curate to enable surprise reminders for the people you love — for no reason at all.</p>
-                        <a href="upgrade.html" class="btn-text-link gold">Upgrade to Curate →</a>
-                    </div>
-                    
-                    <!-- JB Config Section -->
-                    <div id="jbConfigSection" class="jb-config-section">
-                        <div id="justBecauseOptions" class="hidden">
-                            <div class="form-group">
-                                <label>How often?</label>
-                                <div class="radio-group">
-                                    <label><input type="radio" name="jbFrequency" value="every_6_weeks" checked> Every 6 weeks</label>
-                                    <label><input type="radio" name="jbFrequency" value="every_3_months"> Every 3 months</label>
-                                    <label><input type="radio" name="jbFrequency" value="custom"> Custom interval</label>
-                                    <label><input type="radio" name="jbFrequency" value="random"> Random per year</label>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group hidden" id="customMonthsGroup">
-                                <label for="customMonths">Every X months</label>
-                                <input type="number" id="customMonths" min="1" max="24" value="3">
-                            </div>
-                            
-                            <div class="form-group hidden" id="randomPerYearGroup">
-                                <label for="randomPerYear">Times per year</label>
-                                <input type="number" id="randomPerYear" min="1" max="12" value="4">
-                            </div>
-                            
-                            <div class="form-group hidden" id="jbStartDateGroup">
-                                <label for="jbStartDate">Start date</label>
-                                <input type="date" id="jbStartDate">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary modal-close">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="submitReminderBtn">Add Reminder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Just Because Modal -->
+    <div id="justBecauseModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✨ Set up Just Because reminders</h2>
+                <button class="modal-close" data-modal="justBecauseModal">&times;</button>
+            </div>
+
+            <form id="justBecauseForm">
+                <p class="form-helper">Random gentle nudges to surprise someone for no reason at all.</p>
+
+                <!-- Upgrade Prompt (shows for Discover users) -->
+                <div id="jbModalUpgradePrompt" class="jb-upgrade-prompt hidden">
+                    <p><strong>✨ Just Because is a Curate feature</strong></p>
+                    <p>Upgrade to Curate to enable surprise reminders for the people you love — for no reason at all.</p>
+                    <a href="upgrade.html" class="btn-text-link gold">Upgrade to Curate →</a>
+                </div>
+
+                <div id="jbModalConfigSection">
+                    <div class="form-group">
+                        <label for="jbPersonSelect">Who's this for?</label>
+                        <select id="jbPersonSelect" required>
+                            <option value="">Select a recipient</option>
+                        </select>
+                        <span class="form-helper" id="jbNoRecipientsHelper" style="display: none;">You don't have any recipients yet — add a reminder for someone first, then set up Just Because for them.</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>How often?</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="jbModalFrequency" value="every_6_weeks" checked> Every 6 weeks</label>
+                            <label><input type="radio" name="jbModalFrequency" value="every_3_months"> Every 3 months</label>
+                            <label><input type="radio" name="jbModalFrequency" value="random"> Random per year</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-close" data-modal="justBecauseModal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitJustBecauseBtn">Set up Just Because</button>
                 </div>
             </form>
         </div>
