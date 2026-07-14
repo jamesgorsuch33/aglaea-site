@@ -189,7 +189,7 @@ async function createSubscription(customerId, userId, userEmail) {
             plan_variation_id: planVariationId,
             customer_id: customerId,
             external_reference: userId,  // Our Firebase user ID
-            redirect_url: `${SITE_URL}/dashboard.html?upgrade=success`,
+            setup_order_redirect_url: `${SITE_URL}/dashboard.html?upgrade=success`,
             metadata: {
                 userId: userId,
                 userEmail: userEmail,
