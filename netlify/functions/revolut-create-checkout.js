@@ -61,7 +61,7 @@ exports.handler = async (event, context) => {
         }
 
         const order = await retrieveOrder(subscription.setup_order_id);
-        console.log('Order retrieved:', order.id, 'state:', order.state);
+        console.log('Order retrieved:', order.id, 'state:', order.state, 'redirect_url:', order.redirect_url);
 
         const checkoutUrl = order.checkout_url;
 
