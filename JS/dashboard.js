@@ -222,6 +222,7 @@ function renderPeopleList(peopleWithReminders) {
         html += '</div>';
         html += '<div class="person-header-actions">';
         html += '<button class="btn-icon add-reminder-for-person" data-person-id="' + person.id + '" data-person-name="' + person.personName + '" title="Add reminder for this person">➕</button>';
+        html += '<button class="btn-icon add-just-because-for-person" data-person-id="' + person.id + '" data-person-name="' + person.personName + '" title="Set up Just Because reminders for this person">✨</button>';
         html += '<button class="btn-icon delete-person" data-person-id="' + person.id + '" title="Delete person">🗑️</button>';
         html += '</div>';
         html += '</div>';
@@ -261,29 +262,60 @@ function renderPeopleList(peopleWithReminders) {
     document.querySelectorAll('.add-reminder-for-person').forEach(function(btn) {
         btn.addEventListener('click', handleAddReminderForPerson);
     });
+    
+    // NEW: Add Just Because for specific person
+    document.querySelectorAll('.add-just-because-for-person').forEach(function(btn) {
+        btn.addEventListener('click', handleAddJustBecauseForPerson);
+    });
 }
 
 // ============================================================
-// HELPER: Set up JB section based on user tier
+// HELPER: Set up Just Because modal based on user tier + recipients
 // ============================================================
-function setupJustBecauseForTier() {
-    const upgradePrompt = document.getElementById('jbUpgradePrompt');
-    const configSection = document.getElementById('jbConfigSection');
-    const checkbox = document.getElementById('enableJustBecause');
+async function setupJustBecauseModal(lockedPersonId, lockedPersonName) {
+    const upgradePrompt = document.getElementById('jbModalUpgradePrompt');
+    const configSection = document.getElementById('jbModalConfigSection');
+    const submitBtn = document.getElementById('submitJustBecauseBtn');
+    const select = document.getElementById('jbPersonSelect');
+    const noRecipientsHelper = document.getElementById('jbNoRecipientsHelper');
     
-    if (!upgradePrompt || !configSection || !checkbox) return;
+    if (!upgradePrompt || !configSection || !select) return;
     
-    if (currentUserTier === 'free' || currentUserTier === 'discover') {
-        // Discover user - show upgrade prompt and disable
+    const isLocked = currentUserTier === 'free' || currentUserTier === 'discover';
+    
+    if (isLocked) {
         upgradePrompt.classList.remove('hidden');
         configSection.classList.add('disabled');
-        checkbox.disabled = true;
-        checkbox.checked = false;
+        submitBtn.disabled = true;
+        return;
+    }
+    
+    upgradePrompt.classList.add('hidden');
+    configSection.classList.remove('disabled');
+    submitBtn.disabled = false;
+    
+    // Populate recipient dropdown from existing people
+    const people = await getPeopleForUser(currentUser.uid);
+    select.innerHTML = '<option value="">Select a recipient</option>';
+    
+    people.forEach(function(person) {
+        const option = document.createElement('option');
+        option.value = person.id;
+        option.textContent = person.personName + (person.relationship ? ' (' + person.relationship + ')' : '');
+        select.appendChild(option);
+    });
+    
+    noRecipientsHelper.style.display = people.length === 0 ? 'block' : 'none';
+    submitBtn.disabled = people.length === 0;
+    
+    if (lockedPersonId) {
+        // Opened via a specific person's card — pre-select and lock
+        select.value = lockedPersonId;
+        select.disabled = true;
+        select.dataset.locked = 'true';
     } else {
-        // Curate user - all enabled
-        upgradePrompt.classList.add('hidden');
-        configSection.classList.remove('disabled');
-        checkbox.disabled = false;
+        select.disabled = false;
+        delete select.dataset.locked;
     }
 }
 
@@ -321,9 +353,23 @@ function handleAddReminderForPerson(e) {
         document.getElementById('newDate').value = '';
         document.getElementById('newNotes').value = '';
         
-        setupJustBecauseForTier();
         modal.classList.remove('hidden');
     }
+}
+
+// ============================================================
+// HANDLE ADD JUST BECAUSE FOR SPECIFIC PERSON
+// ============================================================
+async function handleAddJustBecauseForPerson(e) {
+    const personId = e.currentTarget.dataset.personId;
+    const personName = e.currentTarget.dataset.personName;
+    
+    const modal = document.getElementById('justBecauseModal');
+    if (!modal) return;
+    
+    resetJustBecauseForm();
+    await setupJustBecauseModal(personId, personName);
+    modal.classList.remove('hidden');
 }
 
 // ============================================================
@@ -465,6 +511,8 @@ function setupEventListeners() {
             document.getElementById(modalId).classList.add('hidden');
             if (modalId === 'addReminderModal') {
                 resetForm();
+            } else if (modalId === 'justBecauseModal') {
+                resetJustBecauseForm();
             }
         });
     });
@@ -512,66 +560,6 @@ function setupEventListeners() {
         });
     }
     
-    const nameInput = document.getElementById('newName');
-    if (nameInput) {
-        nameInput.addEventListener('input', function(e) {
-            const name = e.target.value.trim() || 'this person';
-            document.getElementById('justBecausePersonName').textContent = name;
-        });
-    }
-    
-    const enableJBCheckbox = document.getElementById('enableJustBecause');
-    if (enableJBCheckbox) {
-        enableJBCheckbox.addEventListener('change', function(e) {
-            const options = document.getElementById('justBecauseOptions');
-            const upgradePrompt = document.getElementById('jbUpgradePrompt');
-            const configSection = document.getElementById('jbConfigSection');
-            
-            if (e.target.checked) {
-                options.classList.remove('hidden');
-                
-                if (currentUserTier === 'free' || currentUserTier === 'discover') {
-                    upgradePrompt.classList.remove('hidden');
-                    configSection.classList.add('disabled');
-                } else {
-                    upgradePrompt.classList.add('hidden');
-                    configSection.classList.remove('disabled');
-                }
-            } else {
-                options.classList.add('hidden');
-                configSection.classList.remove('disabled');
-            }
-        });
-    }
-    
-    document.querySelectorAll('input[name="jbFrequency"]').forEach(function(radio) {
-        radio.addEventListener('change', function(e) {
-            const customGroup = document.getElementById('customMonthsGroup');
-            const randomGroup = document.getElementById('randomPerYearGroup');
-            
-            customGroup.classList.add('hidden');
-            randomGroup.classList.add('hidden');
-            
-            if (e.target.value === 'custom') {
-                customGroup.classList.remove('hidden');
-            } else if (e.target.value === 'random') {
-                randomGroup.classList.remove('hidden');
-            }
-        });
-    });
-    
-    const startImmediatelyCheckbox = document.getElementById('jbStartImmediately');
-    if (startImmediatelyCheckbox) {
-        startImmediatelyCheckbox.addEventListener('change', function(e) {
-            const startDateGroup = document.getElementById('jbStartDateGroup');
-            if (e.target.checked) {
-                startDateGroup.classList.add('hidden');
-            } else {
-                startDateGroup.classList.remove('hidden');
-            }
-        });
-    }
-    
     const form = document.getElementById('newReminderForm');
     if (form) {
         form.addEventListener('submit', handleFormSubmit);
@@ -580,6 +568,31 @@ function setupEventListeners() {
     const editForm = document.getElementById('editReminderForm');
     if (editForm) {
         editForm.addEventListener('submit', handleEditSubmit);
+    }
+    
+    // Just Because modal
+    const jbBtn = document.getElementById('addJustBecauseBtn');
+    if (jbBtn) {
+        jbBtn.addEventListener('click', async function() {
+            resetJustBecauseForm();
+            await setupJustBecauseModal(null, null);
+            document.getElementById('justBecauseModal').classList.remove('hidden');
+        });
+    }
+    
+    const jbModal = document.getElementById('justBecauseModal');
+    if (jbModal) {
+        jbModal.addEventListener('click', function(e) {
+            if (e.target.id === 'justBecauseModal') {
+                jbModal.classList.add('hidden');
+                resetJustBecauseForm();
+            }
+        });
+    }
+    
+    const jbForm = document.getElementById('justBecauseForm');
+    if (jbForm) {
+        jbForm.addEventListener('submit', handleJustBecauseFormSubmit);
     }
 }
 
@@ -595,13 +608,6 @@ async function handleFormSubmit(e) {
         alert('You\'ve reached the Discover tier limit of 5 reminders. Please upgrade to Curate to add more.');
         document.getElementById('addReminderModal').classList.add('hidden');
         window.location.href = 'upgrade.html';
-        return;
-    }
-    
-    const enableJB = document.getElementById('enableJustBecause').checked;
-    
-    if (enableJB && (currentUserTier === 'free' || currentUserTier === 'discover')) {
-        alert('Just Because reminders require Curate tier. Please upgrade or uncheck the Just Because option.');
         return;
     }
     
@@ -630,43 +636,15 @@ async function handleFormSubmit(e) {
             }
         }
         
-        if (enableJB && currentUserTier !== 'free' && currentUserTier !== 'discover') {
-            await updatePerson(personId, { hasJustBecause: true });
-        }
-        
         await createDateBasedReminder(personId, {
             occasion: occasion,
             customOccasionName: occasion === 'custom' ? customOccasionName : null,
             date: occasionDate,
             notes: notes
         });
-        
-        if (enableJB && currentUserTier !== 'free' && currentUserTier !== 'discover') {
-            const frequencyRadio = document.querySelector('input[name="jbFrequency"]:checked');
-            const frequency = frequencyRadio ? frequencyRadio.value : 'every_6_weeks';
-            
-            const customMonths = frequency === 'custom' 
-                ? parseInt(document.getElementById('jbCustomMonths').value)
-                : null;
-            
-            const randomPerYear = frequency === 'random'
-                ? parseInt(document.getElementById('jbRandomPerYear').value)
-                : null;
-            
-            const startImmediately = document.getElementById('jbStartImmediately').checked;
-            const startDate = startImmediately 
-                ? null 
-                : document.getElementById('jbStartDate').value;
-            
-            await createJustBecauseReminder(personId, {
-                frequency: frequency,
-                customMonths: customMonths,
-                randomPerYear: randomPerYear,
-                startImmediately: startImmediately,
-                startDate: startDate,
-                smsEnabled: currentUserTier !== 'free'
-            });
-        }
+        // Note: if this person has an active Just Because reminder,
+        // createDateBasedReminder automatically re-checks its date
+        // against this new reminder and shifts it forward if needed.
         
         document.getElementById('addReminderModal').classList.add('hidden');
         resetForm();
@@ -678,6 +656,50 @@ async function handleFormSubmit(e) {
     } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Add Reminder';
+    }
+}
+
+// ============================================================
+// HANDLE JUST BECAUSE FORM SUBMIT
+// ============================================================
+
+async function handleJustBecauseFormSubmit(e) {
+    e.preventDefault();
+    
+    if (currentUserTier === 'free' || currentUserTier === 'discover') {
+        alert('Just Because reminders require Curate tier. Please upgrade to enable this.');
+        return;
+    }
+    
+    const personId = document.getElementById('jbPersonSelect').value;
+    if (!personId) {
+        alert('Please select who this Just Because reminder is for.');
+        return;
+    }
+    
+    const frequencyRadio = document.querySelector('input[name="jbModalFrequency"]:checked');
+    const frequency = frequencyRadio ? frequencyRadio.value : 'every_6_weeks';
+    
+    const submitBtn = document.getElementById('submitJustBecauseBtn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Setting up...';
+    
+    try {
+        await createJustBecauseReminder(personId, {
+            frequency: frequency,
+            smsEnabled: currentUserTier !== 'free'
+        });
+        
+        document.getElementById('justBecauseModal').classList.add('hidden');
+        resetJustBecauseForm();
+        loadDashboard();
+        
+    } catch (error) {
+        console.error('Error setting up Just Because reminder:', error);
+        alert('Error setting up Just Because reminder. Please try again.');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Set up Just Because';
     }
 }
 
@@ -837,19 +859,20 @@ async function handleDeleteReminder(e) {
 function resetForm() {
     document.getElementById('newReminderForm').reset();
     document.getElementById('newCustomOccasion').classList.add('hidden');
-    document.getElementById('justBecauseOptions').classList.add('hidden');
-    document.getElementById('customMonthsGroup').classList.add('hidden');
-    document.getElementById('randomPerYearGroup').classList.add('hidden');
-    document.getElementById('jbStartDateGroup').classList.add('hidden');
-    document.getElementById('jbUpgradePrompt').classList.add('hidden');
-    document.getElementById('jbConfigSection').classList.remove('disabled');
-    document.getElementById('justBecausePersonName').textContent = 'this person';
     
     // Clear readonly and existing person tracking
     document.getElementById('newName').readOnly = false;
     delete document.getElementById('newName').dataset.existingPersonId;
+}
+
+function resetJustBecauseForm() {
+    const form = document.getElementById('justBecauseForm');
+    if (form) form.reset();
     
-    const defaultRadio = document.querySelector('input[name="jbFrequency"][value="every_6_weeks"]');
+    delete document.getElementById('jbPersonSelect').dataset.locked;
+    document.getElementById('jbPersonSelect').disabled = false;
+    
+    const defaultRadio = document.querySelector('input[name="jbModalFrequency"][value="every_6_weeks"]');
     if (defaultRadio) {
         defaultRadio.checked = true;
     }
