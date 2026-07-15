@@ -85,6 +85,12 @@ async function loadUserData() {
             planEl.textContent = tierDisplayNames[currentUserTier] || 'Discover';
         }
         
+        const upgradeActionCard = document.getElementById('upgradeActionCard');
+        if (upgradeActionCard) {
+            const isUpgraded = currentUserTier === 'curate' || currentUserTier === 'essential';
+            upgradeActionCard.classList.toggle('hidden', isUpgraded);
+        }
+        
     } catch (error) {
         console.error('Error loading user data:', error);
         currentUserTier = 'discover';
