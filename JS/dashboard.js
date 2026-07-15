@@ -275,8 +275,6 @@ function renderPeopleList(peopleWithReminders) {
 // HELPER: Set up Just Because modal based on user tier + recipients
 // ============================================================
 async function setupJustBecauseModal(lockedPersonId, lockedPersonName) {
-    console.log('[DEBUG] Just Because modal opening — currentUserTier is:', JSON.stringify(currentUserTier));
-    
     const upgradePrompt = document.getElementById('jbModalUpgradePrompt');
     const configSection = document.getElementById('jbModalConfigSection');
     const submitBtn = document.getElementById('submitJustBecauseBtn');
