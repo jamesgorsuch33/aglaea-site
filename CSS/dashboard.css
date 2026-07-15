@@ -464,6 +464,10 @@
     transform: translateY(-2px);
 }
 
+.action-card.hidden {
+    display: none;
+}
+
 .action-icon {
     font-size: 2rem;
 }
