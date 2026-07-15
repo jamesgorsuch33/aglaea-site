@@ -242,7 +242,6 @@
             
             <form id="editReminderForm">
                 <input type="hidden" id="editReminderId">
-                <input type="hidden" id="editReminderType">
                 <input type="hidden" id="editPersonId">
                 
                 <div class="form-group">
@@ -250,69 +249,63 @@
                     <input type="text" id="editName">
                 </div>
                 
-                <div class="form-group" id="editRelationshipGroup">
-                    <label for="editRelationship">Your Relationship</label>
-                    <select id="editRelationship">
-                        <option value="">Select relationship</option>
-                        <option value="Mother">Mother</option>
-                        <option value="Father">Father</option>
-                        <option value="Sister">Sister</option>
-                        <option value="Brother">Brother</option>
-                        <option value="Partner">Partner</option>
-                        <option value="Spouse">Spouse</option>
-                        <option value="Friend">Friend</option>
-                        <option value="Best Friend">Best Friend</option>
-                        <option value="Colleague">Colleague</option>
-                        <option value="Grandmother">Grandmother</option>
-                        <option value="Grandfather">Grandfather</option>
-                        <option value="Aunt">Aunt</option>
-                        <option value="Uncle">Uncle</option>
-                        <option value="Cousin">Cousin</option>
-                        <option value="Other">Other</option>
+                <div class="form-group">
+                    <label for="editOccasion">Occasion</label>
+                    <select id="editOccasion">
+                        <option value="birthday">Birthday</option>
+                        <option value="anniversary">Anniversary</option>
+                        <option value="valentines">Valentine's Day</option>
+                        <option value="mothers-day">Mother's Day</option>
+                        <option value="fathers-day">Father's Day</option>
+                        <option value="christmas">Christmas</option>
+                        <option value="custom">Custom / Other</option>
                     </select>
+                    <input type="text" id="editCustomOccasion" class="custom-occasion hidden" placeholder="Enter occasion name">
+                    <input type="text" id="editCustomOccasionName" class="custom-occasion hidden" placeholder="Name of the occasion">
                 </div>
                 
-                <div id="editDateFields">
-                    <div class="form-group">
-                        <label for="editOccasion">Occasion</label>
-                        <select id="editOccasion">
-                            <option value="birthday">Birthday</option>
-                            <option value="anniversary">Anniversary</option>
-                            <option value="valentines">Valentine's Day</option>
-                            <option value="mothers-day">Mother's Day</option>
-                            <option value="fathers-day">Father's Day</option>
-                            <option value="christmas">Christmas</option>
-                            <option value="custom">Custom / Other</option>
-                        </select>
-                        <input type="text" id="editCustomOccasion" class="custom-occasion hidden" placeholder="Enter occasion name">
-                        <input type="text" id="editCustomOccasionName" class="custom-occasion hidden" placeholder="Name of the occasion">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="editDate">Date</label>
-                        <input type="date" id="editDate">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="editNotes">Notes (optional)</label>
-                        <textarea id="editNotes" rows="3"></textarea>
-                    </div>
+                <div class="form-group">
+                    <label for="editDate">Date</label>
+                    <input type="date" id="editDate">
                 </div>
                 
-                <div id="editJBFields" class="hidden">
-                    <div class="form-group">
-                        <label for="editJBFrequency">How often?</label>
-                        <select id="editJBFrequency">
-                            <option value="every_6_weeks">Every 6 weeks</option>
-                            <option value="every_3_months">Every 3 months</option>
-                            <option value="random">Random per year</option>
-                        </select>
-                        <span class="form-helper">Changing this recalculates the next reminder date, avoiding any existing reminders within 3 weeks.</span>
-                    </div>
+                <div class="form-group">
+                    <label for="editNotes">Notes (optional)</label>
+                    <textarea id="editNotes" rows="3"></textarea>
                 </div>
                 
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary modal-close" data-modal="editReminderModal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Just Because Modal -->
+    <div id="editJustBecauseModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✨ Edit Just Because</h2>
+                <button class="modal-close" data-modal="editJustBecauseModal">&times;</button>
+            </div>
+            
+            <form id="editJustBecauseForm">
+                <input type="hidden" id="editJBReminderId">
+                <input type="hidden" id="editJBPersonId">
+                
+                <div class="form-group">
+                    <label for="editJBFrequency">How often?</label>
+                    <select id="editJBFrequency">
+                        <option value="every_6_weeks">Every 6 weeks</option>
+                        <option value="every_3_months">Every 3 months</option>
+                        <option value="random">Random per year</option>
+                    </select>
+                    <span class="form-helper">Changing this recalculates the next reminder date, avoiding any existing reminders within 3 weeks.</span>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-close" data-modal="editJustBecauseModal">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Changes</button>
                 </div>
             </form>
