@@ -537,6 +537,20 @@ function setupEventListeners() {
         });
     }
     
+    const editJBModal = document.getElementById('editJustBecauseModal');
+    if (editJBModal) {
+        editJBModal.addEventListener('click', function(e) {
+            if (e.target.id === 'editJustBecauseModal') {
+                editJBModal.classList.add('hidden');
+            }
+        });
+    }
+    
+    const editJBForm = document.getElementById('editJustBecauseForm');
+    if (editJBForm) {
+        editJBForm.addEventListener('submit', handleEditJustBecauseSubmit);
+    }
+    
     const occasionSelect = document.getElementById('newOccasion');
     if (occasionSelect) {
         occasionSelect.addEventListener('change', function(e) {
@@ -721,43 +735,31 @@ async function handleEditReminder(e) {
             return;
         }
         
+        if (reminder.reminderType === 'just-because') {
+            document.getElementById('editJBReminderId').value = reminderId;
+            document.getElementById('editJBPersonId').value = personId;
+            document.getElementById('editJBFrequency').value = reminder.frequency || 'every_6_weeks';
+            
+            document.getElementById('editJustBecauseModal').classList.remove('hidden');
+            return;
+        }
+        
+        // Date-based reminder
         const people = await getPeopleForUser(currentUser.uid);
         const person = people.find(function(p) { return p.id === personId; });
         
         document.getElementById('editReminderId').value = reminderId;
         document.getElementById('editPersonId').value = personId;
-        document.getElementById('editReminderType').value = reminder.reminderType;
         document.getElementById('editName').value = person ? person.personName : '';
+        document.getElementById('editOccasion').value = reminder.occasion || 'birthday';
+        document.getElementById('editDate').value = reminder.date || '';
+        document.getElementById('editNotes').value = reminder.notes || '';
         
-        // Hide relationship field in edit modal (already set when person was created)
-        const editRelationshipGroup = document.getElementById('editRelationshipGroup');
-        if (editRelationshipGroup) {
-            editRelationshipGroup.style.display = 'none';
-        }
-        
-        if (reminder.reminderType === 'date-based') {
-            document.getElementById('editDateFields').classList.remove('hidden');
-            const editJBFields = document.getElementById('editJBFields');
-            if (editJBFields) editJBFields.classList.add('hidden');
-            
-            document.getElementById('editOccasion').value = reminder.occasion || 'birthday';
-            document.getElementById('editDate').value = reminder.date || '';
-            document.getElementById('editNotes').value = reminder.notes || '';
-            
-            if (reminder.occasion === 'custom') {
-                document.getElementById('editCustomOccasion').classList.remove('hidden');
-                document.getElementById('editCustomOccasionName').value = reminder.customOccasionName || '';
-            } else {
-                document.getElementById('editCustomOccasion').classList.add('hidden');
-            }
-        } else if (reminder.reminderType === 'just-because') {
-            document.getElementById('editDateFields').classList.add('hidden');
-            const editJBFields = document.getElementById('editJBFields');
-            if (editJBFields) {
-                editJBFields.classList.remove('hidden');
-                const freqEl = document.getElementById('editJBFrequency');
-                if (freqEl) freqEl.value = reminder.frequency || 'every_6_weeks';
-            }
+        if (reminder.occasion === 'custom') {
+            document.getElementById('editCustomOccasion').classList.remove('hidden');
+            document.getElementById('editCustomOccasionName').value = reminder.customOccasionName || '';
+        } else {
+            document.getElementById('editCustomOccasion').classList.add('hidden');
         }
         
         document.getElementById('editReminderModal').classList.remove('hidden');
@@ -769,7 +771,7 @@ async function handleEditReminder(e) {
 }
 
 // ============================================================
-// HANDLE EDIT SUBMIT
+// HANDLE EDIT SUBMIT (DATE-BASED REMINDERS)
 // ============================================================
 
 async function handleEditSubmit(e) {
@@ -777,42 +779,58 @@ async function handleEditSubmit(e) {
     
     const reminderId = document.getElementById('editReminderId').value;
     const personId = document.getElementById('editPersonId').value;
-    const reminderType = document.getElementById('editReminderType').value;
     const personName = document.getElementById('editName').value.trim();
     
     try {
         await updatePerson(personId, { personName: personName });
         
-        if (reminderType === 'date-based') {
-            const occasion = document.getElementById('editOccasion').value;
-            const customOccasionName = document.getElementById('editCustomOccasionName').value.trim();
-            const date = document.getElementById('editDate').value;
-            const notes = document.getElementById('editNotes').value.trim();
-            
-            await updateReminder(personId, reminderId, {
-                occasion: occasion,
-                customOccasionName: occasion === 'custom' ? customOccasionName : null,
-                date: date,
-                notes: notes
-            });
-        } else if (reminderType === 'just-because') {
-            const frequency = document.getElementById('editJBFrequency').value;
-            
-            // Recalculate the next date for the new frequency, anchored
-            // from today, applying the same conflict-avoidance as creation.
-            const nextDate = await calculateNextJustBecauseDate(personId, frequency, new Date());
-            
-            await updateReminder(personId, reminderId, {
-                frequency: frequency,
-                nextReminderDate: formatDate(nextDate)
-            });
-        }
+        const occasion = document.getElementById('editOccasion').value;
+        const customOccasionName = document.getElementById('editCustomOccasionName').value.trim();
+        const date = document.getElementById('editDate').value;
+        const notes = document.getElementById('editNotes').value.trim();
+        
+        await updateReminder(personId, reminderId, {
+            occasion: occasion,
+            customOccasionName: occasion === 'custom' ? customOccasionName : null,
+            date: date,
+            notes: notes
+        });
         
         document.getElementById('editReminderModal').classList.add('hidden');
         loadDashboard();
         
     } catch (error) {
         console.error('Error updating reminder:', error);
+        alert('Error updating reminder. Please try again.');
+    }
+}
+
+// ============================================================
+// HANDLE EDIT JUST BECAUSE SUBMIT
+// ============================================================
+
+async function handleEditJustBecauseSubmit(e) {
+    e.preventDefault();
+    
+    const reminderId = document.getElementById('editJBReminderId').value;
+    const personId = document.getElementById('editJBPersonId').value;
+    const frequency = document.getElementById('editJBFrequency').value;
+    
+    try {
+        // Recalculate the next date for the new frequency, anchored
+        // from today, applying the same conflict-avoidance as creation.
+        const nextDate = await calculateNextJustBecauseDate(personId, frequency, new Date());
+        
+        await updateReminder(personId, reminderId, {
+            frequency: frequency,
+            nextReminderDate: formatDate(nextDate)
+        });
+        
+        document.getElementById('editJustBecauseModal').classList.add('hidden');
+        loadDashboard();
+        
+    } catch (error) {
+        console.error('Error updating Just Because reminder:', error);
         alert('Error updating reminder. Please try again.');
     }
 }
