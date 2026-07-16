@@ -207,6 +207,7 @@ async function processDateBasedReminders(today, stats) {
             const emailData = {
                 firstName: firstName,
                 recipientName: person.personName || 'someone',
+                relationship: person.relationship || null,
                 occasion: getOccasionLabel(reminder),
                 occasionDate: formatOccasionDate(reminder.date)
             };
@@ -296,7 +297,9 @@ async function processJustBecauseReminders(today, stats) {
             
             const sent = await sendEmail('reminderJustBecause', userEmail, {
                 firstName: firstName,
-                recipientName: person.personName || 'someone'
+                recipientName: person.personName || 'someone',
+                relationship: person.relationship || null,
+                userTier: userData.tier || 'discover'
             });
             
             if (sent) {
