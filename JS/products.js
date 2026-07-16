@@ -4,16 +4,116 @@
 // CONFIG
 // ============================================================
 const PRODUCTS_PER_PAGE = 15;
+const PRODUCT_DATA_URL = '/product-data.json';
 let showingAll = false;
+let productCatalogue = []; // raw data as fetched, tagged with originalIndex
+
+// ============================================================
+// LOAD PRODUCT DATA + RENDER CARDS
+// Fetches the shared product catalogue and builds the DOM cards
+// that filterProducts()/sortProducts() operate on below. This is
+// the only place that reads product-data.json — everything else
+// in this file works off the rendered .brand-card elements, same
+// as before the data file existed.
+// ============================================================
+async function loadAndRenderProducts() {
+    const grid = document.getElementById('brands-grid');
+    const loadingEl = document.getElementById('products-loading');
+
+    try {
+        const response = await fetch(PRODUCT_DATA_URL);
+        if (!response.ok) throw new Error(`Failed to load product data: ${response.status}`);
+        const products = await response.json();
+
+        // Tag each product with its original catalogue position before
+        // shuffling, so "Featured" sort can always restore session order.
+        products.forEach((p, i) => { p.originalIndex = i; });
+        productCatalogue = products;
+
+        const order = getShuffledOrder(products.length);
+        const shuffled = order.map(i => products[i]).filter(Boolean);
+
+        if (loadingEl) loadingEl.remove();
+        shuffled.forEach(product => grid.appendChild(buildProductCard(product)));
+
+    } catch (error) {
+        console.error('Error loading products:', error);
+        if (loadingEl) {
+            loadingEl.textContent = 'Sorry, we couldn\'t load our gifts right now. Please refresh to try again.';
+        }
+    }
+}
+
+// Build one .brand-card <a> element from a product-data.json entry.
+// Markup/classes match the previous hardcoded cards exactly, so all
+// existing CSS and the filter/sort logic below need no changes.
+function buildProductCard(product) {
+    const a = document.createElement('a');
+    a.href = product.affiliateUrl;
+    a.className = 'brand-card';
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.setAttribute('data-brand', product.brandSlug);
+    a.setAttribute('data-occasions', (product.occasions || []).join(','));
+    a.setAttribute('data-original-index', product.originalIndex);
+    a.setAttribute('data-product-id', product.id);
+
+    a.innerHTML = `
+        <div class="brand-image">
+            <img src="${escapeAttr(product.imageUrl)}" alt="${escapeAttr(product.imageAlt || product.productName)}">
+        </div>
+        <div class="brand-info">
+            <p class="brand-badge">${escapeHtml(product.brandName)}</p>
+            <h3 class="brand-name">${escapeHtml(product.productName)}</h3>
+            <p class="brand-category">${escapeHtml(product.productCategory)}</p>
+            <p class="brand-description">${escapeHtml(product.description)}</p>
+            <p class="brand-price">${escapeHtml(product.priceText)}</p>
+        </div>
+    `;
+    return a;
+}
+
+function escapeHtml(str) {
+    if (str === undefined || str === null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+function escapeAttr(str) {
+    return escapeHtml(str).replace(/"/g, '&quot;');
+}
+
+// ============================================================
+// URL-PARAM DEEP LINKING
+// Lets reminder emails link straight into a pre-filtered view, e.g.
+// products.html?occasion=birthday or products.html?occasion=mothers-day&recipient=for-her
+// Runs once after cards are rendered, before the first filterProducts() call.
+// ============================================================
+function applyUrlFilters() {
+    const params = new URLSearchParams(window.location.search);
+    const occasion = params.get('occasion');
+    const recipient = params.get('recipient'); // 'for-her' or 'for-him'
+
+    if (occasion) {
+        const cb = document.querySelector(`.filter-group input[type="checkbox"][value="${CSS.escape(occasion)}"]`);
+        if (cb) cb.checked = true;
+    }
+    if (recipient) {
+        const cb = document.querySelector(`.filter-group input[type="checkbox"][value="${CSS.escape(recipient)}"]`);
+        if (cb) cb.checked = true;
+    }
+}
 
 // ============================================================
 // SESSION-STABLE RANDOM ORDER
-// Each product card gets a "data-order-key" id (its own DOM
-// position index) shuffled once per browser session. The shuffled
-// order is stored in sessionStorage so that navigating back to
-// this page later in the same session shows the same order.
-// A brand-new session (new tab opened fresh, or sessionStorage
-// cleared) will reshuffle.
+// Each product gets a "data-order-key" id (its own array position
+// index) shuffled once per browser session. The shuffled order is
+// stored in sessionStorage so that navigating back to this page
+// later in the same session shows the same order. A brand-new
+// session (new tab opened fresh, or sessionStorage cleared) will
+// reshuffle.
 // ============================================================
 function getShuffledOrder(count) {
     const storageKey = 'aglaea-product-order';
@@ -36,22 +136,6 @@ function getShuffledOrder(count) {
 
     sessionStorage.setItem(storageKey, JSON.stringify(order));
     return order;
-}
-
-// Tag every card with its original index, then reorder the DOM
-// to match the session's shuffled order. Runs once on page load.
-function applySessionShuffle() {
-    const grid = document.getElementById('brands-grid');
-    const cards = Array.from(document.querySelectorAll('.brand-card'));
-
-    cards.forEach((card, i) => card.setAttribute('data-original-index', i));
-
-    const order = getShuffledOrder(cards.length);
-
-    order.forEach(originalIndex => {
-        const card = cards[originalIndex];
-        if (card) grid.appendChild(card);
-    });
 }
 
 // Toggle mobile filters
@@ -242,7 +326,8 @@ document.addEventListener('click', function (event) {
 // ============================================================
 // INITIAL PAGE LOAD
 // ============================================================
-document.addEventListener('DOMContentLoaded', function () {
-    applySessionShuffle();
+document.addEventListener('DOMContentLoaded', async function () {
+    await loadAndRenderProducts();
+    applyUrlFilters();
     filterProducts();
 });
