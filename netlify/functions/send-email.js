@@ -8,6 +8,236 @@ const FROM_EMAIL = process.env.FROM_EMAIL || 'hello@aglaea.co.uk';
 const SITE_URL = process.env.SITE_URL || 'https://aglaea.co.uk';
 
 // ============================================================
+// PRODUCT RECOMMENDATIONS
+// Pulls from the shared product-data.json catalogue (same file
+// products.html renders from) to build a small gift selection
+// inside reminder emails, linking straight to each brand's AWIN
+// affiliate page, plus a CTA back to a pre-filtered products.html.
+// ============================================================
+
+const EMAIL_TYPES_WITH_PRODUCTS = new Set([
+    'reminder21Days', 'reminder14Days', 'reminder10Days',
+    'reminder7DaysCurate', 'reminder7DaysDiscover',
+    'reminder3DaysCurate', 'reminder3DaysDiscover',
+    'reminderDayOf', 'reminderJustBecause'
+]);
+
+// Relationship values that imply a gender, for occasions/emails where
+// we're not otherwise told (Mother's Day / Father's Day are handled
+// separately, since the occasion itself implies gender regardless of
+// relationship).
+const RELATIONSHIP_TO_GENDER = {
+    'Mother': 'her', 'Sister': 'her', 'Wife': 'her', 'Grandmother': 'her', 'Aunt': 'her',
+    'Father': 'him', 'Brother': 'him', 'Husband': 'him', 'Grandfather': 'him', 'Uncle': 'him'
+};
+
+// Occasion codes that actually exist as tags in product-data.json.
+// Anything else (christmas, valentines, custom, or no code at all)
+// falls back to no occasion filter — better to show general gifts
+// than an empty grid.
+const KNOWN_OCCASION_TAGS = new Set([
+    'birthday', 'anniversary', 'wedding', 'mothers-day', 'fathers-day', 'just-because'
+]);
+
+// Curate category mix, in priority order, with a fallback chain per
+// slot for when a category is thin for a given gender (e.g. men's
+// jewellery only has ~3 items site-wide).
+const CURATE_CATEGORY_SLOTS = [
+    { category: 'jewellery', fallbacks: ['fragrance', 'card'] },
+    { category: 'clothing', fallbacks: ['card', 'fragrance'] },
+    { category: 'clothing', fallbacks: ['card', 'fragrance'] },
+    { category: 'card', fallbacks: ['fragrance'] },
+    { category: 'shoes', fallbacks: ['clothing', 'fragrance'] },
+    { category: 'fragrance', fallbacks: ['card'] }
+];
+
+let cachedCatalogue = null;
+
+async function fetchCatalogue() {
+    if (cachedCatalogue) return cachedCatalogue;
+    try {
+        const response = await fetch(`${SITE_URL}/product-data.json`);
+        if (!response.ok) throw new Error(`product-data.json fetch failed: ${response.status}`);
+        cachedCatalogue = await response.json();
+        return cachedCatalogue;
+    } catch (error) {
+        console.error('Failed to load product catalogue for email:', error);
+        return [];
+    }
+}
+
+// Determine the gender pool to draw from: 'her', 'him', or null
+// (unknown/generic — mixed layout).
+function resolveGender(occasionCode, relationship) {
+    if (occasionCode === 'mothers-day') return 'her';
+    if (occasionCode === 'fathers-day') return 'him';
+    if (relationship && RELATIONSHIP_TO_GENDER[relationship]) {
+        return RELATIONSHIP_TO_GENDER[relationship];
+    }
+    return null;
+}
+
+// Filter the catalogue down to products matching the occasion tag
+// (if it's a real tag) and, if given, the gender flag.
+function filterCatalogue(catalogue, occasionCode, gender) {
+    let pool = catalogue;
+
+    if (occasionCode && KNOWN_OCCASION_TAGS.has(occasionCode)) {
+        pool = pool.filter(p => (p.occasions || []).includes(occasionCode));
+    }
+
+    if (gender === 'her') pool = pool.filter(p => p.forHer);
+    if (gender === 'him') pool = pool.filter(p => p.forHim);
+
+    return pool;
+}
+
+function shuffle(array) {
+    const copy = array.slice();
+    for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+}
+
+// Pick the 6-product Curate mix from a pre-filtered pool, following
+// CURATE_CATEGORY_SLOTS with fallbacks, never repeating a product.
+function pickCurateMix(pool) {
+    const usedIds = new Set();
+    const picks = [];
+
+    CURATE_CATEGORY_SLOTS.forEach(slot => {
+        const tryCategories = [slot.category, ...slot.fallbacks];
+        for (const category of tryCategories) {
+            const candidates = shuffle(pool.filter(p => p.category === category && !usedIds.has(p.id)));
+            if (candidates.length > 0) {
+                picks.push(candidates[0]);
+                usedIds.add(candidates[0].id);
+                return;
+            }
+        }
+        // Last resort: any unused product at all, regardless of category
+        const anyLeft = shuffle(pool.filter(p => !usedIds.has(p.id)));
+        if (anyLeft.length > 0) {
+            picks.push(anyLeft[0]);
+            usedIds.add(anyLeft[0].id);
+        }
+    });
+
+    return picks;
+}
+
+// Pick N random distinct products for Discover (no category mix).
+function pickRandom(pool, count) {
+    return shuffle(pool).slice(0, count);
+}
+
+// Build the products.html deep-link, filtered by occasion (and
+// recipient, when gender is known) — used by the CTA under the grid.
+function buildProductsUrl(occasionCode, gender) {
+    const params = new URLSearchParams();
+    if (occasionCode && KNOWN_OCCASION_TAGS.has(occasionCode) && occasionCode !== 'just-because') {
+        params.set('occasion', occasionCode);
+    }
+    if (gender === 'her') params.set('recipient', 'for-her');
+    if (gender === 'him') params.set('recipient', 'for-him');
+    const query = params.toString();
+    return `${SITE_URL}/products.html${query ? '?' + query : ''}`;
+}
+
+// Render a 3-across product grid as an email-safe HTML table.
+function renderProductRow(products) {
+    if (!products.length) return '';
+    const cells = products.map(p => `
+        <td width="33.33%" valign="top" style="padding: 8px;">
+            <a href="${escapeHtml(p.affiliateUrl)}" style="text-decoration: none; display: block;">
+                <img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.productName)}" width="100%" style="display: block; border-radius: 4px; margin-bottom: 10px;">
+                <p style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #c9a870; margin: 0 0 4px 0;">${escapeHtml(p.brandName)}</p>
+                <p style="font-size: 13px; color: #2a2a2a; margin: 0 0 4px 0; line-height: 1.4;">${escapeHtml(p.productName)}</p>
+                <p style="font-size: 13px; font-weight: 600; color: #2a2a2a; margin: 0;">${escapeHtml(p.priceText)}</p>
+            </a>
+        </td>
+    `).join('');
+    return `<tr>${cells}</tr>`;
+}
+
+function renderProductGrid(products, heading) {
+    if (!products.length) return '';
+    // Split into rows of 3
+    const rows = [];
+    for (let i = 0; i < products.length; i += 3) {
+        rows.push(renderProductRow(products.slice(i, i + 3)));
+    }
+    return `
+        ${heading ? `<p style="font-size: 12px; color: #c9a870; letter-spacing: 0.2em; text-transform: uppercase; margin: 0 0 12px 0; font-weight: 600; text-align: center;">${escapeHtml(heading)}</p>` : ''}
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+            ${rows.join('')}
+        </table>
+    `;
+}
+
+// Top-level: given the email's data payload, fetch the catalogue,
+// select products, and return the full HTML block (grid + CTA) to
+// splice into a template. Returns '' if products can't be built for
+// any reason — never blocks the email from sending.
+async function buildProductSectionHtml(data) {
+    try {
+        const catalogue = await fetchCatalogue();
+        if (!catalogue.length) return '';
+
+        const occasionCode = data.occasionCode || null;
+        const relationship = data.relationship || null;
+        const gender = resolveGender(occasionCode, relationship);
+        const isCurate = data.userTier === 'curate' || data.userTier === 'essential';
+        const productsUrl = buildProductsUrl(occasionCode, gender);
+
+        let gridHtml;
+
+        if (gender) {
+            // Known gender — single grid
+            const pool = filterCatalogue(catalogue, occasionCode, gender);
+            const products = isCurate ? pickCurateMix(pool) : pickRandom(pool, 3);
+            gridHtml = renderProductGrid(products, null);
+        } else if (isCurate) {
+            // Generic + Curate — the "stretch" layout: two 6-item grids
+            const herPool = filterCatalogue(catalogue, occasionCode, 'her');
+            const himPool = filterCatalogue(catalogue, occasionCode, 'him');
+            const herProducts = pickCurateMix(herPool);
+            const himProducts = pickCurateMix(himPool);
+            gridHtml = `
+                ${renderProductGrid(herProducts, 'For Her')}
+                <div style="height: 24px;"></div>
+                ${renderProductGrid(himProducts, 'For Him')}
+            `;
+        } else {
+            // Generic + Discover — 3 random from the whole occasion-filtered pool
+            const pool = filterCatalogue(catalogue, occasionCode, null);
+            const products = pickRandom(pool, 3);
+            gridHtml = renderProductGrid(products, null);
+        }
+
+        if (!gridHtml) return '';
+
+        return `
+            <tr>
+                <td style="padding: 0 32px 32px 32px;">
+                    ${gridHtml}
+                    <p style="text-align: center; margin: 24px 0 0 0;">
+                        <a href="${productsUrl}" style="color: #c9a870; font-weight: 600; text-decoration: none; font-size: 14px; letter-spacing: 0.05em;">
+                            See our full curated collection →
+                        </a>
+                    </p>
+                </td>
+            </tr>
+        `;
+    } catch (error) {
+        console.error('Error building product section:', error);
+        return '';
+    }
+}
+
+// ============================================================
 // EMAIL TEMPLATE LIBRARY
 // All 10 templates embedded as functions that take data
 // ============================================================
@@ -55,7 +285,7 @@ const templates = {
                             </div>
                         </div>
                         <p style="font-size: 16px; line-height: 1.7; color: #2a2a2a; margin: 0 0 20px 0;">
-                            Your first reminder is already in place. We'll be in touch before the occasion — quietly, considerately, with everything you need to make it feel effortless.
+                            Your first reminder is already in place. We'll be in touch three weeks before the occasion — quietly, considerately, with everything you need to make it feel effortless.
                         </p>
                     </td>
                 </tr>
@@ -394,6 +624,7 @@ const templates = {
                         </p>
                     </td>
                 </tr>
+                ${data.productGridHtml || ''}
                 <tr>
                     <td style="padding: 0 32px 32px 32px;">
                         <div style="background-color: #f9f5ed; padding: 28px 32px; border-radius: 4px; border-left: 3px solid #c9a870;">
@@ -404,7 +635,7 @@ const templates = {
                                 With Curate, you'd have received this reminder 3 weeks ago — giving you real time to find something truly worthy.
                             </p>
                             <p style="font-size: 14px; color: #6b6b6b; margin: 0 0 16px 0; font-style: italic;">
-                                Just £4.99 per month. Unlimited reminders, 21-day advance notice, full partner brand collection, SMS notifications, and priority support.
+                                Just £4.99 per month. Unlimited reminders, 21-day advance notice, full partner brand collection, and free delivery.
                             </p>
                             <a href="${SITE_URL}/upgrade.html" style="color: #c9a870; font-weight: 600; text-decoration: none; font-size: 14px; letter-spacing: 0.05em;">
                                 Discover Curate →
@@ -488,6 +719,7 @@ const templates = {
                         </p>
                     </td>
                 </tr>
+                ${data.productGridHtml || ''}
                 <tr>
                     <td style="padding: 0 32px 32px 32px;">
                         <div style="background-color: #f9f5ed; padding: 32px; border-radius: 4px; border-left: 3px solid #c9a870;">
@@ -498,7 +730,7 @@ const templates = {
                                 With Curate, you'd have had <em style="color: #c9a870;">3 weeks</em> to find the perfect gift.
                             </p>
                             <p style="font-size: 15px; line-height: 1.7; color: #2a2a2a; margin: 0 0 16px 0;">
-                                Unlimited reminders. 21-day advance notice. Full partner brand collection. SMS notifications. Priority support.
+                                Unlimited reminders. 21-day advance notice. Full partner brand collection. Free delivery on all orders. Gift wrapping and personal notes included.
                             </p>
                             <p style="font-size: 14px; color: #6b6b6b; margin: 0 0 20px 0; font-style: italic;">
                                 All for £4.99 per month. Cancel anytime.
@@ -554,6 +786,7 @@ const templates = {
                         </p>
                     </td>
                 </tr>
+                ${data.productGridHtml || ''}
                 <tr>
                     <td style="text-align: center; padding: 0 32px 48px 32px;">
                         <a href="${SITE_URL}/products.html" style="display: inline-block; background-color: #c9a870; color: #ffffff; text-decoration: none; padding: 14px 40px; font-size: 15px; font-weight: 500; letter-spacing: 0.05em; border-radius: 2px;">
@@ -606,6 +839,7 @@ const templates = {
                         </p>
                     </td>
                 </tr>
+                ${data.productGridHtml || ''}
                 <tr>
                     <td style="text-align: center; padding: 48px 32px; background-color: #2a2a2a;">
                         <h2 style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 28px; font-weight: 400; color: #ffffff; margin: 0 0 12px 0;">
@@ -675,6 +909,7 @@ function buildReminderEmail(data) {
                         </p>
                     </td>
                 </tr>
+                ${data.productGridHtml || ''}
                 ${data.ctaTitle ? `
                 <tr>
                     <td style="text-align: center; padding: 48px 32px; background-color: #2a2a2a;">
@@ -884,8 +1119,17 @@ exports.handler = async (event) => {
             };
         }
         
+        const emailData = data || {};
+        
+        // Build the product recommendation grid for reminder-type emails.
+        // Computed here (not inside each template) so template functions
+        // can stay synchronous — this is the only async step.
+        if (EMAIL_TYPES_WITH_PRODUCTS.has(emailType)) {
+            emailData.productGridHtml = await buildProductSectionHtml(emailData);
+        }
+        
         // Generate email content from template
-        const { subject, html } = templates[emailType](data || {});
+        const { subject, html } = templates[emailType](emailData);
         
         // Send via Resend API
         const response = await fetch('https://api.resend.com/emails', {
