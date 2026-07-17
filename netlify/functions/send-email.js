@@ -170,7 +170,17 @@ function renderProductGrid(products, heading) {
         rows.push(renderProductRow(products.slice(i, i + 3)));
     }
     return `
-        ${heading ? `<p style="font-size: 12px; color: #c9a870; letter-spacing: 0.2em; text-transform: uppercase; margin: 0 0 12px 0; font-weight: 600; text-align: center;">${escapeHtml(heading)}</p>` : ''}
+        ${heading ? `
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 16px;">
+            <tr>
+                <td style="text-align: center; padding-bottom: 8px; border-bottom: 2px solid #c9a870;">
+                    <p style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 26px; font-weight: 600; color: #2a2a2a; margin: 0; letter-spacing: 0.02em;">
+                        ${escapeHtml(heading)}
+                    </p>
+                </td>
+            </tr>
+        </table>
+        ` : ''}
         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
             ${rows.join('')}
         </table>
@@ -223,9 +233,9 @@ async function buildProductSectionHtml(data) {
             <tr>
                 <td style="padding: 0 32px 32px 32px;">
                     ${gridHtml}
-                    <p style="text-align: center; margin: 24px 0 0 0;">
-                        <a href="${productsUrl}" style="color: #c9a870; font-weight: 600; text-decoration: none; font-size: 14px; letter-spacing: 0.05em;">
-                            See our full curated collection →
+                    <p style="text-align: center; margin: 28px 0 0 0;">
+                        <a href="${productsUrl}" style="display: inline-block; background-color: #c9a870; color: #ffffff; text-decoration: none; padding: 14px 40px; font-size: 15px; font-weight: 500; letter-spacing: 0.05em; border-radius: 2px;">
+                            See Our Full Curated Collection →
                         </a>
                     </p>
                 </td>
@@ -606,7 +616,7 @@ const templates = {
                                     <p style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 40px; color: #2a2a2a; margin: 0 0 8px 0; font-weight: 400; line-height: 1.1;">
                                         ${escapeHtml(data.occasionDate)}
                                     </p>
-                                    <p style="font-size: 14px; color: #6b6b6b; margin: 0; font-style: italic; font-family: 'Cormorant Garamond', Georgia, serif;">
+                                    <p style="font-size: 20px; color: #c9a870; margin: 0; font-weight: 600; font-family: 'Cormorant Garamond', Georgia, serif; letter-spacing: 0.02em;">
                                         ${escapeHtml(data.occasion)}
                                     </p>
                                 </td>
@@ -698,7 +708,7 @@ const templates = {
                                     <p style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 40px; color: #2a2a2a; margin: 0 0 8px 0; font-weight: 400; line-height: 1.1;">
                                         ${escapeHtml(data.occasionDate)}
                                     </p>
-                                    <p style="font-size: 14px; color: #6b6b6b; margin: 0; font-style: italic; font-family: 'Cormorant Garamond', Georgia, serif;">
+                                    <p style="font-size: 20px; color: #c9a870; margin: 0; font-weight: 600; font-family: 'Cormorant Garamond', Georgia, serif; letter-spacing: 0.02em;">
                                         ${escapeHtml(data.occasion)}
                                     </p>
                                 </td>
@@ -888,7 +898,7 @@ function buildReminderEmail(data) {
                                     <p style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 40px; color: #2a2a2a; margin: 0 0 8px 0; font-weight: 400; line-height: 1.1;">
                                         ${escapeHtml(data.occasionDate)}
                                     </p>
-                                    <p style="font-size: 14px; color: #6b6b6b; margin: 0; font-style: italic; font-family: 'Cormorant Garamond', Georgia, serif;">
+                                    <p style="font-size: 20px; color: #c9a870; margin: 0; font-weight: 600; font-family: 'Cormorant Garamond', Georgia, serif; letter-spacing: 0.02em;">
                                         ${escapeHtml(data.occasion)}
                                     </p>
                                 </td>
