@@ -209,7 +209,9 @@ async function processDateBasedReminders(today, stats) {
                 recipientName: person.personName || 'someone',
                 relationship: person.relationship || null,
                 occasion: getOccasionLabel(reminder),
-                occasionDate: formatOccasionDate(reminder.date)
+                occasionCode: reminder.occasion,
+                occasionDate: formatOccasionDate(reminder.date),
+                userTier: userTier
             };
             
             console.log(`Sending ${emailType} to ${userEmail} (${userTier} tier) for ${person.personName}`);
@@ -299,6 +301,7 @@ async function processJustBecauseReminders(today, stats) {
                 firstName: firstName,
                 recipientName: person.personName || 'someone',
                 relationship: person.relationship || null,
+                occasionCode: 'just-because',
                 userTier: userData.tier || 'discover'
             });
             
