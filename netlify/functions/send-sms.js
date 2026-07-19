@@ -20,9 +20,9 @@ const SITE_URL = process.env.SITE_URL || 'https://aglaea.co.uk';
 // cutting the real limit from 160 characters to 70.
 // ============================================================
 const SMS_TEMPLATES = {
-    14: (name, occasion) => `${name}'s ${occasion} is in 14 days. Find something special: ${SITE_URL.replace('https://', '')}/gifts`,
-    7:  (name, occasion) => `${name}'s ${occasion} is just 7 days away. Browse gift ideas: ${SITE_URL.replace('https://', '')}/gifts`,
-    3:  (name, occasion) => `Just 3 days left for ${name}'s ${occasion}! Last-minute ideas: ${SITE_URL.replace('https://', '')}/gifts`
+    14: (name, occasion) => `AGLAEA - ${name}'s ${occasion} is in 14 days. Find something special: ${SITE_URL.replace('https://', '')}/gifts`,
+    7:  (name, occasion) => `AGLAEA - ${name}'s ${occasion} is just 7 days away. Browse gift ideas: ${SITE_URL.replace('https://', '')}/gifts`,
+    3:  (name, occasion) => `AGLAEA - Just 3 days left for ${name}'s ${occasion}! Last-minute ideas: ${SITE_URL.replace('https://', '')}/gifts`
 };
 
 const MAX_SMS_LENGTH = 160;
