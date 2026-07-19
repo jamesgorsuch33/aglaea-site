@@ -123,6 +123,27 @@ async function sendEmail(emailType, to, data) {
 }
 
 // ============================================================
+// HELPER: Send SMS via send-sms function
+// Curate tier only, sent at 14/7/3 days before an occasion.
+// ============================================================
+async function sendSms(to, days, recipientName, occasion) {
+    try {
+        const response = await fetch(`${SITE_URL}/.netlify/functions/send-sms`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ to, days, recipientName, occasion })
+        });
+        
+        const result = await response.json();
+        return result.success === true;
+        
+    } catch (error) {
+        console.error(`Send SMS failed (${days} days to ${to}):`, error);
+        return false;
+    }
+}
+
+// ============================================================
 // PROCESS DATE-BASED REMINDERS
 // ============================================================
 async function processDateBasedReminders(today, stats) {
@@ -239,6 +260,52 @@ async function processDateBasedReminders(today, stats) {
             } else {
                 stats.failed++;
                 console.error(`Failed to send ${emailType} for reminder ${reminder.id}`);
+            }
+            
+            // ========================================================
+            // SEND SMS (Curate tier only, 14/7/3 days before occasion)
+            // Independent of email send/fail — tracked separately via
+            // reminder.smsSent so it can never collide with the email
+            // cadence tracking in reminder.remindersSent. Inherits the
+            // giftPurchased suppression above, same as email.
+            // ========================================================
+            const SMS_DAYS = new Set([14, 7, 3]);
+            const isSmsEligibleTier = userTier === 'curate' || userTier === 'essential';
+            
+            if (isSmsEligibleTier && SMS_DAYS.has(days)) {
+                const smsSentList = reminder.smsSent || [];
+                const smsCadenceKey = `${days}days`;
+                
+                if (smsSentList.includes(smsCadenceKey)) {
+                    console.log(`SMS cadence ${smsCadenceKey} already sent for reminder ${reminder.id}`);
+                } else {
+                    const userPhone = userData.phone || null;
+                    
+                    if (!userPhone) {
+                        console.log(`No phone number for user ${person.userId}, skipping SMS`);
+                    } else {
+                        const smsOk = await sendSms(userPhone, days, person.personName || 'someone', getOccasionLabel(reminder));
+                        
+                        if (smsOk) {
+                            stats.smsSent = (stats.smsSent || 0) + 1;
+                            try {
+                                await db.collection('people')
+                                    .doc(person.id)
+                                    .collection('reminders')
+                                    .doc(reminder.id)
+                                    .update({
+                                        smsSent: admin.firestore.FieldValue.arrayUnion(smsCadenceKey),
+                                        lastSmsSentAt: admin.firestore.FieldValue.serverTimestamp()
+                                    });
+                            } catch (updateError) {
+                                console.error(`Failed to update SMS-sent flag for reminder ${reminder.id}:`, updateError);
+                            }
+                        } else {
+                            stats.smsFailed = (stats.smsFailed || 0) + 1;
+                            console.error(`Failed to send SMS (${days} days) for reminder ${reminder.id}`);
+                        }
+                    }
+                }
             }
         }
     }
@@ -460,6 +527,8 @@ exports.handler = async (event) => {
     const stats = {
         sent: 0,
         failed: 0,
+        smsSent: 0,
+        smsFailed: 0,
         justBecauseSent: 0,
         nudgesSent: 0,
         nudgeFailed: 0,
@@ -481,6 +550,8 @@ exports.handler = async (event) => {
         console.log('=== Scheduled Reminders Complete ===');
         console.log(`Duration: ${duration}s`);
         console.log(`Reminders sent: ${stats.sent}`);
+        console.log(`SMS sent: ${stats.smsSent}`);
+        console.log(`SMS failed: ${stats.smsFailed}`);
         console.log(`Just Because sent: ${stats.justBecauseSent}`);
         console.log(`Upgrade nudges sent: ${stats.nudgesSent}`);
         console.log(`Failed: ${stats.failed}`);
