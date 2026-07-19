@@ -5,11 +5,14 @@
 [build.environment]
   # Disable secrets scanning completely (Firebase keys are safe to expose)
   SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"
-
 # Disable pretty URLs to keep .html extensions
 # This prevents CSS/JS relative path issues
 [build.processing]
   skip_processing = false
-
 [build.processing.html]
   pretty_urls = false
+
+[[redirects]]
+  from = "/gifts"
+  to = "/products.html"
+  status = 301
