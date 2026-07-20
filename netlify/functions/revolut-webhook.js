@@ -217,11 +217,47 @@ async function handleSubscriptionActivated(webhookEvent) {
 // Handle subscription cancellation
 // ============================================================
 async function handleSubscriptionCancelled(webhookEvent) {
-    const subscription = webhookEvent.data || webhookEvent;
+    const subscriptionId = webhookEvent.subscription_id || webhookEvent.data?.id;
+    
+    console.log('Handling subscription cancellation - subscription_id:', subscriptionId);
+
+    // Fetch full subscription details from Revolut API if the webhook
+    // only included a bare subscription_id (same pattern as
+    // handleSubscriptionActivated — the cancellation event doesn't
+    // embed external_reference/customer_id directly).
+    let subscription = webhookEvent.data;
+    
+    if (subscriptionId && !subscription) {
+        try {
+            const apiUrl = process.env.REVOLUT_ENV === 'production'
+                ? 'https://merchant.revolut.com/api'
+                : 'https://sandbox-merchant.revolut.com/api';
+                
+            const response = await fetch(`${apiUrl}/subscriptions/${subscriptionId}`, {
+                headers: {
+                    'Authorization': `Bearer ${process.env.REVOLUT_SECRET_KEY}`,
+                    'Revolut-Api-Version': '2026-04-20'
+                }
+            });
+            
+            if (response.ok) {
+                subscription = await response.json();
+                console.log('Fetched subscription details for cancellation');
+            } else {
+                console.error('Failed to fetch subscription details:', response.status);
+            }
+        } catch (err) {
+            console.error('Failed to fetch subscription:', err);
+        }
+    }
+    
+    if (!subscription) {
+        console.error('Could not resolve subscription details for cancellation, subscription_id:', subscriptionId);
+        return;
+    }
+    
     const userId = subscription.external_reference || subscription.metadata?.userId;
     const customerId = subscription.customer_id;
-
-    console.log('Handling subscription cancellation');
 
     // Find user by external reference or customer ID
     let userDoc;
@@ -238,17 +274,22 @@ async function handleSubscriptionCancelled(webhookEvent) {
     }
 
     if (!userDoc || !userDoc.exists) {
-        console.error('User not found for cancellation');
+        console.error('User not found for cancellation. userId:', userId, 'customerId:', customerId);
         return;
     }
 
-    // Downgrade to Discover
+    // Downgrade to Discover — this is a safety-net path only; the
+    // primary downgrade happens synchronously in cancel-subscription.js
+    // at the moment the member clicks Cancel. This just catches
+    // cancellations that originate outside that flow (e.g. from
+    // Revolut's dashboard directly, or a failed-payment auto-cancel).
     await userDoc.ref.set({
         tier: 'discover',
+        subscriptionStatus: 'cancelled',
         cancelledAt: admin.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
-    console.log('User downgraded to Discover');
+    console.log('User downgraded to Discover (via webhook)');
 }
 
 // ============================================================
