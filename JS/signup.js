@@ -4,7 +4,6 @@
 
 // State
 let currentStep = 1;
-let reminderCount = 1;
 let isSubmitting = false;
 let formData = {
     firstName: '',
@@ -12,7 +11,7 @@ let formData = {
     email: '',
     password: '',
     phone: '',
-    reminders: []
+    reminder: null
 };
 
 // DOM Elements
@@ -21,28 +20,19 @@ const step2 = document.getElementById('step2');
 const successStep = document.getElementById('successStep');
 const accountForm = document.getElementById('accountForm');
 const remindersForm = document.getElementById('remindersForm');
-const addReminderBtn = document.getElementById('addReminderBtn');
 const backBtn = document.getElementById('backBtn');
 const progressSteps = document.querySelectorAll('.progress-step');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
-    setupOccasionListeners();
+    setupOccasionListener();
 });
 
 // Setup Event Listeners
 function setupEventListeners() {
-    // Account form submission
     accountForm.addEventListener('submit', handleAccountSubmit);
-    
-    // Reminders form submission
-    remindersForm.addEventListener('submit', handleRemindersSubmit);
-    
-    // Add reminder button
-    addReminderBtn.addEventListener('click', addReminderField);
-    
-    // Back button
+    remindersForm.addEventListener('submit', handleReminderSubmit);
     backBtn.addEventListener('click', goToStep1);
 }
 
@@ -50,51 +40,39 @@ function setupEventListeners() {
 function handleAccountSubmit(e) {
     e.preventDefault();
     
-    // Collect form data
     formData.firstName = document.getElementById('firstName').value;
     formData.lastName = document.getElementById('lastName').value;
     formData.email = document.getElementById('email').value;
     formData.password = document.getElementById('password').value;
     formData.phone = document.getElementById('phone').value;
     
-    // Go to step 2
     goToStep2();
 }
 
-// Handle Reminders Form Submission
-async function handleRemindersSubmit(e) {
+// Handle Reminder Form Submission
+// Onboarding is deliberately limited to a single reminder — the person
+// can add more once they're on the dashboard, matching the standard
+// "add reminder" flow everyone else uses after signup.
+async function handleReminderSubmit(e) {
     e.preventDefault();
     
-    // Guard against double-submission — belt-and-braces alongside the
-    // disabled button below, in case a second click lands before the
-    // disable takes visual effect.
     if (isSubmitting) return;
     isSubmitting = true;
-    
     setSubmitLoading(true);
     
-    // Collect reminders data
-    formData.reminders = [];
-    for (let i = 1; i <= reminderCount; i++) {
-        const nameInput = document.getElementById(`name${i}`);
-        const occasionSelect = document.getElementById(`occasion${i}`);
-        const customOccasionInput = document.getElementById(`customOccasion${i}`);
-        const dateInput = document.getElementById(`date${i}`);
-        
-        if (nameInput && nameInput.value) {
-            const occasion = occasionSelect.value === 'other' 
-                ? customOccasionInput.value 
-                : occasionSelect.value;
-            
-            formData.reminders.push({
-                name: nameInput.value,
-                occasion: occasion,
-                date: dateInput.value
-            });
-        }
-    }
+    const occasionSelect = document.getElementById('occasion1');
+    const customOccasionInput = document.getElementById('customOccasion1');
+    const occasion = occasionSelect.value === 'other'
+        ? customOccasionInput.value
+        : occasionSelect.value;
     
-    // Create account
+    formData.reminder = {
+        name: document.getElementById('name1').value,
+        relationship: document.getElementById('relationship1').value || null,
+        occasion: occasion,
+        date: document.getElementById('date1').value
+    };
+    
     await createAccount();
 }
 
@@ -126,9 +104,9 @@ async function createAccount() {
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         
-        // Add reminders to Firestore — each reminder needs its own
-        // "person" document (this is the schema the dashboard actually
-        // reads), with the reminder nested underneath it at
+        // Create the person + their reminder — matches the exact schema
+        // the dashboard reads: a "person" document at people/{personId},
+        // with the reminder nested underneath at
         // people/{personId}/reminders/{reminderId}.
         //
         // NOTE: deliberately sequential, not batched. Security rules
@@ -136,37 +114,33 @@ async function createAccount() {
         // parent person document's ownership evaluate against committed
         // state — a person doc created in the same atomic batch as its
         // reminder isn't visible to that lookup yet, causing a
-        // permission-denied error even on a fully valid write. This
-        // matches the sequential create-then-create pattern already
-        // used successfully everywhere else (firebase-config-v2.js).
-        for (const reminder of formData.reminders) {
-            const personRef = await firebase.firestore().collection('people').add({
-                userId: user.uid,
-                personName: reminder.name,
-                relationship: null,
-                hasJustBecause: false,
+        // permission-denied error even on a fully valid write.
+        const personRef = await firebase.firestore().collection('people').add({
+            userId: user.uid,
+            personName: formData.reminder.name,
+            relationship: formData.reminder.relationship,
+            hasJustBecause: false,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        await firebase.firestore()
+            .collection('people')
+            .doc(personRef.id)
+            .collection('reminders')
+            .add({
+                reminderType: 'date-based',
+                occasion: formData.reminder.occasion,
+                date: formData.reminder.date,
+                reminderDays: [7, 3, 0],
+                smsEnabled: false,
+                active: true,
+                lastReminderSent: null,
+                giftPurchased: false,
+                purchaseDate: null,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            
-            await firebase.firestore()
-                .collection('people')
-                .doc(personRef.id)
-                .collection('reminders')
-                .add({
-                    reminderType: 'date-based',
-                    occasion: reminder.occasion,
-                    date: reminder.date,
-                    reminderDays: [7, 3, 0],
-                    smsEnabled: false,
-                    active: true,
-                    lastReminderSent: null,
-                    giftPurchased: false,
-                    purchaseDate: null,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-        }
         
         // Show success
         showSuccess();
@@ -233,108 +207,20 @@ function updateProgressBar() {
     });
 }
 
-// Add Reminder Field
-function addReminderField() {
-    if (reminderCount >= 5) {
-        alert('You can add up to 5 reminders on the free plan. Upgrade to Essential for unlimited reminders!');
-        return;
-    }
-    
-    reminderCount++;
-    
-    const container = document.getElementById('remindersContainer');
-    const reminderDiv = document.createElement('div');
-    reminderDiv.className = 'reminder-input';
-    reminderDiv.dataset.reminder = reminderCount;
-    
-    reminderDiv.innerHTML = `
-        <div class="reminder-header">
-            <h3>Reminder ${reminderCount}</h3>
-            <button type="button" class="remove-reminder" onclick="removeReminder(${reminderCount})">✕</button>
-        </div>
-        
-        <div class="form-group">
-            <label for="name${reminderCount}">Person's Name</label>
-            <input type="text" id="name${reminderCount}" placeholder="e.g. Mum, Sarah, Best Friend">
-        </div>
-        
-        <div class="form-row">
-            <div class="form-group">
-                <label for="occasion${reminderCount}">Occasion</label>
-                <select id="occasion${reminderCount}" onchange="handleOccasionChange(${reminderCount})">
-                    <option value="">Select occasion</option>
-                    <option value="birthday">Birthday</option>
-                    <option value="anniversary">Anniversary</option>
-                    <option value="valentines">Valentine's Day</option>
-                    <option value="mothers-day">Mother's Day</option>
-                    <option value="fathers-day">Father's Day</option>
-                    <option value="christmas">Christmas</option>
-                    <option value="other">Other (type your own)</option>
-                </select>
-                <input type="text" id="customOccasion${reminderCount}" class="custom-occasion hidden" placeholder="Enter occasion name">
-            </div>
-            
-            <div class="form-group">
-                <label for="date${reminderCount}">Date</label>
-                <input type="date" id="date${reminderCount}">
-            </div>
-        </div>
-        
-        <p class="date-helper">💡 Enter the actual date of the occasion (we'll remind you 10 days before)</p>
-    `;
-    
-    container.appendChild(reminderDiv);
-    updateReminderCount();
-    
-    // Disable button if at max
-    if (reminderCount >= 5) {
-        addReminderBtn.disabled = true;
-        addReminderBtn.textContent = '✓ Maximum reminders added (5/5)';
-    }
-}
-
-// Remove Reminder Field
-function removeReminder(number) {
-    const reminderDiv = document.querySelector(`.reminder-input[data-reminder="${number}"]`);
-    if (reminderDiv) {
-        reminderDiv.remove();
-        reminderCount--;
-        updateReminderCount();
-        
-        // Re-enable add button
-        if (reminderCount < 5) {
-            addReminderBtn.disabled = false;
-            addReminderBtn.innerHTML = `+ Add Another Reminder <span class="reminder-count">(${reminderCount}/5)</span>`;
-        }
-    }
-}
-
-// Update Reminder Count
-function updateReminderCount() {
-    const countSpan = document.querySelector('.reminder-count');
-    if (countSpan) {
-        countSpan.textContent = `(${reminderCount}/5)`;
-    }
-}
-
-// Setup Occasion Listeners
-function setupOccasionListeners() {
+// Show custom occasion text input if "Other" is selected
+function setupOccasionListener() {
     const occasion1 = document.getElementById('occasion1');
-    occasion1.addEventListener('change', () => handleOccasionChange(1));
-}
-
-// Handle Occasion Change (show custom input if "Other" selected)
-function handleOccasionChange(number) {
-    const occasionSelect = document.getElementById(`occasion${number}`);
-    const customInput = document.getElementById(`customOccasion${number}`);
+    const customInput = document.getElementById('customOccasion1');
     
-    if (occasionSelect.value === 'other') {
-        customInput.classList.remove('hidden');
-        customInput.required = true;
-    } else {
-        customInput.classList.add('hidden');
-        customInput.required = false;
-    }
+    occasion1.addEventListener('change', () => {
+        if (occasion1.value === 'other') {
+            customInput.classList.remove('hidden');
+            customInput.required = true;
+        } else {
+            customInput.classList.add('hidden');
+            customInput.required = false;
+        }
+    });
 }
 
 // Error Messages
@@ -350,7 +236,3 @@ function getErrorMessage(code) {
             return 'An error occurred. Please try again.';
     }
 }
-
-// Make functions globally available
-window.removeReminder = removeReminder;
-window.handleOccasionChange = handleOccasionChange;
