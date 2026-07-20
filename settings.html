@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Account Settings — Aglaea</title>
-    <meta name="description" content="Manage your AGLAEA account settings.">
+    <meta name="description" content="Manage your Aglaea account settings.">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,21 +13,14 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/settings.css">
-    <link rel="stylesheet" href="css/form-validation.css">
 </head>
 <body>
     
     <!-- Header -->
     <header class="header">
-    <div class="container header-content">
-        <a href="index.html" class="logo">AGLAEA</a>
-        
-        <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Open menu">
-    <span></span>
-</button>
-        
-        <nav class="nav" id="mainNav">
-            <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu">×</button>
+        <div class="container header-content">
+            <a href="index.html" class="logo">AGLAEA</a>
+            <nav class="nav">
                 <a href="dashboard.html">Dashboard</a>
                 <a href="products.html">Gifts</a>
                 <a href="upgrade.html">Upgrade</a>
@@ -35,7 +28,6 @@
                 <button class="btn-nav" id="logoutBtn">Sign Out</button>
             </nav>
         </div>
-        <div class="mobile-menu-backdrop" id="mobileMenuBackdrop"></div>
     </header>
 
     <!-- Settings Section -->
@@ -76,7 +68,7 @@
                     <div class="form-group">
                         <label for="settingsPhone">Phone Number</label>
                         <input type="tel" id="settingsPhone" placeholder="+44 7XXX XXXXXX">
-                        <span class="form-helper">For SMS reminders (Essential plan only)</span>
+                        <span class="form-helper">For SMS reminders (Curate plan only)</span>
                     </div>
                     
                     <div class="settings-actions">
@@ -138,13 +130,13 @@
                 
                 <!-- Free user: Upgrade options -->
                 <div id="freeUserSection" class="hidden">
-                    <p class="settings-helper">Upgrade to Essential for unlimited reminders + Just Because moments</p>
+                    <p class="settings-helper">Upgrade to Curate for unlimited reminders + Just Because moments</p>
                     <div class="settings-actions">
-                        <a href="upgrade.html" class="btn btn-primary">Upgrade to Essential</a>
+                        <a href="upgrade.html" class="btn btn-primary">Upgrade to Curate</a>
                     </div>
                 </div>
                 
-                <!-- Essential user: Annual upgrade prompt + cancel -->
+                <!-- Curate user: Annual upgrade prompt + cancel -->
                 <div id="essentialUserSection" class="hidden">
                     <div class="annual-upgrade-prompt">
                         <span class="annual-prompt-icon">💡</span>
@@ -203,16 +195,16 @@
             </div>
             
             <div class="modal-body">
-                <p>Are you sure you want to cancel your Essential subscription?</p>
+                <p>Are you sure you want to cancel your Curate subscription?</p>
                 
                 <div class="cancellation-info">
                     <p><strong>What happens when you cancel:</strong></p>
                     <ul>
-                        <li>You'll keep Essential features until <span id="cancelEndDate">the end of your billing period</span></li>
-                        <li>After that, your account will downgrade to Free</li>
-                        <li>You'll be limited to 5 reminders</li>
-                        <li>Just Because reminders will be paused</li>
-                        <li>You can reactivate anytime before the cancellation date</li>
+                        <li>Your Curate access ends immediately — this isn't deferred to the end of your billing period</li>
+                        <li>Your account moves to the free Discover plan, which allows up to 5 active reminders</li>
+                        <li>If you currently have more than 5, you'll be asked which 5 to keep active — the rest are paused, not deleted</li>
+                        <li>Any Just Because reminders will be paused</li>
+                        <li>All your reminder data is kept safe, and everything picks back up if you upgrade again</li>
                     </ul>
                 </div>
                 
@@ -278,7 +270,6 @@
     
     <!-- Settings Logic -->
     <script type="module" src="js/settings.js"></script>
-    <script src="js/mobile-menu.js"></script>
 
 </body>
 </html>
