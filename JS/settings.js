@@ -69,12 +69,10 @@ async function loadUserData() {
 
 function displaySubscriptionDetails() {
     const tier = currentUserData.tier || 'discover';
-    const subscriptionStatus = currentUserData.subscriptionStatus || null;
     
     // Hide all sections first
     document.getElementById('freeUserSection').classList.add('hidden');
     document.getElementById('essentialUserSection').classList.add('hidden');
-    document.getElementById('cancellationPendingSection').classList.add('hidden');
     
     if (tier === 'discover') {
         // Show free/Discover user upgrade options
@@ -89,34 +87,19 @@ function displaySubscriptionDetails() {
         document.getElementById('nextBillingRow').classList.remove('hidden');
         document.getElementById('billingAmount').textContent = '£4.99/month';
         
-        // Check if cancellation is pending
-        if (subscriptionStatus === 'cancelling' && currentUserData.cancellationDate) {
-            const cancelDate = new Date(currentUserData.cancellationDate);
-            const cancelDateStr = cancelDate.toLocaleDateString('en-GB', { 
-                day: 'numeric', 
-                month: 'long', 
-                year: 'numeric' 
-            });
-            
-            document.getElementById('nextBillingDate').textContent = 'Cancelling on ' + cancelDateStr;
-            document.getElementById('cancellationDate').textContent = 
-                'Your Curate plan will end on ' + cancelDateStr;
-            document.getElementById('cancellationPendingSection').classList.remove('hidden');
+        if (currentUserData.nextBillingDate) {
+            const nextDate = new Date(currentUserData.nextBillingDate);
+            document.getElementById('nextBillingDate').textContent = 
+                nextDate.toLocaleDateString('en-GB', { 
+                    day: 'numeric', 
+                    month: 'long', 
+                    year: 'numeric' 
+                });
         } else {
-            // Active subscription
-            if (currentUserData.nextBillingDate) {
-                const nextDate = new Date(currentUserData.nextBillingDate);
-                document.getElementById('nextBillingDate').textContent = 
-                    nextDate.toLocaleDateString('en-GB', { 
-                        day: 'numeric', 
-                        month: 'long', 
-                        year: 'numeric' 
-                    });
-            } else {
-                document.getElementById('nextBillingDate').textContent = 'Active';
-            }
-            document.getElementById('essentialUserSection').classList.remove('hidden');
+            document.getElementById('nextBillingDate').textContent = 'Active';
         }
+        document.getElementById('essentialUserSection').classList.remove('hidden');
+        
     } else {
         // Unrecognised tier value — fail visibly rather than leaving
         // the card stuck on "Loading..." forever with no explanation
@@ -141,12 +124,6 @@ function setupEventListeners() {
         showCancelSubscriptionModal();
     });
     document.getElementById('confirmCancelBtn').addEventListener('click', handleCancelSubscription);
-    
-    // Reactivate subscription
-    const reactivateBtn = document.getElementById('reactivateSubscriptionBtn');
-    if (reactivateBtn) {
-        reactivateBtn.addEventListener('click', handleReactivateSubscription);
-    }
     
     // Delete account
     document.getElementById('deleteAccountBtn').addEventListener('click', function() {
@@ -355,16 +332,6 @@ async function handleCancelSubscription() {
 }
 
 // ============================================================
-// HANDLE REACTIVATE SUBSCRIPTION
-// Revolut subscriptions can't be un-cancelled once ended — this
-// sends the member back through the normal upgrade/checkout flow
-// to start a fresh subscription, rather than resuming the old one.
-// ============================================================
-
-function handleReactivateSubscription() {
-    window.location.href = 'upgrade.html';
-}
-
 // ============================================================
 // HANDLE DELETE ACCOUNT
 // ============================================================
