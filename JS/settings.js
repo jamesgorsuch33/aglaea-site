@@ -327,7 +327,7 @@ async function handleCancelSubscription() {
             },
             body: JSON.stringify({
                 userId: currentUser.uid,
-                subscriptionId: currentUserData.subscriptionId
+                subscriptionId: currentUserData.revolutSubscriptionId
                 // keepReminderIds: [...]  // TODO: wire in once picker modal exists
             })
         });
