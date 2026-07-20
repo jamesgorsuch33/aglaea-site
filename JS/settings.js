@@ -1,13 +1,11 @@
 // ============================================================
-// SETTINGS PAGE LOGIC - With Inline Validation + Loading States
+// SETTINGS PAGE LOGIC
 // Profile, Security, Subscription, Account Deletion
 // ============================================================
 
 import { 
     getUser,
-    createOrUpdateUser,
-    updateUserTier,
-    updateUserStripeInfo
+    createOrUpdateUser
 } from './firebase-config-v2.js';
 
 import { 
@@ -17,21 +15,6 @@ import {
     EmailAuthProvider,
     reauthenticateWithCredential
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-
-import {
-    showFieldError,
-    clearFieldError,
-    clearAllErrors,
-    validateEmail,
-    validatePassword,
-    validateRequired,
-    validatePhone,
-    setButtonLoading,
-    resetButton,
-    setupFieldValidation,
-    setupPasswordMatchValidation,
-    showSuccess
-} from './form-validation.js';
 
 const auth = window.firebaseAuth;
 
@@ -47,7 +30,6 @@ auth.onAuthStateChanged(async function(user) {
         currentUser = user;
         await loadUserData();
         setupEventListeners();
-        setupValidation();
     } else {
         window.location.href = 'signin.html';
     }
@@ -86,25 +68,28 @@ async function loadUserData() {
 // ============================================================
 
 function displaySubscriptionDetails() {
-    const tier = currentUserData.tier || 'free';
+    const tier = currentUserData.tier || 'discover';
     const subscriptionStatus = currentUserData.subscriptionStatus || null;
     
+    // Hide all sections first
     document.getElementById('freeUserSection').classList.add('hidden');
     document.getElementById('essentialUserSection').classList.add('hidden');
     document.getElementById('cancellationPendingSection').classList.add('hidden');
     
-    if (tier === 'free') {
-        document.getElementById('currentPlan').textContent = 'Free';
+    if (tier === 'discover') {
+        // Show free/Discover user upgrade options
+        document.getElementById('currentPlan').textContent = 'Discover';
         document.getElementById('billingRow').classList.add('hidden');
         document.getElementById('nextBillingRow').classList.add('hidden');
         document.getElementById('freeUserSection').classList.remove('hidden');
         
-    } else if (tier === 'essential') {
-        document.getElementById('currentPlan').textContent = 'Essential';
+    } else if (tier === 'curate' || tier === 'essential') {
+        document.getElementById('currentPlan').textContent = 'Curate';
         document.getElementById('billingRow').classList.remove('hidden');
         document.getElementById('nextBillingRow').classList.remove('hidden');
         document.getElementById('billingAmount').textContent = '£4.99/month';
         
+        // Check if cancellation is pending
         if (subscriptionStatus === 'cancelling' && currentUserData.cancellationDate) {
             const cancelDate = new Date(currentUserData.cancellationDate);
             const cancelDateStr = cancelDate.toLocaleDateString('en-GB', { 
@@ -115,9 +100,10 @@ function displaySubscriptionDetails() {
             
             document.getElementById('nextBillingDate').textContent = 'Cancelling on ' + cancelDateStr;
             document.getElementById('cancellationDate').textContent = 
-                'Your Essential plan will end on ' + cancelDateStr;
+                'Your Curate plan will end on ' + cancelDateStr;
             document.getElementById('cancellationPendingSection').classList.remove('hidden');
         } else {
+            // Active subscription
             if (currentUserData.nextBillingDate) {
                 const nextDate = new Date(currentUserData.nextBillingDate);
                 document.getElementById('nextBillingDate').textContent = 
@@ -131,38 +117,12 @@ function displaySubscriptionDetails() {
             }
             document.getElementById('essentialUserSection').classList.remove('hidden');
         }
+    } else {
+        // Unrecognised tier value — fail visibly rather than leaving
+        // the card stuck on "Loading..." forever with no explanation
+        document.getElementById('currentPlan').textContent = 'Unknown';
+        console.error(`Unrecognised tier value: "${tier}"`);
     }
-}
-
-// ============================================================
-// SETUP REAL-TIME VALIDATION
-// ============================================================
-
-function setupValidation() {
-    // Profile form validation
-    setupFieldValidation('settingsFirstName', function(value) {
-        return validateRequired(value, 'First name');
-    });
-    
-    setupFieldValidation('settingsLastName', function(value) {
-        return validateRequired(value, 'Last name');
-    });
-    
-    setupFieldValidation('settingsEmail', function(value) {
-        return validateEmail(value);
-    });
-    
-    setupFieldValidation('settingsPhone', function(value) {
-        return validatePhone(value);
-    });
-    
-    // Password form validation
-    setupFieldValidation('settingsNewPassword', function(value) {
-        return validatePassword(value);
-    });
-    
-    // Password match validation
-    setupPasswordMatchValidation('settingsNewPassword', 'settingsConfirmPassword');
 }
 
 // ============================================================
@@ -211,6 +171,7 @@ function setupEventListeners() {
         });
     });
     
+    // Click outside modal to close
     document.querySelectorAll('.modal').forEach(function(modal) {
         modal.addEventListener('click', function(e) {
             if (e.target === modal) {
@@ -227,51 +188,19 @@ function setupEventListeners() {
 async function handleProfileUpdate(e) {
     e.preventDefault();
     
-    // Clear previous errors
-    clearAllErrors('profileForm');
+    const saveBtn = document.getElementById('saveProfileBtn');
+    const successMsg = document.getElementById('profileSuccess');
     
-    const firstName = document.getElementById('settingsFirstName').value.trim();
-    const lastName = document.getElementById('settingsLastName').value.trim();
-    const email = document.getElementById('settingsEmail').value.trim();
-    const phone = document.getElementById('settingsPhone').value.trim();
-    
-    let hasErrors = false;
-    
-    // Validate
-    const firstNameCheck = validateRequired(firstName, 'First name');
-    if (!firstNameCheck.valid) {
-        showFieldError('settingsFirstName', firstNameCheck.message);
-        hasErrors = true;
-    }
-    
-    const lastNameCheck = validateRequired(lastName, 'Last name');
-    if (!lastNameCheck.valid) {
-        showFieldError('settingsLastName', lastNameCheck.message);
-        hasErrors = true;
-    }
-    
-    const emailCheck = validateEmail(email);
-    if (!emailCheck.valid) {
-        showFieldError('settingsEmail', emailCheck.message);
-        hasErrors = true;
-    }
-    
-    if (phone) {
-        const phoneCheck = validatePhone(phone);
-        if (!phoneCheck.valid) {
-            showFieldError('settingsPhone', phoneCheck.message);
-            hasErrors = true;
-        }
-    }
-    
-    if (hasErrors) {
-        return;
-    }
-    
-    // Set loading state
-    setButtonLoading('saveProfileBtn', 'Saving...');
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving...';
+    successMsg.classList.add('hidden');
     
     try {
+        const firstName = document.getElementById('settingsFirstName').value.trim();
+        const lastName = document.getElementById('settingsLastName').value.trim();
+        const email = document.getElementById('settingsEmail').value.trim();
+        const phone = document.getElementById('settingsPhone').value.trim();
+        
         // Update email in Firebase Auth if changed
         if (email !== currentUser.email) {
             await updateEmail(currentUser, email);
@@ -292,23 +221,27 @@ async function handleProfileUpdate(e) {
         currentUserData.phone = phone;
         
         // Show success
-        resetButton('saveProfileBtn');
-        showSuccess('profileSuccess', 'Saved successfully');
+        successMsg.classList.remove('hidden');
+        setTimeout(function() {
+            successMsg.classList.add('hidden');
+        }, 3000);
         
     } catch (error) {
         console.error('Error updating profile:', error);
         
-        resetButton('saveProfileBtn');
-        
+        let message = 'Error updating profile. Please try again.';
         if (error.code === 'auth/requires-recent-login') {
-            showFieldError('settingsEmail', 'For security, please sign out and sign back in before changing your email.');
+            message = 'For security reasons, please sign out and sign back in before changing your email.';
         } else if (error.code === 'auth/email-already-in-use') {
-            showFieldError('settingsEmail', 'This email is already in use by another account.');
+            message = 'This email is already in use by another account.';
         } else if (error.code === 'auth/invalid-email') {
-            showFieldError('settingsEmail', 'Please enter a valid email address.');
-        } else {
-            alert('Error updating profile. Please try again.');
+            message = 'Please enter a valid email address.';
         }
+        
+        alert(message);
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save Changes';
     }
 }
 
@@ -319,33 +252,25 @@ async function handleProfileUpdate(e) {
 async function handlePasswordUpdate(e) {
     e.preventDefault();
     
-    // Clear previous errors
-    clearAllErrors('passwordForm');
+    const updateBtn = document.getElementById('updatePasswordBtn');
+    const successMsg = document.getElementById('passwordSuccess');
     
     const newPassword = document.getElementById('settingsNewPassword').value;
     const confirmPassword = document.getElementById('settingsConfirmPassword').value;
     
-    let hasErrors = false;
-    
-    // Validate new password
-    const passwordCheck = validatePassword(newPassword);
-    if (!passwordCheck.valid) {
-        showFieldError('settingsNewPassword', passwordCheck.message);
-        hasErrors = true;
-    }
-    
-    // Check passwords match
     if (newPassword !== confirmPassword) {
-        showFieldError('settingsConfirmPassword', 'Passwords do not match');
-        hasErrors = true;
-    }
-    
-    if (hasErrors) {
+        alert('Passwords do not match. Please try again.');
         return;
     }
     
-    // Set loading state
-    setButtonLoading('updatePasswordBtn', 'Updating...');
+    if (newPassword.length < 6) {
+        alert('Password must be at least 6 characters.');
+        return;
+    }
+    
+    updateBtn.disabled = true;
+    updateBtn.textContent = 'Updating...';
+    successMsg.classList.add('hidden');
     
     try {
         await updatePassword(currentUser, newPassword);
@@ -355,21 +280,25 @@ async function handlePasswordUpdate(e) {
         document.getElementById('settingsConfirmPassword').value = '';
         
         // Show success
-        resetButton('updatePasswordBtn');
-        showSuccess('passwordSuccess', 'Password updated');
+        successMsg.classList.remove('hidden');
+        setTimeout(function() {
+            successMsg.classList.add('hidden');
+        }, 3000);
         
     } catch (error) {
         console.error('Error updating password:', error);
         
-        resetButton('updatePasswordBtn');
-        
+        let message = 'Error updating password. Please try again.';
         if (error.code === 'auth/requires-recent-login') {
-            showFieldError('settingsNewPassword', 'For security, please sign out and sign back in before changing your password.');
+            message = 'For security reasons, please sign out and sign back in before changing your password.';
         } else if (error.code === 'auth/weak-password') {
-            showFieldError('settingsNewPassword', 'Password is too weak. Please use a stronger password.');
-        } else {
-            alert('Error updating password. Please try again.');
+            message = 'Password is too weak. Please use a stronger password.';
         }
+        
+        alert(message);
+    } finally {
+        updateBtn.disabled = false;
+        updateBtn.textContent = 'Update Password';
     }
 }
 
@@ -378,23 +307,19 @@ async function handlePasswordUpdate(e) {
 // ============================================================
 
 function showCancelSubscriptionModal() {
-    if (currentUserData.nextBillingDate) {
-        const endDate = new Date(currentUserData.nextBillingDate);
-        const endDateStr = endDate.toLocaleDateString('en-GB', { 
-            day: 'numeric', 
-            month: 'long', 
-            year: 'numeric' 
-        });
-        document.getElementById('cancelEndDate').textContent = endDateStr;
-    }
-    
     document.getElementById('cancelSubscriptionModal').classList.remove('hidden');
 }
 
 async function handleCancelSubscription() {
-    setButtonLoading('confirmCancelBtn', 'Cancelling...');
+    const confirmBtn = document.getElementById('confirmCancelBtn');
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Cancelling...';
     
     try {
+        // NOTE: this currently cancels immediately with no reminder-keeping
+        // step. The "pick 5 reminders to keep" flow is a separate piece
+        // still to be wired in — once built, that picker will run first
+        // and pass its selection through as keepReminderIds below.
         const response = await fetch('/.netlify/functions/cancel-subscription', {
             method: 'POST',
             headers: {
@@ -403,6 +328,7 @@ async function handleCancelSubscription() {
             body: JSON.stringify({
                 userId: currentUser.uid,
                 subscriptionId: currentUserData.subscriptionId
+                // keepReminderIds: [...]  // TODO: wire in once picker modal exists
             })
         });
         
@@ -410,57 +336,33 @@ async function handleCancelSubscription() {
             throw new Error('Failed to cancel subscription');
         }
         
+        const result = await response.json();
+        
         // Close modal
         document.getElementById('cancelSubscriptionModal').classList.add('hidden');
         
-        // Reload data
+        // Reload data to show updated status
         await loadUserData();
         
-        resetButton('confirmCancelBtn');
-        
-        alert('Your subscription has been cancelled. You will keep access until your billing period ends.');
+        alert('Your Curate subscription has ended and your account is now on the Discover plan. Your reminders and their data are still saved, and everything picks back up if you upgrade again.');
         
     } catch (error) {
         console.error('Error cancelling subscription:', error);
-        resetButton('confirmCancelBtn');
         alert('Error cancelling subscription. Please try again or contact support.');
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Yes, Cancel Subscription';
     }
 }
 
 // ============================================================
 // HANDLE REACTIVATE SUBSCRIPTION
+// Revolut subscriptions can't be un-cancelled once ended — this
+// sends the member back through the normal upgrade/checkout flow
+// to start a fresh subscription, rather than resuming the old one.
 // ============================================================
 
-async function handleReactivateSubscription() {
-    setButtonLoading('reactivateSubscriptionBtn', 'Reactivating...');
-    
-    try {
-        const response = await fetch('/.netlify/functions/reactivate-subscription', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                userId: currentUser.uid,
-                subscriptionId: currentUserData.subscriptionId
-            })
-        });
-        
-        if (!response.ok) {
-            throw new Error('Failed to reactivate subscription');
-        }
-        
-        await loadUserData();
-        
-        resetButton('reactivateSubscriptionBtn');
-        
-        alert('Your subscription has been reactivated. Welcome back!');
-        
-    } catch (error) {
-        console.error('Error reactivating subscription:', error);
-        resetButton('reactivateSubscriptionBtn');
-        alert('Error reactivating subscription. Please try again or contact support.');
-    }
+function handleReactivateSubscription() {
+    window.location.href = 'upgrade.html';
 }
 
 // ============================================================
@@ -468,9 +370,12 @@ async function handleReactivateSubscription() {
 // ============================================================
 
 async function handleDeleteAccount() {
-    setButtonLoading('confirmDeleteBtn', 'Deleting...');
+    const deleteBtn = document.getElementById('confirmDeleteBtn');
+    deleteBtn.disabled = true;
+    deleteBtn.textContent = 'Deleting...';
     
     try {
+        // Call Netlify function to delete account (handles Revolut + Firestore cleanup)
         const response = await fetch('/.netlify/functions/delete-account', {
             method: 'POST',
             headers: {
@@ -485,7 +390,7 @@ async function handleDeleteAccount() {
             throw new Error('Failed to delete account data');
         }
         
-        // Delete Firebase Auth user
+        // Delete Firebase Auth user (must be done from client)
         await deleteUser(currentUser);
         
         alert('Your account has been deleted. We are sorry to see you go.');
@@ -494,12 +399,13 @@ async function handleDeleteAccount() {
     } catch (error) {
         console.error('Error deleting account:', error);
         
-        resetButton('confirmDeleteBtn');
-        
+        let message = 'Error deleting account. Please try again or contact support.';
         if (error.code === 'auth/requires-recent-login') {
-            alert('For security, please sign out and sign back in, then try deleting your account.');
-        } else {
-            alert('Error deleting account. Please try again or contact support.');
+            message = 'For security, please sign out and sign back in, then try deleting your account.';
         }
+        
+        alert(message);
+        deleteBtn.disabled = false;
+        deleteBtn.textContent = 'Delete My Account Permanently';
     }
 }
