@@ -1,419 +1,357 @@
-// ============================================================
-// SIGNUP FLOW - With Inline Validation + Loading States
-// Step 1: Account Details
-// Step 2: First Reminder
-// ============================================================
+/* ============================================================
+   SIGNUP PAGE LOGIC
+   ============================================================ */
 
-import { auth } from './firebase-config-v2.js';
-import { 
-    createUserWithEmailAndPassword,
-    updateProfile
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+// State
+let currentStep = 1;
+let reminderCount = 1;
+let formData = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    phone: '',
+    reminders: []
+};
 
-import {
-    createOrUpdateUser,
-    createPerson,
-    createDateBasedReminder
-} from './firebase-config-v2.js';
-
-import {
-    showFieldError,
-    clearFieldError,
-    clearAllErrors,
-    validateEmail,
-    validatePassword,
-    validateRequired,
-    validatePhone,
-    validateFutureDate,
-    setButtonLoading,
-    resetButton,
-    setupFieldValidation
-} from './form-validation.js';
-
-// ============================================================
-// STEP NAVIGATION
-// ============================================================
-
-function showStep(step) {
-    const step1 = document.getElementById('step1');
-    const step2 = document.getElementById('step2');
-    const successStep = document.getElementById('successStep');
-    
-    if (step1) step1.classList.toggle('hidden', step !== 1);
-    if (step2) step2.classList.toggle('hidden', step !== 2);
-    if (successStep) successStep.classList.add('hidden');
-    
-    // Update progress indicator
-    const progressSteps = document.querySelectorAll('.progress-step');
-    progressSteps.forEach(function(progressStep) {
-        const stepNum = parseInt(progressStep.dataset.step);
-        progressStep.classList.toggle('active', stepNum === step);
-        progressStep.classList.toggle('completed', stepNum < step);
-    });
-    
-    window.scrollTo(0, 0);
-}
-
-// ============================================================
-// STEP 1 - REAL-TIME VALIDATION
-// ============================================================
-
-// Set up real-time validation for all step 1 fields
-setupFieldValidation('firstName', function(value) {
-    return validateRequired(value, 'First name');
-});
-
-setupFieldValidation('lastName', function(value) {
-    return validateRequired(value, 'Last name');
-});
-
-setupFieldValidation('email', function(value) {
-    return validateEmail(value);
-});
-
-setupFieldValidation('password', function(value) {
-    return validatePassword(value);
-});
-
-setupFieldValidation('phone', function(value) {
-    return validatePhone(value);
-});
-
-// ============================================================
-// STEP 1 - ACCOUNT DETAILS FORM SUBMIT
-// ============================================================
-
+// DOM Elements
+const step1 = document.getElementById('step1');
+const step2 = document.getElementById('step2');
+const successStep = document.getElementById('successStep');
 const accountForm = document.getElementById('accountForm');
-if (accountForm) {
-    accountForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Clear previous errors
-        clearAllErrors('accountForm');
-        
-        const firstName = document.getElementById('firstName').value.trim();
-        const lastName = document.getElementById('lastName').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value;
-        const phone = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
-        
-        let hasErrors = false;
-        
-        // Validate each field
-        const firstNameCheck = validateRequired(firstName, 'First name');
-        if (!firstNameCheck.valid) {
-            showFieldError('firstName', firstNameCheck.message);
-            hasErrors = true;
-        }
-        
-        const lastNameCheck = validateRequired(lastName, 'Last name');
-        if (!lastNameCheck.valid) {
-            showFieldError('lastName', lastNameCheck.message);
-            hasErrors = true;
-        }
-        
-        const emailCheck = validateEmail(email);
-        if (!emailCheck.valid) {
-            showFieldError('email', emailCheck.message);
-            hasErrors = true;
-        }
-        
-        const passwordCheck = validatePassword(password);
-        if (!passwordCheck.valid) {
-            showFieldError('password', passwordCheck.message);
-            hasErrors = true;
-        }
-        
-        if (phone) {
-            const phoneCheck = validatePhone(phone);
-            if (!phoneCheck.valid) {
-                showFieldError('phone', phoneCheck.message);
-                hasErrors = true;
-            }
-        }
-        
-        if (hasErrors) {
-            // Scroll to first error
-            const firstError = document.querySelector('.field-error');
-            if (firstError) {
-                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                firstError.focus();
-            }
-            return;
-        }
-        
-        // Store data for Step 2
-        window.signupData = {
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-            password: password,
-            phone: phone
-        };
-        
-        // Move to Step 2
-        showStep(2);
-    });
-}
-
-// ============================================================
-// STEP 2 - REAL-TIME VALIDATION
-// ============================================================
-
-setupFieldValidation('name1', function(value) {
-    return validateRequired(value, 'Name');
-});
-
-setupFieldValidation('date1', function(value) {
-    return validateFutureDate(value, true);
-});
-
-// ============================================================
-// RELATIONSHIP DROPDOWN HANDLER
-// ============================================================
-
-const relationshipSelect = document.getElementById('signupRelationship');
-if (relationshipSelect) {
-    relationshipSelect.addEventListener('change', function(e) {
-        clearFieldError('signupRelationship');
-        
-        const customGroup = document.getElementById('signupCustomRelationship');
-        if (customGroup) {
-            if (e.target.value === 'Other') {
-                customGroup.classList.remove('hidden');
-            } else {
-                customGroup.classList.add('hidden');
-            }
-        }
-    });
-}
-
-// ============================================================
-// OCCASION DROPDOWN HANDLER (custom occasion)
-// ============================================================
-
-const occasionSelect = document.getElementById('occasion1');
-if (occasionSelect) {
-    occasionSelect.addEventListener('change', function(e) {
-        clearFieldError('occasion1');
-        
-        const customInput = document.getElementById('customOccasion1');
-        if (customInput) {
-            if (e.target.value === 'other') {
-                customInput.classList.remove('hidden');
-                customInput.required = true;
-            } else {
-                customInput.classList.add('hidden');
-                customInput.required = false;
-                clearFieldError('customOccasion1');
-            }
-        }
-    });
-}
-
-// ============================================================
-// STEP 2 - CREATE ACCOUNT + FIRST REMINDER
-// ============================================================
-
 const remindersForm = document.getElementById('remindersForm');
-if (remindersForm) {
-    remindersForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        // Clear previous errors
-        clearAllErrors('remindersForm');
-        
-        const submitBtn = e.target.querySelector('button[type="submit"]');
-        const btnId = submitBtn.id || 'createAccountBtn';
-        if (!submitBtn.id) submitBtn.id = btnId;
-        
-        // Get values
-        const personName = document.getElementById('name1').value.trim();
-        const relationshipValue = relationshipSelect ? relationshipSelect.value : '';
-        const customRelationshipInput = document.getElementById('signupCustomRelationshipName');
-        const customRelationship = customRelationshipInput ? customRelationshipInput.value.trim() : '';
-        const relationship = relationshipValue === 'Other' ? customRelationship : relationshipValue;
-        
-        const occasion = document.getElementById('occasion1').value;
-        const customOccasionInput = document.getElementById('customOccasion1');
-        const customOccasionName = customOccasionInput ? customOccasionInput.value.trim() : '';
-        const occasionDate = document.getElementById('date1').value;
-        
-        let hasErrors = false;
-        
-        // Validate person name
-        const nameCheck = validateRequired(personName, 'Name');
-        if (!nameCheck.valid) {
-            showFieldError('name1', nameCheck.message);
-            hasErrors = true;
-        }
-        
-        // Validate relationship
-        if (!relationshipValue) {
-            showFieldError('signupRelationship', 'Please select a relationship');
-            hasErrors = true;
-        } else if (relationshipValue === 'Other' && !customRelationship) {
-            showFieldError('signupCustomRelationshipName', 'Please specify the relationship');
-            hasErrors = true;
-        }
-        
-        // Validate occasion
-        if (!occasion) {
-            showFieldError('occasion1', 'Please select an occasion');
-            hasErrors = true;
-        } else if (occasion === 'other' && !customOccasionName) {
-            showFieldError('customOccasion1', 'Please specify the occasion');
-            hasErrors = true;
-        }
-        
-        // Validate date
-        const dateCheck = validateFutureDate(occasionDate, true);
-        if (!dateCheck.valid) {
-            showFieldError('date1', dateCheck.message);
-            hasErrors = true;
-        }
-        
-        if (hasErrors) {
-            const firstError = document.querySelector('.field-error');
-            if (firstError) {
-                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                firstError.focus();
-            }
-            return;
-        }
-        
-        // Get account data from Step 1
-        const accountData = window.signupData;
-        
-        if (!accountData) {
-            alert('Account details missing. Please go back to Step 1.');
-            showStep(1);
-            return;
-        }
-        
-        // Set loading state
-        setButtonLoading(btnId, 'Creating your account...');
-        
-        try {
-            // Step A: Create Firebase Auth user
-            const userCredential = await createUserWithEmailAndPassword(
-                auth, 
-                accountData.email, 
-                accountData.password
-            );
-            const user = userCredential.user;
-            
-            // Step B: Update display name in Auth
-            await updateProfile(user, {
-                displayName: accountData.firstName + ' ' + accountData.lastName
-            });
-            
-            // Step C: Create user document in Firestore
-            await createOrUpdateUser(user.uid, {
-                firstName: accountData.firstName,
-                lastName: accountData.lastName,
-                email: accountData.email,
-                phone: accountData.phone || '',
-                tier: 'discover',
-                createdAt: new Date().toISOString()
-            });
-            
-            // Step D: Create the person (recipient)
-            const personId = await createPerson(user.uid, personName, relationship);
-            
-            // Step E: Create the date-based reminder
-            const occasionType = occasion === 'other' ? 'custom' : occasion;
-            
-            await createDateBasedReminder(personId, {
-                occasion: occasionType,
-                customOccasionName: occasion === 'other' ? customOccasionName : null,
-                date: occasionDate,
-                notes: ''
-            });
-            
-            // Step F: Send welcome email (uses keepalive - fast and reliable)
-            sendWelcomeEmail(accountData.email, accountData.firstName);
-            
-            // Success! Redirect to dashboard immediately
-            window.location.href = 'dashboard.html';
-            
-        } catch (error) {
-            console.error('Signup error:', error);
-            
-            resetButton(btnId);
-            
-            // Show error on appropriate field
-            if (error.code === 'auth/email-already-in-use') {
-                showStep(1);
-                setTimeout(function() {
-                    showFieldError('email', 'An account with this email already exists. Please sign in instead.');
-                    document.getElementById('email').focus();
-                }, 100);
-            } else if (error.code === 'auth/invalid-email') {
-                showStep(1);
-                setTimeout(function() {
-                    showFieldError('email', 'Please enter a valid email address');
-                    document.getElementById('email').focus();
-                }, 100);
-            } else if (error.code === 'auth/weak-password') {
-                showStep(1);
-                setTimeout(function() {
-                    showFieldError('password', 'Password is too weak. Please use at least 6 characters');
-                    document.getElementById('password').focus();
-                }, 100);
-            } else if (error.code === 'auth/network-request-failed') {
-                alert('Network error. Please check your connection and try again.');
-            } else {
-                alert('Error creating account. Please try again or contact support.');
-            }
-        }
-    });
-}
-
-// ============================================================
-// BACK BUTTON (Step 2 to Step 1)
-// ============================================================
-
+const addReminderBtn = document.getElementById('addReminderBtn');
 const backBtn = document.getElementById('backBtn');
-if (backBtn) {
-    backBtn.addEventListener('click', function() {
-        showStep(1);
-    });
+const progressSteps = document.querySelectorAll('.progress-step');
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    setupEventListeners();
+    setupOccasionListeners();
+});
+
+// Setup Event Listeners
+function setupEventListeners() {
+    // Account form submission
+    accountForm.addEventListener('submit', handleAccountSubmit);
+    
+    // Reminders form submission
+    remindersForm.addEventListener('submit', handleRemindersSubmit);
+    
+    // Add reminder button
+    addReminderBtn.addEventListener('click', addReminderField);
+    
+    // Back button
+    backBtn.addEventListener('click', goToStep1);
 }
 
-// ============================================================
-// SEND WELCOME EMAIL
-// Uses keepalive flag - guarantees request completes 
-// even if page is unloading. Modern browser feature.
-// ============================================================
+// Handle Account Form Submission
+function handleAccountSubmit(e) {
+    e.preventDefault();
+    
+    // Collect form data
+    formData.firstName = document.getElementById('firstName').value;
+    formData.lastName = document.getElementById('lastName').value;
+    formData.email = document.getElementById('email').value;
+    formData.password = document.getElementById('password').value;
+    formData.phone = document.getElementById('phone').value;
+    
+    // Go to step 2
+    goToStep2();
+}
 
-function sendWelcomeEmail(email, firstName) {
+// Handle Reminders Form Submission
+async function handleRemindersSubmit(e) {
+    e.preventDefault();
+    
+    // Collect reminders data
+    formData.reminders = [];
+    for (let i = 1; i <= reminderCount; i++) {
+        const nameInput = document.getElementById(`name${i}`);
+        const occasionSelect = document.getElementById(`occasion${i}`);
+        const customOccasionInput = document.getElementById(`customOccasion${i}`);
+        const dateInput = document.getElementById(`date${i}`);
+        
+        if (nameInput && nameInput.value) {
+            const occasion = occasionSelect.value === 'other' 
+                ? customOccasionInput.value 
+                : occasionSelect.value;
+            
+            formData.reminders.push({
+                name: nameInput.value,
+                occasion: occasion,
+                date: dateInput.value
+            });
+        }
+    }
+    
+    // Create account
+    await createAccount();
+}
+
+// Create Account in Firebase
+async function createAccount() {
     try {
-        // keepalive: true tells browser to complete this request
-        // even if the page is navigating away
-        fetch('/.netlify/functions/send-email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            keepalive: true,  // ⭐ KEY: Request survives page navigation
-            body: JSON.stringify({
-                emailType: 'welcome',
-                to: email,
-                data: { firstName: firstName }
-            })
-        }).then(function(response) {
-            return response.json();
-        }).then(function(result) {
-            if (result && result.success) {
-                console.log('Welcome email sent successfully');
-            } else {
-                console.warn('Welcome email failed (non-blocking):', result);
-            }
-        }).catch(function(error) {
-            console.error('Welcome email error (non-blocking):', error);
+        // Create user in Firebase Auth
+        const userCredential = await firebase.auth().createUserWithEmailAndPassword(
+            formData.email,
+            formData.password
+        );
+        
+        const user = userCredential.user;
+        
+        // Create user document in Firestore
+        await firebase.firestore().collection('users').doc(user.uid).set({
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            phone: formData.phone || '',
+            tier: 'discover',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         
+        // Add reminders to Firestore — each reminder needs its own
+        // "person" document (this is the schema the dashboard actually
+        // reads), with the reminder nested underneath it at
+        // people/{personId}/reminders/{reminderId}. Kept as one atomic
+        // batch with pre-allocated doc refs, so a partial failure can't
+        // leave an orphaned Auth account with missing Firestore data
+        // the way the previous version could.
+        const batch = firebase.firestore().batch();
+        
+        formData.reminders.forEach(reminder => {
+            const personRef = firebase.firestore().collection('people').doc();
+            batch.set(personRef, {
+                userId: user.uid,
+                personName: reminder.name,
+                relationship: null,
+                hasJustBecause: false,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            const reminderRef = personRef.collection('reminders').doc();
+            batch.set(reminderRef, {
+                reminderType: 'date-based',
+                occasion: reminder.occasion,
+                date: reminder.date,
+                reminderDays: [7, 3, 0],
+                smsEnabled: false,
+                active: true,
+                lastReminderSent: null,
+                giftPurchased: false,
+                purchaseDate: null,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        });
+        
+        await batch.commit();
+        
+        // Sync to Mailchimp
+        try {
+            await syncToMailchimp(user.uid);
+        } catch (mailchimpError) {
+            console.error('Mailchimp sync error:', mailchimpError);
+            // Don't fail signup if Mailchimp fails
+        }
+        
+        // Show success
+        showSuccess();
+        
     } catch (error) {
-        // Email failure should never block signup
-        console.error('Welcome email setup error (non-blocking):', error);
+        console.error('Signup error:', error);
+        alert(getErrorMessage(error.code));
     }
 }
+
+// Navigation
+function goToStep2() {
+    currentStep = 2;
+    step1.classList.add('hidden');
+    step2.classList.remove('hidden');
+    updateProgressBar();
+}
+
+function goToStep1() {
+    currentStep = 1;
+    step1.classList.remove('hidden');
+    step2.classList.add('hidden');
+    updateProgressBar();
+}
+
+function showSuccess() {
+    step2.classList.add('hidden');
+    successStep.classList.remove('hidden');
+    
+    // Auto-redirect to dashboard after 2 seconds
+    setTimeout(() => {
+        window.location.href = 'dashboard.html';
+    }, 2000);
+}
+
+function updateProgressBar() {
+    progressSteps.forEach((step, index) => {
+        if (index + 1 <= currentStep) {
+            step.classList.add('active');
+        } else {
+            step.classList.remove('active');
+        }
+    });
+}
+
+// Add Reminder Field
+function addReminderField() {
+    if (reminderCount >= 5) {
+        alert('You can add up to 5 reminders on the free plan. Upgrade to Essential for unlimited reminders!');
+        return;
+    }
+    
+    reminderCount++;
+    
+    const container = document.getElementById('remindersContainer');
+    const reminderDiv = document.createElement('div');
+    reminderDiv.className = 'reminder-input';
+    reminderDiv.dataset.reminder = reminderCount;
+    
+    reminderDiv.innerHTML = `
+        <div class="reminder-header">
+            <h3>Reminder ${reminderCount}</h3>
+            <button type="button" class="remove-reminder" onclick="removeReminder(${reminderCount})">✕</button>
+        </div>
+        
+        <div class="form-group">
+            <label for="name${reminderCount}">Person's Name</label>
+            <input type="text" id="name${reminderCount}" placeholder="e.g. Mum, Sarah, Best Friend">
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="occasion${reminderCount}">Occasion</label>
+                <select id="occasion${reminderCount}" onchange="handleOccasionChange(${reminderCount})">
+                    <option value="">Select occasion</option>
+                    <option value="birthday">Birthday</option>
+                    <option value="anniversary">Anniversary</option>
+                    <option value="valentines">Valentine's Day</option>
+                    <option value="mothers-day">Mother's Day</option>
+                    <option value="fathers-day">Father's Day</option>
+                    <option value="christmas">Christmas</option>
+                    <option value="other">Other (type your own)</option>
+                </select>
+                <input type="text" id="customOccasion${reminderCount}" class="custom-occasion hidden" placeholder="Enter occasion name">
+            </div>
+            
+            <div class="form-group">
+                <label for="date${reminderCount}">Date</label>
+                <input type="date" id="date${reminderCount}">
+            </div>
+        </div>
+        
+        <p class="date-helper">💡 Enter the actual date of the occasion (we'll remind you 10 days before)</p>
+    `;
+    
+    container.appendChild(reminderDiv);
+    updateReminderCount();
+    
+    // Disable button if at max
+    if (reminderCount >= 5) {
+        addReminderBtn.disabled = true;
+        addReminderBtn.textContent = '✓ Maximum reminders added (5/5)';
+    }
+}
+
+// Remove Reminder Field
+function removeReminder(number) {
+    const reminderDiv = document.querySelector(`.reminder-input[data-reminder="${number}"]`);
+    if (reminderDiv) {
+        reminderDiv.remove();
+        reminderCount--;
+        updateReminderCount();
+        
+        // Re-enable add button
+        if (reminderCount < 5) {
+            addReminderBtn.disabled = false;
+            addReminderBtn.innerHTML = `+ Add Another Reminder <span class="reminder-count">(${reminderCount}/5)</span>`;
+        }
+    }
+}
+
+// Update Reminder Count
+function updateReminderCount() {
+    const countSpan = document.querySelector('.reminder-count');
+    if (countSpan) {
+        countSpan.textContent = `(${reminderCount}/5)`;
+    }
+}
+
+// Setup Occasion Listeners
+function setupOccasionListeners() {
+    const occasion1 = document.getElementById('occasion1');
+    occasion1.addEventListener('change', () => handleOccasionChange(1));
+}
+
+// Handle Occasion Change (show custom input if "Other" selected)
+function handleOccasionChange(number) {
+    const occasionSelect = document.getElementById(`occasion${number}`);
+    const customInput = document.getElementById(`customOccasion${number}`);
+    
+    if (occasionSelect.value === 'other') {
+        customInput.classList.remove('hidden');
+        customInput.required = true;
+    } else {
+        customInput.classList.add('hidden');
+        customInput.required = false;
+    }
+}
+
+// Error Messages
+function getErrorMessage(code) {
+    switch (code) {
+        case 'auth/email-already-in-use':
+            return 'This email is already registered. Please sign in instead.';
+        case 'auth/invalid-email':
+            return 'Please enter a valid email address.';
+        case 'auth/weak-password':
+            return 'Password must be at least 6 characters.';
+        default:
+            return 'An error occurred. Please try again.';
+    }
+}
+
+// Sync to Mailchimp
+async function syncToMailchimp(userId) {
+    const response = await fetch('/.netlify/functions/mailchimp-sync-user', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            email: formData.email,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            userId: userId,
+        }),
+    });
+
+    if (!response.ok) {
+        throw new Error('Mailchimp sync failed');
+    }
+
+    // Sync reminders
+    if (formData.reminders.length > 0) {
+        await fetch('/.netlify/functions/mailchimp-sync-reminders', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: formData.email,
+                reminders: formData.reminders,
+            }),
+        });
+    }
+}
+
+// Make functions globally available
+window.removeReminder = removeReminder;
+window.handleOccasionChange = handleOccasionChange;
