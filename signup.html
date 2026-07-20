@@ -106,23 +106,43 @@
                     </form>
                 </div>
 
-                <!-- Step 2: Add Reminders -->
+                <!-- Step 2: Add Reminder -->
                 <div class="signup-step hidden" id="step2">
-                    <h1 class="signup-title">Add Your First Reminders</h1>
-                    <p class="signup-subtitle">Set up 1 free reminders to get started</p>
+                    <h1 class="signup-title">Add Your First Reminder</h1>
+                    <p class="signup-subtitle">Set up one reminder to get started — you can add more from your dashboard</p>
                     
                     <form id="remindersForm" class="signup-form">
                         
                         <div id="remindersContainer">
                             <!-- Reminder 1 (Required) -->
                             <div class="reminder-input" data-reminder="1">
-                                <div class="reminder-header">
-                                    <h3>Reminder 1 <span class="required-badge">Required</span></h3>
-                                </div>
-                                
                                 <div class="form-group">
                                     <label for="name1">Person's Name</label>
                                     <input type="text" id="name1" placeholder="e.g. Mum, Sarah, Best Friend" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="relationship1">Your Relationship</label>
+                                    <select id="relationship1">
+                                        <option value="">Select relationship</option>
+                                        <option value="Mother">Mother</option>
+                                        <option value="Father">Father</option>
+                                        <option value="Sister">Sister</option>
+                                        <option value="Brother">Brother</option>
+                                        <option value="Partner">Partner</option>
+                                        <option value="Spouse">Spouse</option>
+                                        <option value="Wife">Wife</option>
+                                        <option value="Husband">Husband</option>
+                                        <option value="Friend">Friend</option>
+                                        <option value="Best Friend">Best Friend</option>
+                                        <option value="Colleague">Colleague</option>
+                                        <option value="Grandmother">Grandmother</option>
+                                        <option value="Grandfather">Grandfather</option>
+                                        <option value="Aunt">Aunt</option>
+                                        <option value="Uncle">Uncle</option>
+                                        <option value="Cousin">Cousin</option>
+                                        <option value="Other">Other</option>
+                                    </select>
                                 </div>
                                 
                                 <div class="form-row">
@@ -150,10 +170,6 @@
                                 <p class="date-helper">💡 Enter the actual date of the occasion (we'll remind you 10 days before)</p>
                             </div>
                         </div>
-                        
-                        <button type="button" id="addReminderBtn" class="btn btn-outline btn-full add-reminder-btn">
-                            + Add Another Reminder <span class="reminder-count">(1/5)</span>
-                        </button>
                         
                         <div class="form-actions">
                             <button type="button" id="backBtn" class="btn btn-secondary">← Back</button>
