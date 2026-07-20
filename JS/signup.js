@@ -5,6 +5,7 @@
 // State
 let currentStep = 1;
 let reminderCount = 1;
+let isSubmitting = false;
 let formData = {
     firstName: '',
     lastName: '',
@@ -63,6 +64,14 @@ function handleAccountSubmit(e) {
 // Handle Reminders Form Submission
 async function handleRemindersSubmit(e) {
     e.preventDefault();
+    
+    // Guard against double-submission — belt-and-braces alongside the
+    // disabled button below, in case a second click lands before the
+    // disable takes visual effect.
+    if (isSubmitting) return;
+    isSubmitting = true;
+    
+    setSubmitLoading(true);
     
     // Collect reminders data
     formData.reminders = [];
@@ -165,6 +174,27 @@ async function createAccount() {
     } catch (error) {
         console.error('Signup error:', error);
         alert(getErrorMessage(error.code));
+        isSubmitting = false;
+        setSubmitLoading(false);
+    }
+}
+
+// Show/hide the loading state on the account-creation button. Disables
+// both Create Account and Back while a submission is in flight, so
+// there's no way to double-submit or navigate away mid-write.
+function setSubmitLoading(isLoading) {
+    const submitBtn = document.getElementById('createAccountBtn');
+    if (!submitBtn) return;
+    
+    if (isLoading) {
+        submitBtn.dataset.originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="btn-spinner"></span>Creating your account…';
+        if (backBtn) backBtn.disabled = true;
+    } else {
+        submitBtn.disabled = false;
+        submitBtn.textContent = submitBtn.dataset.originalText || 'Create My Account';
+        if (backBtn) backBtn.disabled = false;
     }
 }
 
