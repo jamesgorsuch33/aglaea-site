@@ -34,22 +34,57 @@ exports.handler = async (event, context) => {
 
     try {
         // Verify webhook signature (production security)
+        // Revolut's actual scheme: payload_to_sign = "v1." + timestamp + "." + raw_body,
+        // signed with HMAC-SHA256, compared against the "v1=..." value(s) in
+        // Revolut-Signature (comma-separated if multiple secrets are active
+        // during rotation). See:
+        // https://developer.revolut.com/docs/guides/merchant/monitor-and-observe/webhooks/verify-the-payload-signature
         const signature = event.headers['revolut-signature'] || event.headers['Revolut-Signature'];
+        const timestamp = event.headers['revolut-request-timestamp'] || event.headers['Revolut-Request-Timestamp'];
         const webhookSecret = process.env.REVOLUT_WEBHOOK_SECRET;
 
-        if (webhookSecret && signature) {
-            const expectedSignature = crypto
-                .createHmac('sha256', webhookSecret)
-                .update(event.body)
-                .digest('hex');
+        if (!webhookSecret) {
+            console.error('REVOLUT_WEBHOOK_SECRET not configured — rejecting webhook');
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ error: 'Webhook not configured' })
+            };
+        }
 
-            if (signature !== `sha256=${expectedSignature}`) {
-                console.warn('Invalid webhook signature');
-                return {
-                    statusCode: 401,
-                    body: JSON.stringify({ error: 'Invalid signature' })
-                };
-            }
+        if (!signature || !timestamp) {
+            console.warn('Missing signature or timestamp headers');
+            return {
+                statusCode: 401,
+                body: JSON.stringify({ error: 'Missing signature headers' })
+            };
+        }
+
+        // Reject requests older than 5 minutes (replay protection), per
+        // Revolut's documented tolerance window.
+        const ageMs = Math.abs(Date.now() - Number(timestamp));
+        if (Number.isNaN(ageMs) || ageMs > 5 * 60 * 1000) {
+            console.warn('Webhook timestamp out of tolerance');
+            return {
+                statusCode: 401,
+                body: JSON.stringify({ error: 'Timestamp out of tolerance' })
+            };
+        }
+
+        const payloadToSign = `v1.${timestamp}.${event.body}`;
+        const expectedSignature = 'v1=' + crypto
+            .createHmac('sha256', webhookSecret)
+            .update(payloadToSign)
+            .digest('hex');
+
+        // Revolut-Signature may contain multiple comma-separated v1=... values
+        // during secret rotation — valid if any of them match.
+        const providedSignatures = signature.split(',').map(s => s.trim());
+        if (!providedSignatures.includes(expectedSignature)) {
+            console.warn('Invalid webhook signature');
+            return {
+                statusCode: 401,
+                body: JSON.stringify({ error: 'Invalid signature' })
+            };
         }
 
         // Parse webhook payload
