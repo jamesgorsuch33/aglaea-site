@@ -148,14 +148,6 @@ async function createAccount() {
         
         await batch.commit();
         
-        // Sync to Mailchimp
-        try {
-            await syncToMailchimp(user.uid);
-        } catch (mailchimpError) {
-            console.error('Mailchimp sync error:', mailchimpError);
-            // Don't fail signup if Mailchimp fails
-        }
-        
         // Show success
         showSuccess();
         
@@ -315,40 +307,6 @@ function getErrorMessage(code) {
             return 'Password must be at least 6 characters.';
         default:
             return 'An error occurred. Please try again.';
-    }
-}
-
-// Sync to Mailchimp
-async function syncToMailchimp(userId) {
-    const response = await fetch('/.netlify/functions/mailchimp-sync-user', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            email: formData.email,
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            userId: userId,
-        }),
-    });
-
-    if (!response.ok) {
-        throw new Error('Mailchimp sync failed');
-    }
-
-    // Sync reminders
-    if (formData.reminders.length > 0) {
-        await fetch('/.netlify/functions/mailchimp-sync-reminders', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email: formData.email,
-                reminders: formData.reminders,
-            }),
-        });
     }
 }
 
