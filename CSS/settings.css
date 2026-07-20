@@ -65,6 +65,16 @@
     margin-bottom: 1.25rem;
 }
 
+/* Explicit width on every field — without this, inputs inside a
+   .form-row only look full-size as a side effect of CSS Grid
+   stretching them; standalone fields (email, phone, password) have
+   no such rule and fall back to the browser's narrow native width. */
+.settings-form .form-group input,
+.settings-form .form-group select {
+    width: 100%;
+    box-sizing: border-box;
+}
+
 .settings-actions {
     display: flex;
     align-items: center;
@@ -102,6 +112,10 @@
 
 .subscription-info-row:last-child {
     border-bottom: none;
+}
+
+.subscription-info-row.hidden {
+    display: none;
 }
 
 .subscription-label {
@@ -331,206 +345,4 @@
         flex-direction: column;
         gap: 1rem;
     }
-}
-
-/* ============================================================
-   IMPROVED MODAL STYLING FOR CANCEL SUBSCRIPTION
-   ============================================================ */
-
-#cancelSubscriptionModal .modal-content,
-#deleteAccountModal .modal-content {
-    max-width: 560px;
-    width: 90%;
-}
-
-#cancelSubscriptionModal .modal-body,
-#deleteAccountModal .modal-body {
-    padding: 1.5rem 2rem;
-}
-
-#cancelSubscriptionModal .modal-body > p:first-child {
-    font-size: 1.063rem;
-    color: var(--charcoal);
-    margin-bottom: 1.5rem;
-}
-
-/* Cancellation info box with proper bullet points */
-.cancellation-info {
-    background: var(--cream);
-    border-left: 4px solid var(--gold);
-    border-radius: var(--radius-sm);
-    padding: 1.5rem;
-    margin: 1.5rem 0 2rem 0;
-}
-
-.cancellation-info > p:first-child {
-    margin-bottom: 1rem;
-    color: var(--charcoal);
-    font-weight: 500;
-}
-
-.cancellation-info ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.cancellation-info li {
-    position: relative;
-    padding: 0.5rem 0 0.5rem 1.5rem;
-    color: var(--slate);
-    line-height: 1.5;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.cancellation-info li:last-child {
-    border-bottom: none;
-}
-
-.cancellation-info li::before {
-    content: '✓';
-    position: absolute;
-    left: 0;
-    color: var(--gold);
-    font-weight: 600;
-    font-size: 1rem;
-}
-
-/* Danger warning - similar treatment */
-.danger-warning {
-    background: #fff5f4;
-    border-left: 4px solid #d4574c;
-    border-radius: var(--radius-sm);
-    padding: 1.5rem;
-    margin: 1.5rem 0 2rem 0;
-}
-
-.danger-warning > p:first-child {
-    color: #b8463c;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-}
-
-.danger-warning > p:nth-child(2) {
-    margin-bottom: 1rem;
-    color: var(--charcoal);
-}
-
-.danger-warning ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.danger-warning li {
-    position: relative;
-    padding: 0.5rem 0 0.5rem 1.5rem;
-    color: var(--charcoal);
-    line-height: 1.5;
-}
-
-.danger-warning li::before {
-    content: '✕';
-    position: absolute;
-    left: 0;
-    color: #d4574c;
-    font-weight: 600;
-    font-size: 0.875rem;
-}
-
-/* Modal Actions - Cancel Subscription */
-#cancelSubscriptionModal .modal-actions,
-#deleteAccountModal .modal-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-    align-items: center;
-    padding-top: 1.5rem;
-    margin-top: 1.5rem;
-    border-top: 1px solid var(--stone);
-    flex-wrap: wrap;
-}
-
-#cancelSubscriptionModal .modal-actions .btn,
-#deleteAccountModal .modal-actions .btn {
-    padding: 0.75rem 1.5rem;
-    font-size: 0.938rem;
-    min-width: auto;
-    white-space: nowrap;
-}
-
-#cancelSubscriptionModal .btn-secondary,
-#deleteAccountModal .btn-secondary {
-    background: white;
-    color: var(--charcoal);
-    border: 1px solid var(--stone);
-}
-
-#cancelSubscriptionModal .btn-secondary:hover,
-#deleteAccountModal .btn-secondary:hover {
-    background: var(--cream);
-    border-color: var(--gold);
-}
-
-/* Mobile responsive */
-@media (max-width: 600px) {
-    #cancelSubscriptionModal .modal-actions,
-    #deleteAccountModal .modal-actions {
-        flex-direction: column-reverse;
-    }
-    
-    #cancelSubscriptionModal .modal-actions .btn,
-    #deleteAccountModal .modal-actions .btn {
-        width: 100%;
-    }
-}
-
-/* ============================================================
-   FORCE MODAL BUTTON STYLING (Override conflicts)
-   ============================================================ */
-
-#cancelSubscriptionModal .modal-actions .btn,
-#deleteAccountModal .modal-actions .btn {
-    padding: 0.875rem 1.75rem !important;
-    font-size: 0.938rem !important;
-    line-height: 1.2 !important;
-    height: auto !important;
-    min-width: 160px !important;
-    max-width: none !important;
-    border-radius: var(--radius-sm) !important;
-    font-weight: 500 !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    text-align: center !important;
-    white-space: nowrap !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    box-sizing: border-box !important;
-}
-
-#cancelSubscriptionModal .btn-secondary,
-#deleteAccountModal .btn-secondary {
-    background: white !important;
-    color: var(--charcoal) !important;
-    border: 1px solid var(--stone) !important;
-}
-
-#cancelSubscriptionModal .btn-secondary:hover,
-#deleteAccountModal .btn-secondary:hover {
-    background: var(--cream) !important;
-    border-color: var(--gold) !important;
-}
-
-#cancelSubscriptionModal .btn-danger,
-#deleteAccountModal .btn-danger {
-    background: #d4574c !important;
-    color: white !important;
-    border: 1px solid #d4574c !important;
-}
-
-#cancelSubscriptionModal .btn-danger:hover:not(:disabled),
-#deleteAccountModal .btn-danger:hover:not(:disabled) {
-    background: #b8463c !important;
-    border-color: #b8463c !important;
 }
