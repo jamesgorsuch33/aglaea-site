@@ -113,15 +113,18 @@ async function createAccount() {
         // Add reminders to Firestore — each reminder needs its own
         // "person" document (this is the schema the dashboard actually
         // reads), with the reminder nested underneath it at
-        // people/{personId}/reminders/{reminderId}. Kept as one atomic
-        // batch with pre-allocated doc refs, so a partial failure can't
-        // leave an orphaned Auth account with missing Firestore data
-        // the way the previous version could.
-        const batch = firebase.firestore().batch();
-        
-        formData.reminders.forEach(reminder => {
-            const personRef = firebase.firestore().collection('people').doc();
-            batch.set(personRef, {
+        // people/{personId}/reminders/{reminderId}.
+        //
+        // NOTE: deliberately sequential, not batched. Security rules
+        // that check a reminders-subcollection write by looking up its
+        // parent person document's ownership evaluate against committed
+        // state — a person doc created in the same atomic batch as its
+        // reminder isn't visible to that lookup yet, causing a
+        // permission-denied error even on a fully valid write. This
+        // matches the sequential create-then-create pattern already
+        // used successfully everywhere else (firebase-config-v2.js).
+        for (const reminder of formData.reminders) {
+            const personRef = await firebase.firestore().collection('people').add({
                 userId: user.uid,
                 personName: reminder.name,
                 relationship: null,
@@ -130,23 +133,24 @@ async function createAccount() {
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
             
-            const reminderRef = personRef.collection('reminders').doc();
-            batch.set(reminderRef, {
-                reminderType: 'date-based',
-                occasion: reminder.occasion,
-                date: reminder.date,
-                reminderDays: [7, 3, 0],
-                smsEnabled: false,
-                active: true,
-                lastReminderSent: null,
-                giftPurchased: false,
-                purchaseDate: null,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-        });
-        
-        await batch.commit();
+            await firebase.firestore()
+                .collection('people')
+                .doc(personRef.id)
+                .collection('reminders')
+                .add({
+                    reminderType: 'date-based',
+                    occasion: reminder.occasion,
+                    date: reminder.date,
+                    reminderDays: [7, 3, 0],
+                    smsEnabled: false,
+                    active: true,
+                    lastReminderSent: null,
+                    giftPurchased: false,
+                    purchaseDate: null,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+        }
         
         // Show success
         showSuccess();
