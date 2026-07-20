@@ -100,6 +100,13 @@ async function createAccount() {
         
         const user = userCredential.user;
         
+        // Force a fresh ID token before any Firestore writes. Immediately
+        // after account creation, there can be a brief window where
+        // Firestore's connection is still using the previous (or no)
+        // auth token — causing a permission-denied on the very first
+        // write even when the security rules themselves are correct.
+        await user.getIdToken(true);
+        
         // Create user document in Firestore
         await firebase.firestore().collection('users').doc(user.uid).set({
             firstName: formData.firstName,
