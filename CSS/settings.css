@@ -65,14 +65,20 @@
     margin-bottom: 1.25rem;
 }
 
-/* Explicit width on every field — without this, inputs inside a
-   .form-row only look full-size as a side effect of CSS Grid
-   stretching them; standalone fields (email, phone, password) have
-   no such rule and fall back to the browser's narrow native width. */
+/* Every field matches the Name fields' dimensions exactly — width
+   (same as a .form-row grid column), plus explicit font-size/padding
+   so type="password"/<select> can't fall back to a different native
+   browser default size than type="text" does. */
 .settings-form .form-group input,
 .settings-form .form-group select {
     width: 100%;
+    max-width: calc(50% - 0.5rem);
     box-sizing: border-box;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-family: var(--font-body);
+    border: 1px solid var(--stone);
+    border-radius: var(--radius-md);
 }
 
 .settings-actions {
@@ -86,6 +92,10 @@
     color: #4CAF50;
     font-weight: 500;
     font-size: 0.875rem;
+}
+
+.success-message.hidden {
+    display: none;
 }
 
 .settings-helper {
