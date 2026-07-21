@@ -239,6 +239,24 @@ h6 { font-size: 1rem; }
 }
 
 /* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+
+/* Generic hidden-state utility. Individual pages/components may
+   still define their own more specific .something.hidden rules
+   where a competing display property needs to be overridden (e.g.
+   an element that's normally display:flex) — those continue to
+   take precedence via higher specificity. This is a baseline
+   fallback so any element using bare class="hidden" with no other
+   class works correctly by default, rather than silently failing
+   until someone notices and adds a page-specific rule.
+   Marked !important deliberately: hidden state should always win
+   over whatever component-level display value an element has. */
+.hidden {
+    display: none !important;
+}
+
+/* ============================================================
    HERO SECTION
    ============================================================ */
 
