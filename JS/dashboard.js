@@ -91,6 +91,12 @@ async function loadUserData() {
             upgradeActionCard.classList.toggle('hidden', isUpgraded);
         }
         
+        const addPhoneAction = document.getElementById('addPhoneAction');
+        if (addPhoneAction) {
+            const hasPhone = Boolean(userData && userData.phone);
+            addPhoneAction.classList.toggle('hidden', hasPhone);
+        }
+        
     } catch (error) {
         console.error('Error loading user data:', error);
         currentUserTier = 'discover';
