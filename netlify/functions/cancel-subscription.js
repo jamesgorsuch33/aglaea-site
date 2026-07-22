@@ -117,11 +117,16 @@ exports.handler = async (event, context) => {
         console.log('Subscription cancelled on Revolut. Access was valid until:', accessEndDate);
 
         // Step 3: Downgrade the user immediately in Firestore.
+        // Also clears pendingSubscriptionId — without this, both the
+        // dashboard's post-checkout check and a scheduled 5-minute
+        // backup job keep re-checking this same (now-cancelled)
+        // subscription indefinitely, risking an incorrect re-upgrade.
         await db.collection('users').doc(userId).set({
             tier: 'discover',
             subscriptionStatus: 'cancelled',
             cancellationDate: accessEndDate,
-            cancelledAt: admin.firestore.FieldValue.serverTimestamp()
+            cancelledAt: admin.firestore.FieldValue.serverTimestamp(),
+            pendingSubscriptionId: admin.firestore.FieldValue.delete()
         }, { merge: true });
 
         // Step 4: If a set of reminders to keep was provided, pause
