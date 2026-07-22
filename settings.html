@@ -194,6 +194,31 @@
         </div>
     </div>
 
+    <!-- Select Reminders to Keep Modal -->
+    <div id="selectRemindersModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Choose Your 5 Reminders</h2>
+                <button class="modal-close" data-modal="selectRemindersModal">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <p>Discover allows up to 5 active reminders. Select which ones to keep — the rest will be paused, not deleted, and pick back up automatically if you upgrade again.</p>
+                
+                <div id="reminderPickerList" class="reminder-picker-list">
+                    <!-- Populated by JS -->
+                </div>
+                
+                <p class="settings-helper" id="reminderPickerCount">0 of 5 selected</p>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-close" data-modal="selectRemindersModal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmReminderSelectionBtn" disabled>Confirm Downgrade</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Delete Account Confirmation Modal -->
     <div id="deleteAccountModal" class="modal hidden">
         <div class="modal-content">
