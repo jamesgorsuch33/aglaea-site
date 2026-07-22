@@ -5,7 +5,9 @@
 
 import { 
     getUser,
-    createOrUpdateUser
+    createOrUpdateUser,
+    getPeopleForUser,
+    getRemindersForPerson
 } from './firebase-config-v2.js';
 
 import { 
@@ -123,7 +125,8 @@ function setupEventListeners() {
     document.getElementById('cancelSubscriptionBtn').addEventListener('click', function() {
         showCancelSubscriptionModal();
     });
-    document.getElementById('confirmCancelBtn').addEventListener('click', handleCancelSubscription);
+    document.getElementById('confirmCancelBtn').addEventListener('click', handleCancelConfirm);
+    document.getElementById('confirmReminderSelectionBtn').addEventListener('click', handleReminderSelectionConfirm);
     
     // Delete account
     document.getElementById('deleteAccountBtn').addEventListener('click', function() {
@@ -287,16 +290,114 @@ function showCancelSubscriptionModal() {
     document.getElementById('cancelSubscriptionModal').classList.remove('hidden');
 }
 
-async function handleCancelSubscription() {
+// Fetch every date-based reminder across all of this user's people —
+// this is what decides whether the picker is needed at all, and what
+// populates it if so.
+async function fetchAllDateBasedReminders() {
+    const people = await getPeopleForUser(currentUser.uid);
+    const allReminders = [];
+    
+    for (const person of people) {
+        const reminders = await getRemindersForPerson(person.id);
+        reminders
+            .filter(r => r.reminderType === 'date-based' && !r.paused)
+            .forEach(r => allReminders.push({ ...r, personName: person.personName }));
+    }
+    
+    return allReminders;
+}
+
+// Runs when "Yes, Cancel Subscription" is clicked on the initial warning
+// modal. Decides whether the picker is actually needed — no point making
+// someone choose 5 out of 5 or fewer.
+async function handleCancelConfirm() {
     const confirmBtn = document.getElementById('confirmCancelBtn');
     confirmBtn.disabled = true;
-    confirmBtn.textContent = 'Cancelling...';
+    confirmBtn.textContent = 'Checking your reminders...';
     
     try {
-        // NOTE: this currently cancels immediately with no reminder-keeping
-        // step. The "pick 5 reminders to keep" flow is a separate piece
-        // still to be wired in — once built, that picker will run first
-        // and pass its selection through as keepReminderIds below.
+        const reminders = await fetchAllDateBasedReminders();
+        
+        document.getElementById('cancelSubscriptionModal').classList.add('hidden');
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Yes, Cancel Subscription';
+        
+        if (reminders.length <= 5) {
+            // Already at or under the Discover cap — nothing to choose,
+            // keep everything as-is.
+            await performCancellation(reminders.map(r => r.id));
+        } else {
+            showReminderPicker(reminders);
+        }
+        
+    } catch (error) {
+        console.error('Error checking reminders before cancellation:', error);
+        alert('Error checking your reminders. Please try again.');
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Yes, Cancel Subscription';
+    }
+}
+
+// Populate and show the "choose 5 reminders to keep" picker.
+function showReminderPicker(reminders) {
+    const list = document.getElementById('reminderPickerList');
+    list.innerHTML = '';
+    
+    reminders.forEach(reminder => {
+        const label = document.createElement('label');
+        label.className = 'reminder-picker-item';
+        
+        const dateStr = reminder.date
+            ? new Date(reminder.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })
+            : '';
+        
+        label.innerHTML = `
+            <input type="checkbox" class="reminder-picker-checkbox" data-reminder-id="${reminder.id}">
+            <div class="reminder-picker-info">
+                <div class="reminder-picker-name">${escapeHtml(reminder.personName)}</div>
+                <div class="reminder-picker-meta">${escapeHtml(reminder.occasion || '')}${dateStr ? ' · ' + dateStr : ''}</div>
+            </div>
+        `;
+        list.appendChild(label);
+    });
+    
+    document.querySelectorAll('.reminder-picker-checkbox').forEach(cb => {
+        cb.addEventListener('change', updateReminderPickerState);
+    });
+    
+    updateReminderPickerState();
+    document.getElementById('selectRemindersModal').classList.remove('hidden');
+}
+
+// Caps selection at 5 (disables further checkboxes once 5 are checked)
+// and keeps the count text + confirm button in sync.
+function updateReminderPickerState() {
+    const checkboxes = Array.from(document.querySelectorAll('.reminder-picker-checkbox'));
+    const checkedCount = checkboxes.filter(cb => cb.checked).length;
+    
+    checkboxes.forEach(cb => {
+        if (!cb.checked) {
+            cb.disabled = checkedCount >= 5;
+        }
+    });
+    
+    document.getElementById('reminderPickerCount').textContent = `${checkedCount} of 5 selected`;
+    document.getElementById('confirmReminderSelectionBtn').disabled = checkedCount === 0;
+}
+
+async function handleReminderSelectionConfirm() {
+    const keepReminderIds = Array.from(document.querySelectorAll('.reminder-picker-checkbox'))
+        .filter(cb => cb.checked)
+        .map(cb => cb.dataset.reminderId);
+    
+    document.getElementById('selectRemindersModal').classList.add('hidden');
+    await performCancellation(keepReminderIds);
+}
+
+// The actual cancellation call — shared by both the "already under 5"
+// direct path and the picker-confirmed path.
+async function performCancellation(keepReminderIds) {
+    try {
         const response = await fetch('/.netlify/functions/cancel-subscription', {
             method: 'POST',
             headers: {
@@ -304,8 +405,8 @@ async function handleCancelSubscription() {
             },
             body: JSON.stringify({
                 userId: currentUser.uid,
-                subscriptionId: currentUserData.revolutSubscriptionId
-                // keepReminderIds: [...]  // TODO: wire in once picker modal exists
+                subscriptionId: currentUserData.revolutSubscriptionId,
+                keepReminderIds: keepReminderIds
             })
         });
         
@@ -315,23 +416,29 @@ async function handleCancelSubscription() {
         
         const result = await response.json();
         
-        // Close modal
-        document.getElementById('cancelSubscriptionModal').classList.add('hidden');
-        
         // Reload data to show updated status
         await loadUserData();
         
-        alert('Your Curate subscription has ended and your account is now on the Discover plan. Your reminders and their data are still saved, and everything picks back up if you upgrade again.');
+        const pausedNote = result.remindersPaused > 0
+            ? ` ${result.remindersPaused} other reminder${result.remindersPaused === 1 ? '' : 's'} ${result.remindersPaused === 1 ? 'has' : 'have'} been paused and will pick back up if you upgrade again.`
+            : '';
+        
+        alert(`Your Curate subscription has ended and your account is now on the Discover plan.${pausedNote}`);
         
     } catch (error) {
         console.error('Error cancelling subscription:', error);
         alert('Error cancelling subscription. Please try again or contact support.');
-        confirmBtn.disabled = false;
-        confirmBtn.textContent = 'Yes, Cancel Subscription';
     }
 }
 
-// ============================================================
+function escapeHtml(str) {
+    if (str === undefined || str === null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
 // ============================================================
 // HANDLE DELETE ACCOUNT
 // ============================================================
