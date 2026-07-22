@@ -71,6 +71,26 @@ exports.handler = async (event, context) => {
             };
         }
 
+        // If this user has explicitly cancelled, never re-check or
+        // re-grant tier based on a stale pendingSubscriptionId — that
+        // flag may not have been cleared on older cancellations from
+        // before this check existed, so self-heal it here too.
+        if (userData.subscriptionStatus === 'cancelled') {
+            if (userData.pendingSubscriptionId) {
+                await db.collection('users').doc(userId).set({
+                    pendingSubscriptionId: admin.firestore.FieldValue.delete()
+                }, { merge: true });
+            }
+            return {
+                statusCode: 200,
+                body: JSON.stringify({
+                    success: true,
+                    tier: userData.tier || 'discover',
+                    message: 'Subscription was explicitly cancelled — not re-checking'
+                })
+            };
+        }
+
         // Get pending subscription ID
         const pendingSubId = userData.pendingSubscriptionId;
         
@@ -91,7 +111,7 @@ exports.handler = async (event, context) => {
         const response = await fetch(`${REVOLUT_API_URL}/subscriptions/${pendingSubId}`, {
             headers: {
                 'Authorization': `Bearer ${process.env.REVOLUT_SECRET_KEY}`,
-                'Revolut-Api-Version': '2024-09-01'
+                'Revolut-Api-Version': '2026-04-20'
             }
         });
 
