@@ -112,6 +112,11 @@
     margin-bottom: 1.5rem;
 }
 
+#freeUserSection.hidden,
+#essentialUserSection.hidden {
+    display: none;
+}
+
 .subscription-info-row {
     display: flex;
     justify-content: space-between;
@@ -325,6 +330,54 @@
 /* Modal Body */
 .modal-body {
     padding: 1.5rem;
+}
+
+/* Reminder Picker (Cancel/Downgrade flow) */
+.reminder-picker-list {
+    max-height: 320px;
+    overflow-y: auto;
+    border: 1px solid var(--stone);
+    border-radius: var(--radius-sm);
+    margin: 1rem 0;
+}
+
+.reminder-picker-item {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid var(--stone);
+    cursor: pointer;
+}
+
+.reminder-picker-item:last-child {
+    border-bottom: none;
+}
+
+.reminder-picker-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: var(--gold);
+}
+
+.reminder-picker-item input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+}
+
+.reminder-picker-info {
+    flex: 1;
+}
+
+.reminder-picker-name {
+    font-weight: 500;
+    color: var(--charcoal);
+}
+
+.reminder-picker-meta {
+    font-size: 0.875rem;
+    color: var(--slate);
 }
 
 /* Mobile Responsive */
