@@ -142,20 +142,34 @@ exports.handler = async (event, context) => {
                 const remindersSnapshot = await db.collection('people')
                     .doc(personDoc.id)
                     .collection('reminders')
-                    .where('reminderType', '==', 'date-based')
                     .get();
 
                 for (const reminderDoc of remindersSnapshot.docs) {
-                    const shouldKeep = keepReminderIds.includes(reminderDoc.id);
-                    const currentlyPaused = reminderDoc.data().paused === true;
+                    const reminderData = reminderDoc.data();
+                    const currentlyPaused = reminderData.paused === true;
 
-                    if (!shouldKeep && !currentlyPaused) {
-                        await reminderDoc.ref.update({ paused: true });
-                        pausedCount++;
-                    } else if (shouldKeep && currentlyPaused) {
-                        // Defensive: un-pause anything explicitly kept,
-                        // in case it was paused by a previous downgrade.
-                        await reminderDoc.ref.update({ paused: false });
+                    if (reminderData.reminderType === 'just-because') {
+                        // Just Because is Curate-only — pause every
+                        // instance unconditionally, not tied to the
+                        // 5-reminder date-based cap or picker selection.
+                        if (!currentlyPaused) {
+                            await reminderDoc.ref.update({ paused: true });
+                            pausedCount++;
+                        }
+                        continue;
+                    }
+
+                    if (reminderData.reminderType === 'date-based') {
+                        const shouldKeep = keepReminderIds.includes(reminderDoc.id);
+
+                        if (!shouldKeep && !currentlyPaused) {
+                            await reminderDoc.ref.update({ paused: true });
+                            pausedCount++;
+                        } else if (shouldKeep && currentlyPaused) {
+                            // Defensive: un-pause anything explicitly kept,
+                            // in case it was paused by a previous downgrade.
+                            await reminderDoc.ref.update({ paused: false });
+                        }
                     }
                 }
             }
