@@ -314,6 +314,25 @@
         </div>
     </div>
 
+    <!-- Renewal Prompt Modal (shown after marking a gift purchased) -->
+    <div id="renewalPromptModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🎁 Nice one!</h2>
+                <button class="modal-close" data-modal="renewalPromptModal">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <p>Want AGLAEA to set this reminder up for next year too, so you never have to think about it again?</p>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="renewalDismissBtn">Not Now</button>
+                    <button type="button" class="btn btn-primary" id="renewalConfirmBtn">Yes, Set Up Next Year</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
