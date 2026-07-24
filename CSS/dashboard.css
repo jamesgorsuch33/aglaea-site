@@ -388,6 +388,77 @@
     font-size: 1rem;
 }
 
+.past-gifts-section {
+    margin-top: 1rem;
+    padding-top: 0.875rem;
+    border-top: 1px solid var(--stone);
+}
+
+.past-gifts-toggle {
+    background: none;
+    border: none;
+    color: var(--gold);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0.25rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.past-gifts-toggle:hover {
+    color: var(--charcoal);
+}
+
+.past-gifts-chevron {
+    transition: transform 0.2s ease;
+    font-size: 0.75rem;
+}
+
+.past-gifts-toggle.expanded .past-gifts-chevron {
+    transform: rotate(180deg);
+}
+
+.past-gifts-list {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+
+.past-gift-item {
+    padding: 0.75rem 0.875rem;
+    background: var(--cream-light, #f9f5ed);
+    border-radius: var(--radius-sm);
+}
+
+.past-gift-occasion {
+    font-weight: 500;
+    color: var(--charcoal);
+    font-size: 0.9rem;
+}
+
+.past-gift-meta {
+    font-size: 0.8rem;
+    color: var(--slate);
+    margin-top: 0.125rem;
+}
+
+.past-gift-note {
+    font-size: 0.85rem;
+    color: var(--charcoal);
+    margin-top: 0.375rem;
+    font-style: italic;
+}
+
+.past-gifts-loading,
+.past-gifts-empty {
+    font-size: 0.85rem;
+    color: var(--slate);
+    padding: 0.5rem 0;
+}
+
 .reminder-info {
     flex: 1;
 }
