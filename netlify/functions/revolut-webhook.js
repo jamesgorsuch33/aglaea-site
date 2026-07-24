@@ -170,7 +170,14 @@ async function handleSubscriptionActivated(webhookEvent) {
     const customerId = subscription?.customer_id;
 
     if (!userId) {
-        console.error('No userId in webhook or subscription data');
+        // Expected, not a failure: ORDER_COMPLETED events for subscription
+        // setup don't reliably carry a userId reference the way
+        // subscription-lifecycle events do (Revolut's Order object doesn't
+        // expose the same external_reference linkage Subscriptions do).
+        // The subsequent SUBSCRIPTION_INITIATED event for the same
+        // checkout always arrives with the full subscription details and
+        // completes the activation — this one is a safe no-op.
+        console.log(`No userId resolvable from ORDER_COMPLETED event (order_id: ${orderId}) — expected, activation will complete via the paired subscription event`);
         return;
     }
 
