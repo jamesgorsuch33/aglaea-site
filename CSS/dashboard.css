@@ -345,6 +345,41 @@
     box-shadow: 0 2px 6px rgba(201, 168, 112, 0.2);
 }
 
+/* Paused (e.g. downgraded past the Discover cap) and purchased
+   (gift already bought for this occasion) states — both grey the
+   card out so it visually recedes, and neither should hover-highlight
+   the way an active reminder does. */
+.reminder-item.paused,
+.reminder-item.purchased {
+    opacity: 0.55;
+}
+
+.reminder-item.paused:hover,
+.reminder-item.purchased:hover {
+    border-color: var(--stone);
+    box-shadow: none;
+}
+
+.reminder-status-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 0.2rem 0.6rem;
+    border-radius: 100px;
+    margin-left: 0.5rem;
+}
+
+.reminder-status-badge.paused-badge {
+    background: var(--stone);
+    color: var(--slate);
+}
+
+.reminder-status-badge.purchased-badge {
+    background: rgba(76, 175, 80, 0.15);
+    color: #2e7d32;
+}
+
 .reminder-info {
     flex: 1;
 }
