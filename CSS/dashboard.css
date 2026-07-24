@@ -380,6 +380,14 @@
     color: #2e7d32;
 }
 
+.locked-icon {
+    padding: 0.5rem;
+    color: var(--slate);
+    opacity: 0.6;
+    cursor: default;
+    font-size: 1rem;
+}
+
 .reminder-info {
     flex: 1;
 }
