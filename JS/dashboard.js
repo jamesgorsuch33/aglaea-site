@@ -17,6 +17,8 @@ import {
     deleteReminder,
     getUser,
     createOrUpdateUser,
+    recordGiftPurchase,
+    getGiftHistory,
     auth
 } from './firebase-config-v2.js';
 
@@ -261,10 +263,19 @@ function renderPeopleList(peopleWithReminders) {
             html += '</div>';
         }
         
+        html += '<div class="past-gifts-section">';
+        html += '<button class="past-gifts-toggle" data-person-id="' + person.id + '">Past Gifts <span class="past-gifts-chevron">▾</span></button>';
+        html += '<div class="past-gifts-list hidden" data-person-id="' + person.id + '"></div>';
+        html += '</div>';
+        
         html += '</div>';
     });
     
     listEl.innerHTML = html;
+    
+    document.querySelectorAll('.past-gifts-toggle').forEach(function(btn) {
+        btn.addEventListener('click', handlePastGiftsToggle);
+    });
     
     document.querySelectorAll('.delete-person').forEach(function(btn) {
         btn.addEventListener('click', handleDeletePerson);
@@ -614,6 +625,11 @@ function setupEventListeners() {
         renewalDismissBtn.addEventListener('click', handleRenewalDismiss);
     }
     
+    const markPurchasedConfirmBtn = document.getElementById('markPurchasedConfirmBtn');
+    if (markPurchasedConfirmBtn) {
+        markPurchasedConfirmBtn.addEventListener('click', handleMarkPurchasedConfirm);
+    }
+    
     const occasionSelect = document.getElementById('newOccasion');
     if (occasionSelect) {
         occasionSelect.addEventListener('change', function(e) {
@@ -948,16 +964,56 @@ async function handleDeleteReminder(e) {
 // MARK AS PURCHASED + NEXT-YEAR RENEWAL
 // ============================================================
 
-async function handleMarkPurchased(e) {
+function handleMarkPurchased(e) {
     const personId = e.currentTarget.dataset.personId;
     const reminderId = e.currentTarget.dataset.reminderId;
     
+    const modal = document.getElementById('markPurchasedModal');
+    if (!modal) return;
+    
+    modal.dataset.personId = personId;
+    modal.dataset.reminderId = reminderId;
+    document.getElementById('giftNoteInput').value = '';
+    modal.classList.remove('hidden');
+}
+
+async function handleMarkPurchasedConfirm() {
+    const modal = document.getElementById('markPurchasedModal');
+    const personId = modal.dataset.personId;
+    const reminderId = modal.dataset.reminderId;
+    const giftNote = document.getElementById('giftNoteInput').value.trim();
+    
     try {
+        const reminders = await getRemindersForPerson(personId);
+        const reminder = reminders.find(function(r) { return r.id === reminderId; });
+        const people = await getPeopleForUser(currentUser.uid);
+        const person = people.find(function(p) { return p.id === personId; });
+        
+        const purchaseDate = formatDateYMD(new Date());
+        
+        let occasionLabel = reminder ? reminder.occasion : 'gift';
+        if (reminder && reminder.occasion === 'custom' && reminder.customOccasionName) {
+            occasionLabel = reminder.customOccasionName;
+        }
+        
         await updateReminder(personId, reminderId, {
             giftPurchased: true,
-            purchaseDate: formatDateYMD(new Date())
+            purchaseDate: purchaseDate
         });
         
+        // Record permanently in gift history — independent of whether
+        // this reminder later gets renewed for next year or not, so
+        // the person's gift log builds up regardless.
+        await recordGiftPurchase({
+            userId: currentUser.uid,
+            personId: personId,
+            personName: person ? person.personName : 'someone',
+            occasion: capitalize(occasionLabel),
+            purchaseDate: purchaseDate,
+            giftDescription: giftNote || null
+        });
+        
+        modal.classList.add('hidden');
         await loadDashboard();
         showRenewalPrompt(personId, reminderId);
         
@@ -1021,6 +1077,82 @@ async function handleRenewalConfirm() {
 
 function handleRenewalDismiss() {
     document.getElementById('renewalPromptModal').classList.add('hidden');
+}
+
+// ============================================================
+// PAST GIFTS DROPDOWN
+// Lazy-loads on first expand, rather than fetching gift history for
+// every person on every dashboard load — most people won't open it
+// every visit, so this avoids unnecessary Firestore reads.
+// ============================================================
+
+const pastGiftsCache = {};
+
+async function handlePastGiftsToggle(e) {
+    const personId = e.currentTarget.dataset.personId;
+    const listEl = document.querySelector('.past-gifts-list[data-person-id="' + personId + '"]');
+    const toggleBtn = e.currentTarget;
+    
+    if (!listEl) return;
+    
+    const isOpen = !listEl.classList.contains('hidden');
+    
+    if (isOpen) {
+        listEl.classList.add('hidden');
+        toggleBtn.classList.remove('expanded');
+        return;
+    }
+    
+    toggleBtn.classList.add('expanded');
+    listEl.classList.remove('hidden');
+    
+    if (pastGiftsCache[personId]) {
+        renderPastGifts(listEl, pastGiftsCache[personId]);
+        return;
+    }
+    
+    listEl.innerHTML = '<p class="past-gifts-loading">Loading…</p>';
+    
+    try {
+        const history = await getGiftHistory(currentUser.uid, personId);
+        pastGiftsCache[personId] = history;
+        renderPastGifts(listEl, history);
+    } catch (error) {
+        console.error('Error loading gift history:', error);
+        listEl.innerHTML = '<p class="past-gifts-loading">Couldn\'t load past gifts. Please try again.</p>';
+    }
+}
+
+function renderPastGifts(listEl, history) {
+    if (history.length === 0) {
+        listEl.innerHTML = '<p class="past-gifts-empty">No past gifts recorded yet.</p>';
+        return;
+    }
+    
+    let html = '';
+    history.forEach(function(entry) {
+        const dateStr = entry.purchaseDate
+            ? new Date(entry.purchaseDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+            : '';
+        
+        html += '<div class="past-gift-item">';
+        html += '<div class="past-gift-occasion">' + escapeHtml(entry.occasion || 'Gift') + '</div>';
+        html += '<div class="past-gift-meta">' + escapeHtml(dateStr) + '</div>';
+        if (entry.giftDescription) {
+            html += '<div class="past-gift-note">' + escapeHtml(entry.giftDescription) + '</div>';
+        }
+        html += '</div>';
+    });
+    
+    listEl.innerHTML = html;
+}
+
+function escapeHtml(str) {
+    if (str === undefined || str === null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
 }
 
 // ============================================================
