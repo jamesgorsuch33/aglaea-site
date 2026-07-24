@@ -314,6 +314,28 @@
         </div>
     </div>
 
+    <!-- Mark Purchased Modal (captures optional gift note) -->
+    <div id="markPurchasedModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🎁 Mark as Purchased</h2>
+                <button class="modal-close" data-modal="markPurchasedModal">&times;</button>
+            </div>
+
+            <div class="renewal-prompt-body">
+                <div class="form-group">
+                    <label for="giftNoteInput">What did you get them? (optional)</label>
+                    <input type="text" id="giftNoteInput" placeholder="e.g. A silk scarf from her favourite brand">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-close" data-modal="markPurchasedModal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="markPurchasedConfirmBtn">Confirm Purchased</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Renewal Prompt Modal (shown after marking a gift purchased) -->
     <div id="renewalPromptModal" class="modal hidden">
         <div class="modal-content">
