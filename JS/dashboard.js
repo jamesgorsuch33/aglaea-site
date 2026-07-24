@@ -463,7 +463,11 @@ function renderDateReminder(reminder, personId) {
     if (!isPaused && !isPurchased) {
         html += '<button class="btn-icon mark-purchased" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Mark gift as purchased">🎁</button>';
     }
-    html += '<button class="btn-icon edit-reminder" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Edit">✏️</button>';
+    if (isPaused) {
+        html += '<span class="btn-icon locked-icon" title="Upgrade to Curate to edit this reminder">🔒</span>';
+    } else {
+        html += '<button class="btn-icon edit-reminder" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Edit">✏️</button>';
+    }
     html += '<button class="btn-icon delete-reminder" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Delete">🗑️</button>';
     html += '</div>';
     html += '</div>';
@@ -513,7 +517,11 @@ function renderJustBecauseReminder(reminder, personId) {
     html += '</div>';
     html += '</div>';
     html += '<div class="reminder-actions">';
-    html += '<button class="btn-icon edit-reminder" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Edit">✏️</button>';
+    if (isPaused) {
+        html += '<span class="btn-icon locked-icon" title="Upgrade to Curate to edit this reminder">🔒</span>';
+    } else {
+        html += '<button class="btn-icon edit-reminder" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Edit">✏️</button>';
+    }
     html += '<button class="btn-icon delete-reminder" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Delete">🗑️</button>';
     html += '</div>';
     html += '</div>';
@@ -787,6 +795,11 @@ async function handleEditReminder(e) {
         
         if (!reminder) {
             alert('Reminder not found');
+            return;
+        }
+        
+        if (reminder.paused) {
+            alert('This reminder is paused because it\'s over your Discover plan\'s limit. Upgrade to Curate to edit it again.');
             return;
         }
         
