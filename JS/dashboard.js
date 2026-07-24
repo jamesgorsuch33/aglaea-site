@@ -245,7 +245,13 @@ function renderPeopleList(peopleWithReminders) {
             html += '<p class="no-reminders">No reminders for this person</p>';
         } else {
             html += '<div class="reminders-list">';
-            person.reminders.forEach(function(reminder) {
+            // Active reminders first, paused ones sink to the bottom —
+            // matches how the reminder-picker pausing is meant to read
+            // visually: paused isn't deleted, just deprioritised.
+            const sortedReminders = person.reminders.slice().sort(function(a, b) {
+                return (a.paused === true ? 1 : 0) - (b.paused === true ? 1 : 0);
+            });
+            sortedReminders.forEach(function(reminder) {
                 if (reminder.reminderType === 'date-based') {
                     html += renderDateReminder(reminder, person.id);
                 } else if (reminder.reminderType === 'just-because') {
@@ -270,6 +276,10 @@ function renderPeopleList(peopleWithReminders) {
     
     document.querySelectorAll('.delete-reminder').forEach(function(btn) {
         btn.addEventListener('click', handleDeleteReminder);
+    });
+    
+    document.querySelectorAll('.mark-purchased').forEach(function(btn) {
+        btn.addEventListener('click', handleMarkPurchased);
     });
     
     // NEW: Add reminder for specific person
@@ -423,7 +433,21 @@ function renderDateReminder(reminder, personId) {
         daysText = '<span class="days-until">in ' + daysUntil + ' days</span>';
     }
     
-    let html = '<div class="reminder-item date-based" data-reminder-id="' + reminder.id + '">';
+    const isPaused = reminder.paused === true;
+    const isPurchased = reminder.giftPurchased === true;
+    
+    let statusBadge = '';
+    if (isPaused) {
+        statusBadge = '<span class="reminder-status-badge paused-badge">Paused</span>';
+    } else if (isPurchased) {
+        statusBadge = '<span class="reminder-status-badge purchased-badge">✓ Purchased</span>';
+    }
+    
+    let itemClasses = 'reminder-item date-based';
+    if (isPaused) itemClasses += ' paused';
+    if (isPurchased) itemClasses += ' purchased';
+    
+    let html = '<div class="' + itemClasses + '" data-reminder-id="' + reminder.id + '">';
     html += '<div class="reminder-info">';
     html += '<span class="reminder-icon">' + icon + '</span>';
     html += '<div class="reminder-text">';
@@ -432,9 +456,13 @@ function renderDateReminder(reminder, personId) {
     html += '<span class="reminder-date-text">' + dateStr + '</span>';
     html += '<span class="reminder-separator"> • </span>';
     html += daysText;
+    html += statusBadge;
     html += '</div>';
     html += '</div>';
     html += '<div class="reminder-actions">';
+    if (!isPaused && !isPurchased) {
+        html += '<button class="btn-icon mark-purchased" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Mark gift as purchased">🎁</button>';
+    }
     html += '<button class="btn-icon edit-reminder" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Edit">✏️</button>';
     html += '<button class="btn-icon delete-reminder" data-person-id="' + personId + '" data-reminder-id="' + reminder.id + '" title="Delete">🗑️</button>';
     html += '</div>';
@@ -466,7 +494,11 @@ function renderJustBecauseReminder(reminder, personId) {
         nextDateText = nextDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
     }
     
-    let html = '<div class="reminder-item just-because" data-reminder-id="' + reminder.id + '">';
+    const isPaused = reminder.paused === true;
+    const statusBadge = isPaused ? '<span class="reminder-status-badge paused-badge">Paused</span>' : '';
+    const itemClasses = 'reminder-item just-because' + (isPaused ? ' paused' : '');
+    
+    let html = '<div class="' + itemClasses + '" data-reminder-id="' + reminder.id + '">';
     html += '<div class="reminder-info">';
     html += '<span class="reminder-icon">✨</span>';
     html += '<div class="reminder-text">';
@@ -477,6 +509,7 @@ function renderJustBecauseReminder(reminder, personId) {
         html += '<span class="reminder-separator"> • </span>';
         html += '<span class="reminder-date-text">Next: ' + nextDateText + '</span>';
     }
+    html += statusBadge;
     html += '</div>';
     html += '</div>';
     html += '<div class="reminder-actions">';
@@ -561,6 +594,16 @@ function setupEventListeners() {
     const editJBForm = document.getElementById('editJustBecauseForm');
     if (editJBForm) {
         editJBForm.addEventListener('submit', handleEditJustBecauseSubmit);
+    }
+    
+    const renewalConfirmBtn = document.getElementById('renewalConfirmBtn');
+    if (renewalConfirmBtn) {
+        renewalConfirmBtn.addEventListener('click', handleRenewalConfirm);
+    }
+    
+    const renewalDismissBtn = document.getElementById('renewalDismissBtn');
+    if (renewalDismissBtn) {
+        renewalDismissBtn.addEventListener('click', handleRenewalDismiss);
     }
     
     const occasionSelect = document.getElementById('newOccasion');
@@ -886,6 +929,85 @@ async function handleDeleteReminder(e) {
         console.error('Error deleting reminder:', error);
         alert('Error deleting reminder. Please try again.');
     }
+}
+
+// ============================================================
+// MARK AS PURCHASED + NEXT-YEAR RENEWAL
+// ============================================================
+
+async function handleMarkPurchased(e) {
+    const personId = e.currentTarget.dataset.personId;
+    const reminderId = e.currentTarget.dataset.reminderId;
+    
+    try {
+        await updateReminder(personId, reminderId, {
+            giftPurchased: true,
+            purchaseDate: formatDateYMD(new Date())
+        });
+        
+        await loadDashboard();
+        showRenewalPrompt(personId, reminderId);
+        
+    } catch (error) {
+        console.error('Error marking reminder as purchased:', error);
+        alert('Error updating reminder. Please try again.');
+    }
+}
+
+// Formats a Date as YYYY-MM-DD, matching the plain date-string format
+// reminder.date is already stored in (same format <input type="date">
+// produces), so this can be written straight back without a timezone
+// round-trip through toISOString().
+function formatDateYMD(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function showRenewalPrompt(personId, reminderId) {
+    const modal = document.getElementById('renewalPromptModal');
+    if (!modal) return;
+    
+    modal.dataset.personId = personId;
+    modal.dataset.reminderId = reminderId;
+    modal.classList.remove('hidden');
+}
+
+async function handleRenewalConfirm() {
+    const modal = document.getElementById('renewalPromptModal');
+    const personId = modal.dataset.personId;
+    const reminderId = modal.dataset.reminderId;
+    
+    try {
+        // Find the reminder's current date so we can roll it forward a
+        // year rather than guessing — re-fetch rather than trust
+        // whatever's still in the DOM after the purchased-state re-render.
+        const reminders = await getRemindersForPerson(personId);
+        const reminder = reminders.find(function(r) { return r.id === reminderId; });
+        
+        if (reminder && reminder.date) {
+            const [year, month, day] = reminder.date.split('-').map(Number);
+            const nextYearDate = `${year + 1}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            
+            await updateReminder(personId, reminderId, {
+                date: nextYearDate,
+                giftPurchased: false,
+                purchaseDate: null
+            });
+        }
+        
+        modal.classList.add('hidden');
+        loadDashboard();
+        
+    } catch (error) {
+        console.error('Error setting up next year\'s reminder:', error);
+        alert('Error updating reminder. Please try again.');
+    }
+}
+
+function handleRenewalDismiss() {
+    document.getElementById('renewalPromptModal').classList.add('hidden');
 }
 
 // ============================================================
