@@ -153,7 +153,7 @@ async function handleSubscriptionActivated(webhookEvent) {
             const response = await fetch(`${apiUrl}/subscriptions/${subscriptionId}`, {
                 headers: {
                     'Authorization': `Bearer ${process.env.REVOLUT_SECRET_KEY}`,
-                    'Revolut-Api-Version': '2024-09-01'
+                    'Revolut-Api-Version': '2026-04-20'
                 }
             });
             
@@ -174,6 +174,26 @@ async function handleSubscriptionActivated(webhookEvent) {
         return;
     }
 
+    // Guard against delayed/retried webhook deliveries. Revolut can
+    // redeliver an event well after it was first sent (observed: ~30
+    // minutes) — if the user already explicitly cancelled *this same*
+    // subscription in the meantime, a late-arriving activation event
+    // must not silently re-grant Curate. Only blocks re-activation for
+    // the specific subscription that was cancelled — a genuinely new
+    // resubscription (different subscription_id) still goes through.
+    const existingUserDoc = await db.collection('users').doc(userId).get();
+    if (existingUserDoc.exists) {
+        const existingData = existingUserDoc.data();
+        const thisSubscriptionId = subscriptionId || subscription?.id;
+        const wasCancelled = existingData.subscriptionStatus === 'cancelled';
+        const sameSubscription = existingData.revolutSubscriptionId === thisSubscriptionId;
+
+        if (wasCancelled && sameSubscription) {
+            console.log(`Ignoring stale activation event for already-cancelled subscription ${thisSubscriptionId} (user ${userId})`);
+            return;
+        }
+    }
+
     console.log('Activating Curate subscription for user:', userId);
 
     // Update Firestore - upgrade user to Curate
@@ -181,6 +201,7 @@ async function handleSubscriptionActivated(webhookEvent) {
         tier: 'curate',
         revolutCustomerId: customerId,
         revolutSubscriptionId: subscriptionId || subscription?.id,
+        subscriptionStatus: 'active',
         upgradedAt: admin.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
