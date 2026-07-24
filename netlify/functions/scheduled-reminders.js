@@ -198,6 +198,13 @@ async function processDateBasedReminders(today, stats) {
             // Only process date-based reminders here
             if (reminder.reminderType !== 'date-based') continue;
             
+            // Skip entirely if paused (e.g. over the Discover cap after a
+            // downgrade) — this previously only affected what showed on
+            // the dashboard, not what actually got sent. Applies to every
+            // cadence including day-of, unlike the purchased-suppression
+            // below which deliberately still sends day-of.
+            if (reminder.paused) continue;
+            
             // Skip if no date
             if (!reminder.date) continue;
             
@@ -207,8 +214,11 @@ async function processDateBasedReminders(today, stats) {
             // Only process valid cadence days for this user's tier
             if (!(days in userCadences)) continue;
             
-            // Skip if purchased AND it's not day-of
-            // (Day-of always sends so they don't forget the actual day)
+            // Skip if purchased AND it's not day-of.
+            // Email day-of always sends (occasion-day well-wish, not a
+            // shopping nudge). SMS day-of (added separately below) also
+            // deliberately ignores purchased status — it's a "reach out"
+            // nudge, independent of whether a gift was bought.
             if (reminder.giftPurchased && days !== 0) {
                 console.log(`Skipping purchased reminder ${reminder.id} (${days} days)`);
                 continue;
@@ -232,7 +242,8 @@ async function processDateBasedReminders(today, stats) {
                 occasion: getOccasionLabel(reminder),
                 occasionCode: reminder.occasion,
                 occasionDate: formatOccasionDate(reminder.date),
-                userTier: userTier
+                userTier: userTier,
+                giftPurchased: reminder.giftPurchased === true
             };
             
             console.log(`Sending ${emailType} to ${userEmail} (${userTier} tier) for ${person.personName}`);
@@ -269,7 +280,7 @@ async function processDateBasedReminders(today, stats) {
             // cadence tracking in reminder.remindersSent. Inherits the
             // giftPurchased suppression above, same as email.
             // ========================================================
-            const SMS_DAYS = new Set([14, 7, 3]);
+            const SMS_DAYS = new Set([14, 7, 3, 0]);
             const isSmsEligibleTier = userTier === 'curate' || userTier === 'essential';
             
             if (isSmsEligibleTier && SMS_DAYS.has(days)) {
