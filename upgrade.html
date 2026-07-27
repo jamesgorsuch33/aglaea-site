@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upgrade — Aglaea</title>
+    <title>Upgrade — AGLAEA</title>
     <meta name="description" content="Upgrade to AGLAEA Curate for unlimited reminders and SMS alerts. Atelier tier coming soon.">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,14 +19,22 @@
     <header class="header">
         <div class="container header-content">
             <a href="index.html" class="logo">AGLAEA</a>
-            <nav class="nav">
-                <a href="dashboard.html">Dashboard</a>
+            
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Open menu">
+                <span></span>
+            </button>
+            
+            <nav class="nav" id="mainNav">
+                <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu">×</button>
+                <a href="about.html">Our Story</a>
                 <a href="products.html">Gifts</a>
-                <a href="upgrade.html">Upgrade</a>
+                <a href="blog.html">Journal</a>
+                <a href="upgrade.html" class="active">Pricing</a>
                 <a href="signin.html">Sign In</a>
                 <a href="signup.html" class="btn-nav">Get Started</a>
             </nav>
         </div>
+        <div class="mobile-menu-backdrop" id="mobileMenuBackdrop"></div>
     </header>
 
     <!-- Upgrade Section -->
@@ -57,7 +65,7 @@
                     <div class="pricing-header">
                         <h2>Discover</h2>
                         <div class="pricing-price">
-                            <span class="price-amount">Free</span>
+                            <span class="price-amount">Discover</span>
                             <span class="price-period">forever</span>
                         </div>
                     </div>
@@ -66,7 +74,6 @@
                         <li>5 reminders maximum</li>
                         <li>Email notifications</li>
                         <li>Browse luxury gifts</li>
-                        <li>Purchase via affiliate links</li>
                         <li>Basic support</li>
                     </ul>
                     
@@ -90,11 +97,10 @@
                         <li>Email + SMS notifications</li>
                         <li>Full gift catalogue</li>
                         <li>Priority support</li>
-                        <li>Export reminders</li>
                     </ul>
                     
                     <button class="btn btn-primary" id="upgradeToCurate">Upgrade to Curate</button>
-                    <p class="pricing-note">Credit card required to start</p>
+                    <p class="pricing-note">No credit card required to start</p>
                 </div>
 
                 <!-- Atelier Tier -->
@@ -240,6 +246,27 @@
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <p class="footer-logo">AGLAEA</p>
+                    <p class="footer-tagline">Never miss another moment.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="about.html">Our Story</a>
+                    <a href="products.html">Gifts</a>
+                    <a href="upgrade.html">Pricing</a>
+                    <a href="privacy.html">Privacy</a>
+                    <a href="cookie-policy.html">Cookies</a>
+                    <a href="terms.html">Terms</a>
+                </div>
+            </div>
+            <p class="footer-copyright">&copy; 2026 AGLAEA GROUP LIMITED. Thoughtful gifting, beautifully timed.</p>
+        </div>
+    </footer>
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -252,6 +279,8 @@
     
     <!-- Upgrade Logic -->
     <script src="js/upgrade.js"></script>
+
+    <script src="js/mobile-menu.js"></script>
 
 </body>
 </html>
