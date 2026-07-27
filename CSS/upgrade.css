@@ -396,6 +396,19 @@ input:checked + .toggle-slider:before {
     color: var(--charcoal);
 }
 
+/* When .modal-close is reused on an actual button (e.g. a "Cancel"
+   action) purely to hook into the close-modal click handler, it
+   shouldn't inherit the header icon's 2rem/32px sizing meant for a
+   single "×" character. This combined selector has higher specificity
+   than .modal-close alone, so it wins regardless of source order. */
+.btn.modal-close {
+    font-size: 0.938rem;
+    width: auto;
+    height: auto;
+    line-height: normal;
+    padding: 0.875rem 2rem;
+}
+
 .modal-actions {
     display: flex;
     gap: var(--space-sm);
