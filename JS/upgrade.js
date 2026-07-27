@@ -11,10 +11,10 @@ const billingToggle = document.getElementById('billingToggle');
 const curatePrice = document.getElementById('curatePrice');
 const curatePeriod = document.getElementById('curatePeriod');
 const curateAnnual = document.getElementById('curateAnnual');
+const discoverPlanBtn = document.getElementById('discoverPlanBtn');
 const upgradeToCurateBtn = document.getElementById('upgradeToCurate');
 const premiumWaitlistBtn = document.getElementById('premiumWaitlistBtn');
 const premiumWaitlistModal = document.getElementById('premiumWaitlistModal');
-const premiumWaitlistFormModal = document.getElementById('premiumWaitlistFormModal');
 const joinWaitlistModalBtn = document.getElementById('joinWaitlistModalBtn');
 const waitlistModalMessage = document.getElementById('waitlistModalMessage');
 
@@ -23,6 +23,14 @@ firebase.auth().onAuthStateChanged((user) => {
     currentUser = user;
     if (user) {
         checkUserPlan();
+    } else {
+        // Logged out: Discover reads as a real call to action (signup),
+        // Curate button stays as-is (clicking it will prompt sign-in
+        // first, same as before).
+        if (discoverPlanBtn) {
+            discoverPlanBtn.textContent = 'Get Started';
+            discoverPlanBtn.disabled = false;
+        }
     }
 });
 
@@ -47,7 +55,9 @@ function updatePricing() {
     }
 }
 
-// Check User Plan
+// Check User Plan — updates BOTH cards based on actual tier, rather
+// than only ever touching the Curate button while Discover stays
+// permanently hardcoded to "Current Plan" regardless of reality.
 async function checkUserPlan() {
     try {
         const userDoc = await firebase.firestore()
@@ -55,24 +65,46 @@ async function checkUserPlan() {
             .doc(currentUser.uid)
             .get();
         
-        if (userDoc.exists) {
-            const userData = userDoc.data();
-            const tier = userData.tier || userData.plan || 'discover';
+        const userData = userDoc.exists ? userDoc.data() : {};
+        const tier = userData.tier || userData.plan || 'discover';
+        const isCurate = tier === 'essential' || tier === 'curate';
+        
+        if (isCurate) {
+            upgradeToCurateBtn.textContent = 'Current Plan';
+            upgradeToCurateBtn.disabled = true;
             
-            if (tier === 'essential' || tier === 'curate') {
-                upgradeToCurateBtn.textContent = 'Current Plan';
-                upgradeToCurateBtn.disabled = true;
+            if (discoverPlanBtn) {
+                // They're not actually on Discover — downgrading happens
+                // via Settings' Cancel Subscription flow, not from here.
+                discoverPlanBtn.textContent = 'Downgrade in Settings';
+                discoverPlanBtn.disabled = true;
             }
-            
-            // Check Atelier waitlist status
-            if (userData.premiumWaitlist) {
-                premiumWaitlistBtn.textContent = 'On Waitlist';
-                premiumWaitlistBtn.disabled = true;
+        } else {
+            // Genuinely on Discover
+            if (discoverPlanBtn) {
+                discoverPlanBtn.textContent = 'Current Plan';
+                discoverPlanBtn.disabled = true;
             }
+        }
+        
+        // Check Atelier waitlist status
+        if (userData.premiumWaitlist && premiumWaitlistBtn) {
+            premiumWaitlistBtn.textContent = 'On Waitlist';
+            premiumWaitlistBtn.disabled = true;
         }
     } catch (error) {
         console.error('Error checking user plan:', error);
     }
+}
+
+// Discover button click (logged-out state only — logged-in states are
+// always disabled, so this only ever fires as the "Get Started" CTA)
+if (discoverPlanBtn) {
+    discoverPlanBtn.addEventListener('click', () => {
+        if (!currentUser) {
+            window.location.href = 'signup.html';
+        }
+    });
 }
 
 // Upgrade to Curate via Revolut
@@ -141,16 +173,20 @@ upgradeToCurateBtn.addEventListener('click', async () => {
 if (premiumWaitlistBtn) {
     premiumWaitlistBtn.addEventListener('click', () => {
         if (!currentUser) {
-            alert('Please sign in first');
-            window.location.href = 'signin.html';
+            // Not a current user — they need a Discover account before
+            // they can join the waitlist, not just a sign-in.
+            window.location.href = 'signup.html';
             return;
         }
-        premiumWaitlistFormModal.classList.remove('hidden');
+        // Logged in: this IS the "tick box" exercise — open the modal
+        // (previously toggled the wrong element and never opened at all).
+        premiumWaitlistModal.classList.remove('hidden');
     });
 }
 
 if (joinWaitlistModalBtn) {
-    joinWaitlistModalBtn.addEventListener('click', async () => {
+    joinWaitlistModalBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
         if (!currentUser) return;
         
         try {
@@ -163,21 +199,24 @@ if (joinWaitlistModalBtn) {
                 }, { merge: true });
             
             waitlistModalMessage.textContent = 'You\'re on the list! We\'ll be in touch soon.';
+            waitlistModalMessage.classList.remove('hidden');
             premiumWaitlistBtn.textContent = 'On Waitlist';
             premiumWaitlistBtn.disabled = true;
             
             setTimeout(() => {
-                premiumWaitlistFormModal.classList.add('hidden');
+                premiumWaitlistModal.classList.add('hidden');
             }, 2000);
         } catch (error) {
             console.error('Waitlist error:', error);
             waitlistModalMessage.textContent = 'Something went wrong. Please try again.';
+            waitlistModalMessage.classList.remove('hidden');
         }
     });
 }
 
-// Close modals
-document.querySelectorAll('.close-modal').forEach(btn => {
+// Close modals — fixed selector (was ".close-modal", actual class is
+// ".modal-close") so the × button and Cancel button now actually work.
+document.querySelectorAll('.modal-close').forEach(btn => {
     btn.addEventListener('click', (e) => {
         e.target.closest('.modal').classList.add('hidden');
     });
