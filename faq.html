@@ -15,14 +15,22 @@
     <header class="header">
         <div class="container header-content">
             <a href="index.html" class="logo">AGLAEA</a>
-            <nav class="nav">
+            
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Open menu">
+                <span></span>
+            </button>
+            
+            <nav class="nav" id="mainNav">
+                <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu">×</button>
+                <a href="about.html">Our Story</a>
                 <a href="products.html">Gifts</a>
-                <a href="blog.html">Inspiration</a>
+                <a href="blog.html">Journal</a>
                 <a href="upgrade.html">Pricing</a>
                 <a href="signin.html">Sign In</a>
                 <a href="signup.html" class="btn-nav">Get Started</a>
             </nav>
         </div>
+        <div class="mobile-menu-backdrop" id="mobileMenuBackdrop"></div>
     </header>
 
     <!-- FAQ Hero -->
@@ -60,8 +68,8 @@
                         <p>It's simple:</p>
                         <ol>
                             <li><strong>Add occasions:</strong> Enter the birthdays, anniversaries, and other dates you want to remember</li>
-                            <li><strong>Get reminded:</strong> We'll send you email reminders 21 days before each occasion, giving you plenty of time to shop</li>
-                            <li><strong>Shop thoughtfully:</strong> Browse our curated gift recommendations from luxury brands, or shop anywhere you like</li>
+                            <li><strong>Get reminded:</strong> We'll send you email reminders 7 days before each occasion, giving you plenty of time to shop</li>
+                            <li><strong>Shop thoughtfully:</strong> Browse our curated gift recommendations from luxury British brands, or shop anywhere you like</li>
                             <li><strong>Mark as purchased:</strong> Once you've bought a gift, tick the "gift purchased" box and we'll stop sending reminders for that occasion</li>
                         </ol>
                     </div>
@@ -73,8 +81,8 @@
                         <span class="faq-icon">+</span>
                     </button>
                     <div class="faq-answer">
-                        <p>Yes! Our free Remind plan lets you set up to 5 reminders with email notifications. This is perfect for tracking your closest family and friends' birthdays and anniversaries.</p>
-                        <p>If you need more than 5 reminders or want SMS alerts, you can upgrade to our Essential plan (£4.99/month or £49.99/year). There's no pressure to upgrade—many users stay on the free plan indefinitely.</p>
+                        <p>Yes! Our free Discover plan lets you set up to 5 reminders with email notifications. This is perfect for tracking your closest family and friends' birthdays and anniversaries.</p>
+                        <p>If you need more than 5 reminders or want SMS alerts, you can upgrade to our Curate plan (£4.99/month or £49.99/year). There's no pressure to upgrade — many users stay on the free plan indefinitely.</p>
                     </div>
                 </div>
 
@@ -84,7 +92,7 @@
                         <span class="faq-icon">+</span>
                     </button>
                     <div class="faq-answer">
-                        <p>No! You can sign up for our free Remind plan with just your email address — no credit card required. We only ask for payment details if you choose to upgrade to the Essential plan.</p>
+                        <p>No! You can sign up for our free Discover plan with just your email address — no credit card required. We only ask for payment details if you choose to upgrade to the Curate plan.</p>
                     </div>
                 </div>
             </div>
@@ -99,7 +107,7 @@
                         <span class="faq-icon">+</span>
                     </button>
                     <div class="faq-answer">
-                        <p>On our free Remind plan, you can set up to 5 reminders. If you upgrade to Essential (£4.99/month or £49.99/year), you get unlimited reminders for all your important occasions.</p>
+                        <p>On our free Discover plan, you can set up to 5 reminders. If you upgrade to Curate (£4.99/month or £49.99/year), you get unlimited reminders for all your important occasions.</p>
                     </div>
                 </div>
 
@@ -109,15 +117,9 @@
                         <span class="faq-icon">+</span>
                     </button>
                     <div class="faq-answer">
-                        <p>We send you multiple email reminders before each occasion:</p>
-                        <ul>
-                            <li><strong>21 days before:</strong> Early heads-up</li>
-                            <li><strong>14 days before:</strong> Planning reminder</li>
-                            <li><strong>10 days before:</strong> Main shopping reminder</li>
-                            <li><strong>7 days before:</strong> Last week reminder</li>
-                            <li><strong>3 days before:</strong> Final reminder</li>
-                        </ul>
-                        <p>If you upgrade to Essential, you also receive SMS alerts 14 and 7 days before each occasion.</p>
+                        <p>Discover (free) members receive email reminders 7 days and 3 days before each occasion, plus a reminder on the day itself.</p>
+                        <p>Curate members receive a fuller cadence: 21, 14, 10, 7, and 3 days before, plus a reminder on the day itself.</p>
+                        <p>Curate members also receive SMS alerts at 14, 7, and 3 days before each occasion, plus a friendly SMS nudge on the day.</p>
                     </div>
                 </div>
 
@@ -127,7 +129,7 @@
                         <span class="faq-icon">+</span>
                     </button>
                     <div class="faq-answer">
-                        <p>Absolutely! We love spontaneous gestures. When adding a reminder, you can choose "Just Because" as the occasion type. This is perfect for sending unexpected gifts to maintain relationships outside of obligatory occasions.</p>
+                        <p>Absolutely! We love spontaneous gestures. When adding a reminder, you can choose "Just Because" as the occasion type. You will need to be a Curate member to access this reminder. This is perfect for sending unexpected gifts to maintain relationships outside of obligatory occasions.</p>
                         <p>You can set these for specific dates (like "send mum flowers every spring") or use them as periodic reminders to think of someone special.</p>
                     </div>
                 </div>
@@ -139,7 +141,8 @@
                     </button>
                     <div class="faq-answer">
                         <p>Once you've bought a gift for an upcoming occasion, you can check the "gift purchased" box on your dashboard. This tells AGLAEA you're all sorted, and we'll stop sending you reminder emails for that specific occasion.</p>
-                        <p>This prevents reminder fatigue — you won't get unnecessary emails once you've already handled the gift. The reminder card turns grey on your dashboard so you can see at a glance which gifts are sorted.</p>
+                        <p>This prevents reminder fatigue—you won't get unnecessary emails once you've already handled the gift. The reminder card turns grey on your dashboard so you can see at a glance which gifts are sorted.</p>
+                        <p>We'll also ask you if you'd like your reminder to be put in place for next year, saving you time re-entering birthdays or anniversaries!</p>
                     </div>
                 </div>
 
@@ -174,19 +177,19 @@
                         <span class="faq-icon">+</span>
                     </button>
                     <div class="faq-answer">
-                        <p>We've partnered with exceptional British brands that align with our values of quality, craftsmanship, and thoughtful gifting. Our current partners include:</p>
+                        <p>We've partnered with exceptional brands that align with our values of quality, craftsmanship, and thoughtful gifting. Our current partners include:</p>
                         <ul>
                             <li><strong>Jo Loves:</strong> Artisan fragrances and candles</li>
-                            <li><strong>Scribbler:</strong> Personalized greeting cards</li>
+                            <li><strong>Vilebrequin:</strong> Luxury swimwear</li>
+                            <li><strong>Mappin & Webb:</strong> Heritage jewelry</li>
+                            <li><strong>Dean Morris Cards:</strong> Premium greeting cards</li>
+                            <li><strong>Scribbler:</strong> Personalised greetings cards</li>
                             <li><strong>Nicchia Luxury:</strong> Premium fragrances and home scents</li>
                             <li><strong>Purely Diamonds:</strong> Luxury jewellery</li>
-                            <li><strong>TruffleHunter:</strong> Artisan Truffle food gifts</li>
-                            <li><strong>Vilebrequin:</strong> Luxury swimwear</li>
-                            <li><strong>Norman Walsh:</strong> Handcrafted British footwear</li>
-                            <li><strong>Mappin & Webb:</strong> Heritage jewellery</li>
-                            <li><strong>Dean Morris Cards:</strong> Premium greeting cards</li>
+                            <li><strong>TruffleHunter:</strong> Artisan truffle food gifts</li>
                             <li><strong>CTRNE:</strong> Crystal infused footwear</li>
-                            <li><strong>BONHEUR JEWELRY:</strong> Unique jewellery</li>
+                            <li><strong>BONHEUR JEWELRY:</strong> Unitque jewellery</li>
+                            <li><strong>Anthbot:</strong> Robotic grass cutters</li>
                         </ul>
                     </div>
                 </div>
@@ -223,25 +226,25 @@
                         <span class="faq-icon">+</span>
                     </button>
                     <div class="faq-answer">
-                        <p><strong>Remind (Free):</strong></p>
+                        <p><strong>Discover (Free):</strong></p>
                         <ul>
                             <li>Up to 5 reminders</li>
                             <li>Email notifications</li>
                             <li>Gift purchased tracking</li>
                             <li>Access to all gift partners</li>
                         </ul>
-                        <p><strong>Essential (£4.99/month or £49.99/year):</strong></p>
+                        <p><strong>Curate (£4.99/month or £49.99/year):</strong></p>
                         <ul>
                             <li>Unlimited reminders</li>
                             <li>Email notifications</li>
-                            <li>SMS alerts (14 and 7 days before)</li>
+                            <li>SMS alerts (14, 7, and 3 days before, plus day-of)</li>
                             <li>Gift purchased tracking</li>
                             <li>Access to all gift partners</li>
                             <li>Priority support</li>
                         </ul>
-                        <p><strong>Premium (Coming Soon):</strong></p>
+                        <p><strong>Atelier (Coming Soon):</strong></p>
                         <ul>
-                            <li>Everything in Essential</li>
+                            <li>Everything in Curate</li>
                             <li>VIP partner access (exclusive brands)</li>
                             <li>Auto-scheduled gift delivery</li>
                             <li>Personal gifting concierge</li>
@@ -255,8 +258,8 @@
                         <span class="faq-icon">+</span>
                     </button>
                     <div class="faq-answer">
-                        <p>Yes! You can upgrade from Remind to Essential anytime from your dashboard. If you're on Essential and want to downgrade to Remind, you can do so at the end of your current billing period — your reminders will remain active until then.</p>
-                        <p>When downgrading from Essential to Remind, if you have more than 5 reminders set up, you'll need to choose which 5 to keep active. The others won't be deleted — they'll just be paused until you upgrade again.</p>
+                        <p>Yes! You can upgrade from Discover to Curate anytime from your dashboard. If you're on Curate and want to downgrade, cancelling takes effect immediately — you'll move to the free Discover plan straight away, rather than waiting until the end of a billing period.</p>
+                        <p>When downgrading, if you have more than 5 reminders set up, you'll be asked to choose which 5 to keep active. The others won't be deleted — they'll just be paused until you upgrade again.</p>
                     </div>
                 </div>
 
@@ -266,8 +269,8 @@
                         <span class="faq-icon">+</span>
                     </button>
                     <div class="faq-answer">
-                        <p>If you're on the Essential plan and want to cancel, simply go to your dashboard, click "Manage Subscription," and select "Cancel Plan." Your reminders will remain active until the end of your current billing period, then you'll automatically move to the free Remind plan (with up to 5 reminders).</p>
-                        <p>If you're on the free Remind plan, there's nothing to cancel — just stop using the service if you no longer need it. Your account and data remain available if you want to come back.</p>
+                        <p>If you're on the Curate plan and want to cancel, simply go to your account settings and select "Cancel Subscription." Your account moves to the free Discover plan immediately, with up to 5 reminders staying active — any beyond that are paused, not deleted.</p>
+                        <p>If you're on the free Discover plan, there's nothing to cancel—just stop using the service if you no longer need it. Your account and data remain available if you want to come back.</p>
                     </div>
                 </div>
 
@@ -277,7 +280,7 @@
                         <span class="faq-icon">+</span>
                     </button>
                     <div class="faq-answer">
-                        <p>We offer a 14-day money-back guarantee on all paid plans. If you're not satisfied with Essential within the first 14 days, contact us at hello@aglaea.co.uk and we'll refund your payment in full, no questions asked.</p>
+                        <p>We offer a 14-day money-back guarantee on all paid plans. If you're not satisfied with Curate within the first 14 days, contact us at hello@aglaea.co.uk and we'll refund your payment in full, no questions asked.</p>
                         <p>After 14 days, subscriptions are non-refundable, but you can cancel anytime to prevent future charges.</p>
                     </div>
                 </div>
@@ -297,7 +300,7 @@
                         <ul>
                             <li><strong>Encryption:</strong> All data is encrypted in transit and at rest</li>
                             <li><strong>Secure authentication:</strong> We use Firebase Authentication, trusted by millions of apps</li>
-                            <li><strong>Payment security:</strong> We never store your card details — all payments are processed securely through Stripe</li>
+                            <li><strong>Payment security:</strong> We never store your card details—all payments are processed securely through Revolut</li>
                             <li><strong>Access controls:</strong> Only you can access your reminders and personal information</li>
                         </ul>
                     </div>
@@ -311,8 +314,8 @@
                     <div class="faq-answer">
                         <p>We share minimal information with essential service providers:</p>
                         <ul>
-                            <li><strong>Resend:</strong> To send your reminder emails (we share your email address and reminder dates)</li>
-                            <li><strong>Stripe:</strong> To process payments if you upgrade (they handle payment details securely)</li>
+                            <li><strong>Resent:</strong> To send your reminder emails (we share your email address and reminder dates)</li>
+                            <li><strong>Revolut:</strong> To process payments if you upgrade (they handle payment details securely)</li>
                         </ul>
                         <p>We never sell your data to advertisers or third parties. We don't share your reminder details (who you're buying gifts for, occasions, etc.) with anyone. Your personal information is private and stays private.</p>
                     </div>
@@ -353,42 +356,21 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <h4 class="footer-title">AGLAEA</h4>
-                    <p class="footer-tagline">Moments, quietly made.<br>Beautifully remembered.</p>
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <p class="footer-logo">AGLAEA</p>
+                    <p class="footer-tagline">Never miss another moment.</p>
                 </div>
-                
-                <div class="footer-col">
-                    <h5 class="footer-heading">Product</h5>
-                    <ul class="footer-links">
-                        <li><a href="products.html">Browse Gifts</a></li>
-                        <li><a href="upgrade.html">Pricing</a></li>
-                        <li><a href="signup.html">Sign Up</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-col">
-                    <h5 class="footer-heading">Company</h5>
-                    <ul class="footer-links">
-                        <li><a href="blog.html">Blog</a></li>
-                        <li><a href="faq.html">FAQ</a></li>
-                        <li><a href="#">About</a></li>
-                        <li><a href="#">Privacy</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-col">
-                    <h5 class="footer-heading">Contact</h5>
-                    <ul class="footer-links">
-                        <li><a href="mailto:hello@aglaea.co.uk">hello@aglaea.co.uk</a></li>
-                    </ul>
+                <div class="footer-links">
+                    <a href="about.html">Our Story</a>
+                    <a href="products.html">Gifts</a>
+                    <a href="upgrade.html">Pricing</a>
+                    <a href="privacy.html">Privacy</a>
+                    <a href="cookie-policy.html">Cookies</a>
+                    <a href="terms.html">Terms</a>
                 </div>
             </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2026 AGLAEA GROUP LIMITED. All rights reserved.</p>
-            </div>
+            <p class="footer-copyright">&copy; 2026 AGLAEA GROUP LIMITED. Thoughtful gifting, beautifully timed.</p>
         </div>
     </footer>
 
