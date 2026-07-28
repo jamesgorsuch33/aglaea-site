@@ -280,23 +280,40 @@ const templates = {
                         <p style="font-size: 16px; line-height: 1.7; color: #2a2a2a; margin: 0 0 20px 0;">
                             From this moment on, the people you love will never quietly slip from your calendar. Birthdays, anniversaries, and those small, considered moments in between — we'll hold the space for them, so you can focus on what truly matters: the thought, the gesture, the meaning behind every gift.
                         </p>
-                        <div style="background-color: #f9f5ed; padding: 32px; margin: 32px 0; border-radius: 4px;">
+                        <p style="font-size: 13px; color: #c9a870; letter-spacing: 0.15em; text-transform: uppercase; margin: 0 0 12px 0; font-weight: 600;">
+                            Here's what's included on Discover
+                        </p>
+                        <div style="background-color: #f9f5ed; padding: 32px; margin: 0 0 32px 0; border-radius: 4px;">
                             <div style="padding: 12px 0; border-bottom: 1px solid rgba(201, 168, 112, 0.15);">
                                 <span style="display: inline-block; font-size: 20px; margin-right: 12px; vertical-align: middle; color: #c9a870;">✦</span>
-                                <span style="display: inline-block; font-size: 15px; color: #2a2a2a; vertical-align: middle; font-weight: 500;">Thoughtful reminders, three weeks in advance</span>
+                                <span style="display: inline-block; font-size: 15px; color: #2a2a2a; vertical-align: middle; font-weight: 500;">Up to 5 reminders, completely free</span>
                             </div>
                             <div style="padding: 12px 0; border-bottom: 1px solid rgba(201, 168, 112, 0.15);">
                                 <span style="display: inline-block; font-size: 20px; margin-right: 12px; vertical-align: middle; color: #c9a870;">✦</span>
-                                <span style="display: inline-block; font-size: 15px; color: #2a2a2a; vertical-align: middle; font-weight: 500;">A curated edit of gifts from exceptional brand partners</span>
+                                <span style="display: inline-block; font-size: 15px; color: #2a2a2a; vertical-align: middle; font-weight: 500;">Email reminders 7 days and 3 days before each occasion</span>
                             </div>
                             <div style="padding: 12px 0;">
                                 <span style="display: inline-block; font-size: 20px; margin-right: 12px; vertical-align: middle; color: #c9a870;">✦</span>
-                                <span style="display: inline-block; font-size: 15px; color: #2a2a2a; vertical-align: middle; font-weight: 500;">'Just Because' moments, planned with intention</span>
+                                <span style="display: inline-block; font-size: 15px; color: #2a2a2a; vertical-align: middle; font-weight: 500;">A curated edit of gifts from exceptional brand partners</span>
                             </div>
                         </div>
                         <p style="font-size: 16px; line-height: 1.7; color: #2a2a2a; margin: 0 0 20px 0;">
-                            Your first reminder is already in place. We'll be in touch three weeks before the occasion — quietly, considerately, with everything you need to make it feel effortless.
+                            Your first reminder is already in place. We'll be in touch before the occasion — quietly, considerately, with everything you need to make it feel effortless.
                         </p>
+                        <div style="background-color: #f9f5ed; padding: 28px 32px; margin: 0 0 12px 0; border-radius: 4px; border-left: 3px solid #c9a870;">
+                            <p style="font-size: 12px; color: #c9a870; letter-spacing: 0.2em; text-transform: uppercase; margin: 0 0 12px 0; font-weight: 600;">
+                                ✦ Want more room to breathe?
+                            </p>
+                            <p style="font-size: 15px; line-height: 1.6; color: #2a2a2a; margin: 0 0 12px 0;">
+                                Curate unlocks unlimited reminders, a full 21-day advance notice, SMS alerts, 'Just Because' moments, and access to our complete partner brand collection.
+                            </p>
+                            <p style="font-size: 14px; color: #6b6b6b; margin: 0 0 16px 0; font-style: italic;">
+                                Just £4.99 per month — no pressure, upgrade whenever it feels right.
+                            </p>
+                            <a href="${SITE_URL}/upgrade.html" style="color: #c9a870; font-weight: 600; text-decoration: none; font-size: 14px; letter-spacing: 0.05em;">
+                                Discover Curate →
+                            </a>
+                        </div>
                     </td>
                 </tr>
                 <tr>
@@ -645,7 +662,7 @@ const templates = {
                                 With Curate, you'd have received this reminder 3 weeks ago — giving you real time to find something truly worthy.
                             </p>
                             <p style="font-size: 14px; color: #6b6b6b; margin: 0 0 16px 0; font-style: italic;">
-                                Just £4.99 per month. Unlimited reminders, 21-day advance notice, full partner brand collection, and free delivery.
+                                Just £4.99 per month. Unlimited reminders, 21-day advance notice, and the full partner brand collection.
                             </p>
                             <a href="${SITE_URL}/upgrade.html" style="color: #c9a870; font-weight: 600; text-decoration: none; font-size: 14px; letter-spacing: 0.05em;">
                                 Discover Curate →
@@ -740,7 +757,7 @@ const templates = {
                                 With Curate, you'd have had <em style="color: #c9a870;">3 weeks</em> to find the perfect gift.
                             </p>
                             <p style="font-size: 15px; line-height: 1.7; color: #2a2a2a; margin: 0 0 16px 0;">
-                                Unlimited reminders. 21-day advance notice. Full partner brand collection. Free delivery on all orders. Gift wrapping and personal notes included.
+                                Unlimited reminders. 21-day advance notice. Full partner brand collection. SMS alerts so you never miss an occasion.
                             </p>
                             <p style="font-size: 14px; color: #6b6b6b; margin: 0 0 20px 0; font-style: italic;">
                                 All for £4.99 per month. Cancel anytime.
