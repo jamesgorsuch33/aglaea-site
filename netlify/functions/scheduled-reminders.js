@@ -527,7 +527,37 @@ function calculateNextJBDate(reminder, fromDate) {
 // ============================================================
 // MAIN HANDLER
 // ============================================================
-exports.handler = async (event) => {
+//
+// SCHEDULING: this function was previously never actually wired to
+// run on any schedule at all — Netlify Scheduled Functions require
+// an explicit trigger (this schedule() wrapper, or a netlify.toml
+// entry), and neither existed. This is why nothing fired.
+//
+// Runs every hour on the hour (UTC, per Netlify's cron), but only
+// proceeds with the actual reminder run when it's currently 7am UK
+// local time — checked via Intl.DateTimeFormat against the real
+// Europe/London timezone, which is DST-aware automatically. This
+// means the send time stays correct at 7am UK time year-round
+// (GMT in winter, BST in summer) without needing the cron
+// expression itself to be manually changed twice a year.
+const { schedule } = require('@netlify/functions');
+
+const mainHandler = async (event) => {
+    // Gate: only proceed if it's currently 7am in the UK right now.
+    const ukHourNow = parseInt(
+        new Intl.DateTimeFormat('en-GB', {
+            timeZone: 'Europe/London',
+            hour: 'numeric',
+            hour12: false
+        }).format(new Date()),
+        10
+    );
+
+    if (ukHourNow !== 7) {
+        console.log(`Skipping run — current UK local hour is ${ukHourNow}, not 7. (This function runs hourly and only acts at 7am UK time.)`);
+        return { statusCode: 200, body: JSON.stringify({ skipped: true, ukHourNow }) };
+    }
+
     const startTime = Date.now();
     console.log('=== AGLAEA Scheduled Reminders Started ===');
     console.log('Time:', new Date().toISOString());
@@ -593,8 +623,14 @@ exports.handler = async (event) => {
 
 // ============================================================
 // SCHEDULE CONFIG (Netlify Scheduled Functions)
-// Runs daily at 8:00 AM UTC
+// Runs hourly (UTC) — mainHandler itself gates on "is it currently
+// 7am UK local time" before doing any real work, so this correctly
+// self-adjusts for GMT/BST without the cron expression needing to
+// change twice a year. This wrapper is the actual, correct
+// mechanism for CommonJS-style functions (exports.handler) — a
+// previous exports.config block here used a syntax that only
+// applies to Netlify's newer ES-module Functions API, which this
+// file doesn't use, and was never actually being recognized as a
+// schedule at all.
 // ============================================================
-exports.config = {
-    schedule: "0 8 * * *"
-};
+exports.handler = schedule('0 * * * *', mainHandler);
