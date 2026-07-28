@@ -412,7 +412,14 @@ async function handleAddJustBecauseForPerson(e) {
 // ============================================================
 
 function renderDateReminder(reminder, personId) {
-    const date = new Date(reminder.date);
+    // Parse as local-time components (not new Date(string), which the
+    // JS spec parses as UTC midnight for a date-only ISO string) — this
+    // keeps both dates in the same reference frame as `today`, which is
+    // always local. Mixing UTC-midnight and local-midnight previously
+    // added up to a full extra day whenever local time was ahead of UTC
+    // (e.g. BST), making a genuine 7-day gap display as "8 days".
+    const [year, month, day] = reminder.date.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const daysUntil = Math.ceil((date - today) / (1000 * 60 * 60 * 24));
