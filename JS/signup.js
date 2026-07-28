@@ -11,6 +11,8 @@ let formData = {
     email: '',
     password: '',
     phone: '',
+    termsConsent: false,
+    marketingConsent: false,
     reminder: null
 };
 
@@ -45,6 +47,8 @@ function handleAccountSubmit(e) {
     formData.email = document.getElementById('email').value;
     formData.password = document.getElementById('password').value;
     formData.phone = document.getElementById('phone').value;
+    formData.termsConsent = document.getElementById('termsConsent').checked;
+    formData.marketingConsent = document.getElementById('marketingConsent').checked;
     
     goToStep2();
 }
@@ -101,6 +105,9 @@ async function createAccount() {
             email: formData.email,
             phone: formData.phone || '',
             tier: 'discover',
+            termsAcceptedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            marketingConsent: formData.marketingConsent,
+            marketingConsentAt: firebase.firestore.FieldValue.serverTimestamp(),
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         
