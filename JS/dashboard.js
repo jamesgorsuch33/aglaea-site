@@ -22,6 +22,8 @@ import {
     auth
 } from './firebase-config-v2.js';
 
+import { signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
 let currentUser = null;
 let currentUserTier = 'free';
 let currentDateBasedCount = 0;  // Track count for limit checks
@@ -552,6 +554,20 @@ function renderJustBecauseReminder(reminder, personId) {
 // ============================================================
 
 function setupEventListeners() {
+    const signOutBtn = document.getElementById('signOutBtn');
+    if (signOutBtn) {
+        signOutBtn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            try {
+                await signOut(auth);
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Sign out error:', error);
+                alert('Something went wrong signing out. Please try again.');
+            }
+        });
+    }
+    
     const addBtn = document.getElementById('addReminderBtn');
     if (addBtn) {
         addBtn.addEventListener('click', function() {
