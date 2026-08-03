@@ -258,14 +258,14 @@ const templates = {
     // 01 - WELCOME EMAIL
     // ============================================================
     welcome: (data) => ({
-        subject: `Welcome to AGLAEA, ${data.firstName || 'there'}`,
+        subject: `A personal note from AGLAEA's founder`,
         html: buildEmail({
             preheader: 'The art of thoughtful gifting starts here.',
             content: `
                 <tr>
                     <td class="hero" style="text-align: center; padding: 0 32px 48px 32px;">
                         <h1 style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 36px; font-weight: 400; color: #2a2a2a; line-height: 1.2; margin: 0 0 16px 0;">
-                            Welcome, ${escapeHtml(data.firstName || 'friend')}.
+                            Welcome, ${escapeHtml(data.firstName || 'there')}.
                         </h1>
                         <p style="font-size: 16px; color: #6b6b6b; margin: 0; font-style: italic; font-family: 'Cormorant Garamond', Georgia, serif;">
                             You're in the right place.
@@ -275,10 +275,31 @@ const templates = {
                 <tr>
                     <td class="content" style="padding: 0 32px 0 32px;">
                         <p style="font-size: 16px; line-height: 1.7; color: #2a2a2a; margin: 0 0 20px 0;">
-                            Thank you for joining us. We're so glad you're here.
+                            I'm so pleased you've signed up and started using your reminders.
                         </p>
                         <p style="font-size: 16px; line-height: 1.7; color: #2a2a2a; margin: 0 0 20px 0;">
-                            From this moment on, the people you love will never quietly slip from your calendar. Birthdays, anniversaries, and those small, considered moments in between — we'll hold the space for them, so you can focus on what truly matters: the thought, the gesture, the meaning behind every gift.
+                            I built this myself, because I was becoming less and less proactive at remembering birthdays and anniversaries. As I've gotten older, life has gotten busier — work adds more responsibilities, you start a family, and suddenly those important dates can slip by so easily, even though the people behind them matter more than ever.
+                        </p>
+                        <p style="font-size: 16px; line-height: 1.7; color: #2a2a2a; margin: 0 0 20px 0;">
+                            I didn't want that to keep happening. I wanted to be the one who remembers, who's organised when it comes to gifting (something my wife has always been rather better at than me!).
+                        </p>
+                        <p style="font-size: 16px; line-height: 1.7; color: #2a2a2a; margin: 0 0 20px 0;">
+                            AGLAEA isn't just there for the usual occasions, either. It's also there for the moments that don't need a justification at all — a gift given just because you felt like giving one. Those moments are really beautiful, and they show the people you love just how special they are to you.
+                        </p>
+                        <p style="font-size: 16px; line-height: 1.7; color: #2a2a2a; margin: 0 0 20px 0;">
+                            Thank you so much for signing up, and for trusting us with your reminders.
+                        </p>
+                        <p style="font-size: 16px; line-height: 1.7; color: #2a2a2a; margin: 0 0 32px 0;">
+                            I'd also love to hear any feedback you might have, good or bad. As we grow, we want to make sure we're as user-friendly and convenient as possible, so any thoughts are always welcome — just reply to this email, and I'll get back to you myself.
+                        </p>
+                        <p style="font-size: 16px; line-height: 1.6; color: #2a2a2a; margin: 0 0 4px 0;">
+                            Thanks,
+                        </p>
+                        <p style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px; font-style: italic; color: #2a2a2a; margin: 0 0 2px 0;">
+                            James
+                        </p>
+                        <p style="font-size: 13px; color: #6b6b6b; margin: 0 0 40px 0;">
+                            Founder &amp; CEO
                         </p>
                         <p style="font-size: 13px; color: #c9a870; letter-spacing: 0.15em; text-transform: uppercase; margin: 0 0 12px 0; font-weight: 600;">
                             Here's what's included on Discover
