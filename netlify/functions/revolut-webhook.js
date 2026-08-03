@@ -322,14 +322,114 @@ async function handleSubscriptionCancelled(webhookEvent) {
 
 // ============================================================
 // Handle failed payment
+// Fires on SUBSCRIPTION_OVERDUE (a subscription-level event, so it
+// reliably resolves via the same subscription_id lookup pattern used
+// in handleSubscriptionCancelled), plus ORDER_PAYMENT_DECLINED and
+// ORDER_PAYMENT_FAILED (order-level events, which — like
+// ORDER_COMPLETED — may not always carry enough to resolve a user;
+// treated as a safe no-op if so, since SUBSCRIPTION_OVERDUE for the
+// same failure reliably will).
+//
+// Deliberately does NOT touch tier — Revolut's own subscription
+// lifecycle has a distinct "overdue" state before "cancelled", so a
+// failed payment already gets some grace period on Revolut's side
+// before anything is actually cancelled. This only records the
+// status and lets the member know, rather than racing ahead of
+// whatever grace period Revolut itself enforces.
 // ============================================================
 async function handlePaymentFailed(webhookEvent) {
-    const order = webhookEvent.data || webhookEvent;
-    const customerId = order.customer_id;
+    const subscriptionId = webhookEvent.subscription_id || webhookEvent.data?.id;
 
-    console.log('Payment failed for customer:', customerId);
+    console.log('Handling payment failure - subscription_id:', subscriptionId);
 
-    // Optional: Send email to user about failed payment
-    // Optional: Log to admin dashboard
-    // Revolut handles retry logic automatically
+    let subscription = webhookEvent.data;
+
+    if (subscriptionId && !subscription) {
+        try {
+            const apiUrl = process.env.REVOLUT_ENV === 'production'
+                ? 'https://merchant.revolut.com/api'
+                : 'https://sandbox-merchant.revolut.com/api';
+
+            const response = await fetch(`${apiUrl}/subscriptions/${subscriptionId}`, {
+                headers: {
+                    'Authorization': `Bearer ${process.env.REVOLUT_SECRET_KEY}`,
+                    'Revolut-Api-Version': '2026-04-20'
+                }
+            });
+
+            if (response.ok) {
+                subscription = await response.json();
+                console.log('Fetched subscription details for payment failure');
+            } else {
+                console.error('Failed to fetch subscription details:', response.status);
+            }
+        } catch (err) {
+            console.error('Failed to fetch subscription:', err);
+        }
+    }
+
+    if (!subscription) {
+        // Expected for order-level events without enough to resolve a
+        // user (same limitation as ORDER_COMPLETED) — not an error,
+        // SUBSCRIPTION_OVERDUE for the same failure will resolve fully.
+        console.log(`No subscription details resolvable for payment-failure event (subscription_id: ${subscriptionId}) — expected for order-level events; SUBSCRIPTION_OVERDUE will cover this case fully.`);
+        return;
+    }
+
+    const userId = subscription.external_reference || subscription.metadata?.userId;
+    const customerId = subscription.customer_id;
+
+    let userDoc;
+    if (userId) {
+        userDoc = await db.collection('users').doc(userId).get();
+    } else if (customerId) {
+        const snapshot = await db.collection('users')
+            .where('revolutCustomerId', '==', customerId)
+            .get();
+
+        if (!snapshot.empty) {
+            userDoc = snapshot.docs[0];
+        }
+    }
+
+    if (!userDoc || !userDoc.exists) {
+        console.error('User not found for payment failure. userId:', userId, 'customerId:', customerId);
+        return;
+    }
+
+    const userData = userDoc.data();
+
+    // Guard against sending this more than once for the same overdue
+    // period, in case Revolut fires this event repeatedly during its
+    // own retry attempts — only notify on the actual transition into
+    // "overdue", not on every subsequent retry of the same failure.
+    if (userData.subscriptionStatus === 'overdue') {
+        console.log('Already marked overdue — skipping duplicate payment-failed email for user:', userDoc.id);
+        return;
+    }
+
+    await userDoc.ref.set({
+        subscriptionStatus: 'overdue',
+        paymentFailedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    console.log('User marked overdue:', userDoc.id);
+
+    try {
+        await fetch(`${SITE_URL}/.netlify/functions/send-email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                emailType: 'paymentFailed',
+                to: userData.email,
+                data: {
+                    firstName: userData.firstName || 'there'
+                }
+            })
+        });
+        console.log('Payment-failed email sent');
+    } catch (emailError) {
+        console.error('Failed to send payment-failed email:', emailError);
+        // Don't fail the webhook — the overdue status is already recorded
+    }
 }
