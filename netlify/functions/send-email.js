@@ -483,9 +483,59 @@ const templates = {
     }),
     
     // ============================================================
-    // UPGRADE NUDGE EMAIL (3 days after signup, free users only)
-    // Story-based approach introducing Just Because moments
+    // PAYMENT FAILED EMAIL
+    // Sent when a Curate subscription payment fails (Revolut's
+    // SUBSCRIPTION_OVERDUE event) — a heads-up while access is still
+    // active, giving the member a chance to sort it out before
+    // Revolut's own grace period runs out and the subscription is
+    // actually cancelled.
     // ============================================================
+    paymentFailed: (data) => ({
+        subject: `There was an issue with your AGLAEA payment`,
+        html: buildEmail({
+            preheader: 'A quick heads-up about your Curate subscription.',
+            content: `
+                <tr>
+                    <td class="hero" style="text-align: center; padding: 0 32px 48px 32px;">
+                        <p style="font-size: 12px; color: #c9a870; letter-spacing: 0.3em; text-transform: uppercase; margin: 0 0 16px 0; font-weight: 600;">
+                            Payment issue
+                        </p>
+                        <h1 style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 32px; font-weight: 400; color: #2a2a2a; line-height: 1.2; margin: 0;">
+                            A quick heads-up, ${escapeHtml(data.firstName || 'there')}.
+                        </h1>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 0 32px 0 32px;">
+                        <p style="font-size: 16px; line-height: 1.7; color: #2a2a2a; margin: 0 0 20px 0;">
+                            We weren't able to take payment for your AGLAEA Curate subscription this billing cycle. This can happen for all sorts of reasons — an expired card, insufficient funds, or your bank simply flagging the payment for a security check.
+                        </p>
+                        <p style="font-size: 16px; line-height: 1.7; color: #2a2a2a; margin: 0 0 20px 0;">
+                            Your Curate access is still active for now, so there's nothing to worry about immediately — but we'd recommend checking your card details or contacting your bank soon, so your reminders and Just Because moments keep running without any interruption.
+                        </p>
+                        <div style="background-color: #f9f5ed; padding: 28px 32px; margin: 0 0 32px 0; border-radius: 4px; border-left: 3px solid #c9a870;">
+                            <p style="font-size: 15px; line-height: 1.6; color: #2a2a2a; margin: 0;">
+                                If this keeps happening, please just reply to this email — we're genuinely happy to help sort it out.
+                            </p>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; padding: 48px 32px; background-color: #2a2a2a;">
+                        <h2 style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 28px; font-weight: 400; color: #ffffff; margin: 0 0 12px 0;">
+                            Check your account
+                        </h2>
+                        <p style="color: rgba(255, 255, 255, 0.85); font-size: 15px; margin: 0 0 24px 0;">
+                            Review your subscription details in Settings.
+                        </p>
+                        <a href="${SITE_URL}/settings.html" style="display: inline-block; background-color: #c9a870; color: #ffffff; text-decoration: none; padding: 14px 40px; font-size: 15px; font-weight: 500; letter-spacing: 0.05em; border-radius: 2px;">
+                            Go to Settings
+                        </a>
+                    </td>
+                </tr>
+            `
+        })
+    }),
     upgradeNudge: (data) => ({
         subject: `${data.firstName || 'A thought'}, on the smaller moments`,
         html: buildEmail({
