@@ -71,6 +71,7 @@ async function loadUserData() {
 
 function displaySubscriptionDetails() {
     const tier = currentUserData.tier || 'discover';
+    const isGifted = currentUserData.giftedAccess === true;
     
     // Hide all sections first
     document.getElementById('freeUserSection').classList.add('hidden');
@@ -85,22 +86,38 @@ function displaySubscriptionDetails() {
         
     } else if (tier === 'curate' || tier === 'essential') {
         document.getElementById('currentPlan').textContent = 'Curate';
-        document.getElementById('billingRow').classList.remove('hidden');
-        document.getElementById('nextBillingRow').classList.remove('hidden');
-        document.getElementById('billingAmount').textContent = '£4.99/month';
         
-        if (currentUserData.nextBillingDate) {
-            const nextDate = new Date(currentUserData.nextBillingDate);
-            document.getElementById('nextBillingDate').textContent = 
-                nextDate.toLocaleDateString('en-GB', { 
-                    day: 'numeric', 
-                    month: 'long', 
-                    year: 'numeric' 
-                });
+        if (isGifted) {
+            // Complimentary access — no real billing to show, and no
+            // benefit to them cancelling since it's not costing anything.
+            // This only changes what's displayed; cancel-subscription.js
+            // itself is untouched, since a gifted account would fail its
+            // subscriptionId check harmlessly anyway if this button were
+            // ever clicked — hiding it just avoids that dead end.
+            document.getElementById('billingRow').classList.remove('hidden');
+            document.querySelector('#billingRow .subscription-label').textContent = 'Access';
+            document.getElementById('billingAmount').textContent = 'Gifted — Complimentary Access';
+            document.getElementById('nextBillingRow').classList.add('hidden');
+            document.getElementById('essentialUserSection').classList.add('hidden');
         } else {
-            document.getElementById('nextBillingDate').textContent = 'Active';
+            document.getElementById('billingRow').classList.remove('hidden');
+            document.querySelector('#billingRow .subscription-label').textContent = 'Billing';
+            document.getElementById('billingAmount').textContent = '£4.99/month';
+            document.getElementById('nextBillingRow').classList.remove('hidden');
+            
+            if (currentUserData.nextBillingDate) {
+                const nextDate = new Date(currentUserData.nextBillingDate);
+                document.getElementById('nextBillingDate').textContent = 
+                    nextDate.toLocaleDateString('en-GB', { 
+                        day: 'numeric', 
+                        month: 'long', 
+                        year: 'numeric' 
+                    });
+            } else {
+                document.getElementById('nextBillingDate').textContent = 'Active';
+            }
+            document.getElementById('essentialUserSection').classList.remove('hidden');
         }
-        document.getElementById('essentialUserSection').classList.remove('hidden');
         
     } else {
         // Unrecognised tier value — fail visibly rather than leaving
