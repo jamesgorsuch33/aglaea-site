@@ -2708,4 +2708,254 @@
     "forHer": false,
     "forHim": true
   }
+  {
+    "id": "flowers-and-plants-red-red-rose",
+    "brandSlug": "flowers-and-plants",
+    "brandName": "Flowers & Plants Co",
+    "productName": "Red Red Rose, 25 Roses",
+    "productCategory": "flowers",
+    "category": "flowers",
+    "description": "Our luxurious ‘Rhodos’ roses hand-tied and wrapped for that perfect floral surprise. Rich, vibrant and long lasting, these roses are great for every occasion.",
+    "priceText": "£74.99",
+    "priceValue": 74.99,
+    "currency": "GBP",
+    "imageUrl": "https://flowersandplantsco.com/cdn/shop/products/red-red-rose-8674322.jpg?v=1775817141&width=1100",
+    "imageAlt": "Flowers & Plants Co - Red Red Rose, 25 Roses",
+    "affiliateUrl": "https://www.awin1.com/cread.php?awinmid=20856&awinaffid=2799680&ued=https%3A%2F%2Fflowersandplantsco.com%2Fproducts%2Fred-red-rose",
+    "occasions": [
+      "birthday",
+      "anniversary",
+      "mothers-day",
+      "wedding",
+      "just-because",
+      "for-her"
+    ],
+    "forHer": true,
+    "forHim": false
+  }
+  {
+    "id": "flowers-and-plants-wild-and-wonderful",
+    "brandSlug": "flowers-and-plants",
+    "brandName": "Flowers & Plants Co",
+    "productName": "Wild & Wonderful bouquet with Moet & Chandon Champagne",
+    "productCategory": "flowers",
+    "category": "flowers",
+    "description": "A wild and wonderful arrangement featuring our favourite roses, lisianthus, alstroemeria, hypericum & fresh foliage. Paired with a bottle of premium champagne it really is the ideal gift.",
+    "priceText": "£109.99",
+    "priceValue": 109.99,
+    "currency": "GBP",
+    "imageUrl": "https://flowersandplantsco.com/cdn/shop/files/wild-wonderful-2178452.jpg?v=1775817136&width=1100",
+    "imageAlt": "Flowers & Plants Co - Wild & Wonderful bouquet with Moet & Chandon Champagne",
+    "affiliateUrl": "https://www.awin1.com/cread.php?awinmid=20856&awinaffid=2799680&ued=https%3A%2F%2Fflowersandplantsco.com%2Fproducts%2Fwild-wonderful%3Fvariant%3D44162340389174",
+    "occasions": [
+      "birthday",
+      "anniversary",
+      "mothers-day",
+      "wedding",
+      "just-because",
+      "for-her"
+    ],
+    "forHer": true,
+    "forHim": false
+  }
+  {
+    "id": "flowers-and-plants-strawberries-and-cream",
+    "brandSlug": "flowers-and-plants",
+    "brandName": "Flowers & Plants Co",
+    "productName": "Stawberries & Cream, 75 roses",
+    "productCategory": "flowers",
+    "category": "flowers",
+    "description": "Indulge in the irresistible elegance of our Strawberries & Cream bouquet. Let yourself be captivated with perfectly balanced pink and cream roses as they slowly reveal their true colors, making for a truly mesmerizing experience.",
+    "priceText": "£104.99",
+    "priceValue": 104.99,
+    "currency": "GBP",
+    "imageUrl": "https://flowersandplantsco.com/cdn/shop/files/strawberries-cream-7195068.jpg?v=1775817020&width=1100",
+    "imageAlt": "Flowers & Plants Co - Stawberries & Cream, 75 roses",
+    "affiliateUrl": "https://www.awin1.com/cread.php?awinmid=20856&awinaffid=2799680&ued=https%3A%2F%2Fflowersandplantsco.com%2Fproducts%2Fstrawberries-cream%3Fvariant%3D48512086638902",
+    "occasions": [
+      "birthday",
+      "anniversary",
+      "mothers-day",
+      "wedding",
+      "just-because",
+      "for-her"
+    ],
+    "forHer": true,
+    "forHim": false
+  }
+  {
+    "id": "flowers-and-plants-stocks-and-rose",
+    "brandSlug": "flowers-and-plants",
+    "brandName": "Flowers & Plants Co",
+    "productName": "Stocks & Rose",
+    "productCategory": "flowers",
+    "category": "flowers",
+    "description": "Scented stocks, roses and stems of purple veronica make this bouquet an instant sensory experience. Finished with fresh foliage it’s perfect for every occasion.",
+    "priceText": "£34.99",
+    "priceValue": 34.99,
+    "currency": "GBP",
+    "imageUrl": "https://flowersandplantsco.com/cdn/shop/products/stocks-rose-4585783.jpg?v=1775817135&width=1100",
+    "imageAlt": "Flowers & Plants Co - Stocks & Rose",
+    "affiliateUrl": "https://www.awin1.com/cread.php?awinmid=20856&awinaffid=2799680&ued=https%3A%2F%2Fflowersandplantsco.com%2Fproducts%2Fa-hint-of-blue",
+    "occasions": [
+      "birthday",
+      "anniversary",
+      "mothers-day",
+      "wedding",
+      "just-because",
+      "for-her"
+    ],
+    "forHer": true,
+    "forHim": false
+  }
+  {
+    "id": "flowers-and-plants-hydrangeas-and-berries",
+    "brandSlug": "flowers-and-plants",
+    "brandName": "Flowers & Plants Co",
+    "productName": "Hydrangeas & Berries large bouquet with Veuve Clicquot Champagne",
+    "productCategory": "flowers",
+    "category": "flowers",
+    "description": "Enjoy a bunch of our premium purple hydrangeas & a bottle of vintage champagne. This classic bouquet includes clematis, fresh red roses & hypericum berries, making it the perfect gift for friends and family alike.",
+    "priceText": "£109.99",
+    "priceValue": 109.99,
+    "currency": "GBP",
+    "imageUrl": "https://flowersandplantsco.com/cdn/shop/files/hydrangeas-berries-2128062.jpg?v=1775817078&width=1100",
+    "imageAlt": "Flowers & Plants Co - Hydrangeas & Berries",
+    "affiliateUrl": "https://www.awin1.com/cread.php?awinmid=20856&awinaffid=2799680&ued=https%3A%2F%2Fflowersandplantsco.com%2Fproducts%2Fhydrangeas-berries%3Fvariant%3D46077301424438",
+    "occasions": [
+      "birthday",
+      "anniversary",
+      "mothers-day",
+      "wedding",
+      "just-because",
+      "for-her"
+    ],
+    "forHer": true,
+    "forHim": false
+  }
+  {
+    "id": "flowers-and-plants-yellow-roses",
+    "brandSlug": "flowers-and-plants",
+    "brandName": "Flowers & Plants Co",
+    "productName": "Deluxe Yellow Roses",
+    "productCategory": "flowers",
+    "category": "flowers",
+    "description": "Yellow roses dominate this luscious, hand-made bouquet. They’re some of our most popular and enduring blooms and we use them whenever we can. If they’re your favourites as well, why not treat yourself today?",
+    "priceText": "£97.99",
+    "priceValue": 97.99,
+    "currency": "GBP",
+    "imageUrl": "https://flowersandplantsco.com/cdn/shop/products/yellow-roses-9052514.jpg?v=1775817150&width=1100",
+    "imageAlt": "Flowers & Plants Co - Yellow Roses",
+    "affiliateUrl": "https://www.awin1.com/cread.php?awinmid=20856&awinaffid=2799680&ued=https%3A%2F%2Fflowersandplantsco.com%2Fproducts%2Fyellow-roses%3Fvariant%3D44161502675254",
+    "occasions": [
+      "birthday",
+      "anniversary",
+      "mothers-day",
+      "wedding",
+      "just-because",
+      "for-her"
+    ],
+    "forHer": true,
+    "forHim": false
+  }
+  {
+    "id": "flowers-and-plants-the-pink-lady",
+    "brandSlug": "flowers-and-plants",
+    "brandName": "Flowers & Plants Co",
+    "productName": "The Pink Lady, Large bouquet",
+    "productCategory": "flowers",
+    "category": "flowers",
+    "description": "Dusky pink carnations and spray roses; sprigs of eucalyptus; premium red roses & fresh astrantia. Our fabulous ‘Pink Lady’ is a pastel toned triumph with a hint of woody fragrance and laid-back airs.",
+    "priceText": "£58.99",
+    "priceValue": 58.99,
+    "currency": "GBP",
+    "imageUrl": "https://flowersandplantsco.com/cdn/shop/files/the-pink-lady-9662654.jpg?v=1775817256&width=1100",
+    "imageAlt": "Flowers & Plants Co - The Pink Lady",
+    "affiliateUrl": "https://www.awin1.com/cread.php?awinmid=20856&awinaffid=2799680&ued=https%3A%2F%2Fflowersandplantsco.com%2Fproducts%2Fthe-pink-lady%3Fvariant%3D44115107053878",
+    "occasions": [
+      "birthday",
+      "anniversary",
+      "mothers-day",
+      "wedding",
+      "just-because",
+      "for-her"
+    ],
+    "forHer": true,
+    "forHim": false
+  }
+  {
+    "id": "flowers-and-plants-pink-rose-passion",
+    "brandSlug": "flowers-and-plants",
+    "brandName": "Flowers & Plants Co",
+    "productName": "Pink Rose Passion, 100 roses",
+    "productCategory": "flowers",
+    "category": "flowers",
+    "description": "Redefine the meaning of love with the ‘Pink Rose Passion’. We’ve kept it simple with this bouquet and let’s be honest, the effect is irresistible. Our premium pink roses leave little to be desire, and a lot to cherish.",
+    "priceText": "£295.99",
+    "priceValue": 295.99,
+    "currency": "GBP",
+    "imageUrl": "https://flowersandplantsco.com/cdn/shop/products/pink-rose-passion-7529279.jpg?v=1775817202&width=1100",
+    "imageAlt": "Flowers & Plants Co - Pink Rose Passion, 100 roses",
+    "affiliateUrl": "https://www.awin1.com/cread.php?awinmid=20856&awinaffid=2799680&ued=https%3A%2F%2Fflowersandplantsco.com%2Fproducts%2Fpink-rose-passion%3Fvariant%3D44160947847478",
+    "occasions": [
+      "birthday",
+      "anniversary",
+      "mothers-day",
+      "wedding",
+      "just-because",
+      "for-her"
+    ],
+    "forHer": true,
+    "forHim": false
+  }
+  {
+    "id": "flowers-and-plants-the-highlands",
+    "brandSlug": "flowers-and-plants",
+    "brandName": "Flowers & Plants Co",
+    "productName": "The Highlands",
+    "productCategory": "flowers",
+    "category": "flowers",
+    "description": "A richly textured seasonal bouquet with real depth and drama. Full roses and ruffled spray roses sit alongside velvety eustoma, bold thistles, jewel-toned hypericum berries and trailing clematis, all woven through with lush seasonal foliage and softened with the blush of carnations.",
+    "priceText": "£54.99",
+    "priceValue": 54.99,
+    "currency": "GBP",
+    "imageUrl": "https://flowersandplantsco.com/cdn/shop/files/the-highlands-2125066.jpg?v=1775816968&width=1100",
+    "imageAlt": "Flowers & Plants Co - The Highlands",
+    "affiliateUrl": "https://www.awin1.com/cread.php?awinmid=20856&awinaffid=2799680&ued=https%3A%2F%2Fflowersandplantsco.com%2Fproducts%2Fthe-highlands",
+    "occasions": [
+      "birthday",
+      "anniversary",
+      "mothers-day",
+      "wedding",
+      "just-because",
+      "for-her"
+    ],
+    "forHer": true,
+    "forHim": false
+  }
+  {
+    "id": "flowers-and-plants-sea-breeze",
+    "brandSlug": "flowers-and-plants",
+    "brandName": "Flowers & Plants Co",
+    "productName": "Sea Breeze large bouquet with Ruinart Champagne",
+    "productCategory": "flowers",
+    "category": "flowers",
+    "description": "Clean, classy and suitable for every occasion, this bouquet features white lisianthus and our premium alstroemeria. Finished with fresh pittosporum & a bottle of bubbly - what’s not to like?",
+    "priceText": "£151.99",
+    "priceValue": 151.99,
+    "currency": "GBP",
+    "imageUrl": "https://flowersandplantsco.com/cdn/shop/files/sea-breeze-9282812.jpg?v=1775817134&width=1100",
+    "imageAlt": "Flowers & Plants Co - Sea Breeze",
+    "affiliateUrl": "https://www.awin1.com/cread.php?awinmid=20856&awinaffid=2799680&ued=https%3A%2F%2Fflowersandplantsco.com%2Fproducts%2Fsea-breeze%3Fvariant%3D44161895563574",
+    "occasions": [
+      "birthday",
+      "anniversary",
+      "mothers-day",
+      "wedding",
+      "just-because",
+      "for-her"
+    ],
+    "forHer": true,
+    "forHim": false
+  }
 ]
