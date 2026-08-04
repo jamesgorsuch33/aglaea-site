@@ -2707,7 +2707,7 @@
     ],
     "forHer": false,
     "forHim": true
-  }
+  },
   {
     "id": "flowers-and-plants-red-red-rose",
     "brandSlug": "flowers-and-plants",
@@ -2732,7 +2732,7 @@
     ],
     "forHer": true,
     "forHim": false
-  }
+  },
   {
     "id": "flowers-and-plants-wild-and-wonderful",
     "brandSlug": "flowers-and-plants",
@@ -2757,7 +2757,7 @@
     ],
     "forHer": true,
     "forHim": false
-  }
+  },
   {
     "id": "flowers-and-plants-strawberries-and-cream",
     "brandSlug": "flowers-and-plants",
@@ -2782,7 +2782,7 @@
     ],
     "forHer": true,
     "forHim": false
-  }
+  },
   {
     "id": "flowers-and-plants-stocks-and-rose",
     "brandSlug": "flowers-and-plants",
@@ -2807,7 +2807,7 @@
     ],
     "forHer": true,
     "forHim": false
-  }
+  },
   {
     "id": "flowers-and-plants-hydrangeas-and-berries",
     "brandSlug": "flowers-and-plants",
@@ -2832,7 +2832,7 @@
     ],
     "forHer": true,
     "forHim": false
-  }
+  },
   {
     "id": "flowers-and-plants-yellow-roses",
     "brandSlug": "flowers-and-plants",
@@ -2857,7 +2857,7 @@
     ],
     "forHer": true,
     "forHim": false
-  }
+  },
   {
     "id": "flowers-and-plants-the-pink-lady",
     "brandSlug": "flowers-and-plants",
@@ -2882,7 +2882,7 @@
     ],
     "forHer": true,
     "forHim": false
-  }
+  },
   {
     "id": "flowers-and-plants-pink-rose-passion",
     "brandSlug": "flowers-and-plants",
@@ -2907,7 +2907,7 @@
     ],
     "forHer": true,
     "forHim": false
-  }
+  },
   {
     "id": "flowers-and-plants-the-highlands",
     "brandSlug": "flowers-and-plants",
@@ -2932,7 +2932,7 @@
     ],
     "forHer": true,
     "forHim": false
-  }
+  },
   {
     "id": "flowers-and-plants-sea-breeze",
     "brandSlug": "flowers-and-plants",
@@ -2957,5 +2957,5 @@
     ],
     "forHer": true,
     "forHim": false
-  }
+  },
 ]
