@@ -203,16 +203,59 @@ async function handleSubscriptionActivated(webhookEvent) {
 
     console.log('Activating Curate subscription for user:', userId);
 
+    // Fetch the current billing cycle's end date, so the settings page
+    // can actually show a real next-billing date instead of just
+    // "Active" — this field was previously never being written at all.
+    // Same lookup pattern already proven working in cancel-subscription.js.
+    let nextBillingDate = null;
+    const thisSubscriptionId = subscriptionId || subscription?.id;
+    try {
+        const apiUrl = process.env.REVOLUT_ENV === 'production'
+            ? 'https://merchant.revolut.com/api'
+            : 'https://sandbox-merchant.revolut.com/api';
+
+        const subResponse = await fetch(`${apiUrl}/subscriptions/${thisSubscriptionId}`, {
+            headers: {
+                'Authorization': `Bearer ${process.env.REVOLUT_SECRET_KEY}`,
+                'Revolut-Api-Version': '2026-04-20'
+            }
+        });
+
+        if (subResponse.ok) {
+            const fullSubscription = await subResponse.json();
+            if (fullSubscription.current_cycle_id) {
+                const cycleResponse = await fetch(
+                    `${apiUrl}/subscriptions/${thisSubscriptionId}/cycles/${fullSubscription.current_cycle_id}`,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${process.env.REVOLUT_SECRET_KEY}`,
+                            'Revolut-Api-Version': '2026-04-20'
+                        }
+                    }
+                );
+                if (cycleResponse.ok) {
+                    const cycle = await cycleResponse.json();
+                    nextBillingDate = cycle.end_date || null;
+                }
+            }
+        }
+    } catch (cycleError) {
+        // Non-fatal — activation still proceeds even if we couldn't
+        // fetch the cycle date; it's only used for display.
+        console.error('Could not fetch billing cycle for nextBillingDate:', cycleError);
+    }
+
     // Update Firestore - upgrade user to Curate
     await db.collection('users').doc(userId).set({
         tier: 'curate',
         revolutCustomerId: customerId,
-        revolutSubscriptionId: subscriptionId || subscription?.id,
+        revolutSubscriptionId: thisSubscriptionId,
         subscriptionStatus: 'active',
+        nextBillingDate: nextBillingDate,
         upgradedAt: admin.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
-    console.log('User tier updated to Curate');
+    console.log('User tier updated to Curate. Next billing date:', nextBillingDate);
 
     // Send upgrade confirmation email
     try {
