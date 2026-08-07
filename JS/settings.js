@@ -260,8 +260,8 @@ async function handlePasswordUpdate(e) {
         return;
     }
     
-    if (newPassword.length < 6) {
-        alert('Password must be at least 6 characters.');
+    if (newPassword.length < 10) {
+        alert('Password must be at least 10 characters.');
         return;
     }
     
