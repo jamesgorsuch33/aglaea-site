@@ -238,7 +238,7 @@ function getErrorMessage(code) {
         case 'auth/invalid-email':
             return 'Please enter a valid email address.';
         case 'auth/weak-password':
-            return 'Password must be at least 6 characters.';
+            return 'Password must be at least 10 characters.';
         default:
             return 'An error occurred. Please try again.';
     }
