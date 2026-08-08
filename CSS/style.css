@@ -1173,11 +1173,6 @@ h6 { font-size: 1rem; }
         font-size: 1.063rem;
     }
     
-    .nav a[href="settings.html"]::after {
-        content: ' Settings';
-        font-size: 1rem;
-    }
-    
     /* Close button inside menu */
     .mobile-menu-close {
         position: absolute;
