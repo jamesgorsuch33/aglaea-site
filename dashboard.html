@@ -430,6 +430,23 @@
         </div>
     </div>
 
+    <!-- Interactive Dashboard Tour -->
+    <div id="tourDimmer" class="tour-dimmer hidden"></div>
+    <div id="tourSpotlight" class="tour-spotlight hidden"></div>
+    <div id="tourCaption" class="tour-caption hidden">
+        <p class="tour-step-counter" id="tourStepCounter"></p>
+        <h3 id="tourCaptionTitle"></h3>
+        <p id="tourCaptionText"></p>
+        <a href="#" class="tour-written-guide-link hidden" id="tourWrittenGuideLink">Prefer a full written guide instead?</a>
+        <div class="tour-caption-actions">
+            <button type="button" class="btn-text-link" id="tourSkipBtn">Skip tour</button>
+            <div class="tour-nav-buttons">
+                <button type="button" class="btn btn-secondary" id="tourBackBtn">Back</button>
+                <button type="button" class="btn btn-primary" id="tourNextBtn">Next</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
