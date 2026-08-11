@@ -24,6 +24,82 @@ import {
 
 import { signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
+// ============================================================
+// UK FIXED-OCCASION DATE CALCULATION
+// Auto-suggests the correct UK date when Mother's Day, Father's
+// Day, or Christmas is selected — still fully editable afterward
+// for anyone using a different country's date. Mother's Day is
+// NOT a fixed date (it moves with Easter every year), so this
+// calculates Easter Sunday properly via the standard Anonymous
+// Gregorian algorithm rather than hardcoding a lookup table.
+// Verified against confirmed real-world UK dates for 2025-2028.
+// ============================================================
+
+function getEasterSunday(year) {
+    const a = year % 19;
+    const b = Math.floor(year / 100);
+    const c = year % 100;
+    const d = Math.floor(b / 4);
+    const e = b % 4;
+    const f = Math.floor((b + 8) / 25);
+    const g = Math.floor((b - f + 1) / 3);
+    const h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4);
+    const k = c % 4;
+    const l = (32 + 2 * e + 2 * i - h - k) % 7;
+    const m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const month = Math.floor((h + l - 7 * m + 114) / 31);
+    const day = ((h + l - 7 * m + 114) % 31) + 1;
+    return new Date(year, month - 1, day);
+}
+
+function getMothersDayUK(year) {
+    const easter = getEasterSunday(year);
+    const mothersDay = new Date(easter);
+    mothersDay.setDate(easter.getDate() - 21); // 4th Sunday of Lent = 3 weeks before Easter Sunday
+    return mothersDay;
+}
+
+function getFathersDayUK(year) {
+    // Third Sunday of June — not linked to Easter
+    const firstOfJune = new Date(year, 5, 1);
+    const daysUntilFirstSunday = (7 - firstOfJune.getDay()) % 7;
+    const thirdSunday = 1 + daysUntilFirstSunday + 14;
+    return new Date(year, 5, thirdSunday);
+}
+
+function getChristmasDate(year) {
+    return new Date(year, 11, 25);
+}
+
+// Returns a 'YYYY-MM-DD' string (matching <input type="date">) for
+// the given fixed occasion, using the current year unless that
+// date has already passed this year, in which case next year's
+// date is used instead — so the suggestion is always upcoming.
+function getSuggestedDateForOccasion(occasionCode) {
+    const calculators = {
+        'mothers-day': getMothersDayUK,
+        'fathers-day': getFathersDayUK,
+        'christmas': getChristmasDate
+    };
+    const calculate = calculators[occasionCode];
+    if (!calculate) return null;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const currentYear = today.getFullYear();
+
+    let suggested = calculate(currentYear);
+    if (suggested < today) {
+        suggested = calculate(currentYear + 1);
+    }
+
+    const yyyy = suggested.getFullYear();
+    const mm = String(suggested.getMonth() + 1).padStart(2, '0');
+    const dd = String(suggested.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+}
+
 let currentUser = null;
 let currentUserTier = 'free';
 let currentDateBasedCount = 0;  // Track count for limit checks
@@ -390,6 +466,9 @@ function handleAddReminderForPerson(e) {
         document.getElementById('newDate').value = '';
         document.getElementById('newNotes').value = '';
         
+        const newNoteEl = document.getElementById('newDateAutoFillNote');
+        if (newNoteEl) newNoteEl.classList.add('hidden');
+        
         modal.classList.remove('hidden');
     }
 }
@@ -662,6 +741,17 @@ function setupEventListeners() {
             } else {
                 customGroup.classList.add('hidden');
             }
+            
+            const suggestedDate = getSuggestedDateForOccasion(e.target.value);
+            const noteEl = document.getElementById('newDateAutoFillNote');
+            if (suggestedDate) {
+                document.getElementById('newDate').value = suggestedDate;
+                const occasionLabel = e.target.options[e.target.selectedIndex].text;
+                noteEl.textContent = `📅 We've filled in the UK date for ${occasionLabel} — feel free to change it if you're celebrating elsewhere.`;
+                noteEl.classList.remove('hidden');
+            } else {
+                noteEl.classList.add('hidden');
+            }
         });
     }
     
@@ -673,6 +763,17 @@ function setupEventListeners() {
                 customGroup.classList.remove('hidden');
             } else {
                 customGroup.classList.add('hidden');
+            }
+            
+            const suggestedDate = getSuggestedDateForOccasion(e.target.value);
+            const noteEl = document.getElementById('editDateAutoFillNote');
+            if (suggestedDate) {
+                document.getElementById('editDate').value = suggestedDate;
+                const occasionLabel = e.target.options[e.target.selectedIndex].text;
+                noteEl.textContent = `📅 We've filled in the UK date for ${occasionLabel} — feel free to change it if you're celebrating elsewhere.`;
+                noteEl.classList.remove('hidden');
+            } else {
+                noteEl.classList.add('hidden');
             }
         });
     }
@@ -861,6 +962,9 @@ async function handleEditReminder(e) {
         document.getElementById('editOccasion').value = reminder.occasion || 'birthday';
         document.getElementById('editDate').value = reminder.date || '';
         document.getElementById('editNotes').value = reminder.notes || '';
+        
+        const editNoteEl = document.getElementById('editDateAutoFillNote');
+        if (editNoteEl) editNoteEl.classList.add('hidden');
         
         if (reminder.occasion === 'custom') {
             document.getElementById('editCustomOccasion').classList.remove('hidden');
