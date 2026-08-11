@@ -72,6 +72,10 @@ function getChristmasDate(year) {
     return new Date(year, 11, 25);
 }
 
+function getValentinesDate(year) {
+    return new Date(year, 1, 14);
+}
+
 // Returns a 'YYYY-MM-DD' string (matching <input type="date">) for
 // the given fixed occasion, using the current year unless that
 // date has already passed this year, in which case next year's
@@ -80,7 +84,8 @@ function getSuggestedDateForOccasion(occasionCode) {
     const calculators = {
         'mothers-day': getMothersDayUK,
         'fathers-day': getFathersDayUK,
-        'christmas': getChristmasDate
+        'christmas': getChristmasDate,
+        'valentines': getValentinesDate
     };
     const calculate = calculators[occasionCode];
     if (!calculate) return null;
