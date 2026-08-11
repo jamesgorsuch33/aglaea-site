@@ -127,9 +127,166 @@ function checkAndShowTutorial() {
         // the auto-show rather than risk showing it every load.
         return;
     }
-    const modal = document.getElementById('tutorialModal');
-    if (modal) modal.classList.remove('hidden');
+    startInteractiveTour();
 }
+
+// ============================================================
+// INTERACTIVE DASHBOARD TOUR
+// A spotlight-style walkthrough over real, already-rendered
+// elements — this only works because every user has at least one
+// genuine reminder card from the moment they sign up (onboarding
+// requires adding one), so there's always something real to point
+// at. Steps whose target element doesn't exist or isn't currently
+// visible (e.g. the Upgrade card for an existing Curate member)
+// are skipped automatically rather than breaking the tour.
+// ============================================================
+
+const TOUR_STEPS = [
+    {
+        selector: '#addReminderBtn',
+        title: 'Add Reminders',
+        text: "This is where you'll add reminders for the people you care about. You've already got one to get started — let's take a look at it."
+    },
+    {
+        selector: '.person-card',
+        title: 'Your first reminder',
+        text: "Here's the reminder you just added — a countdown to the occasion, with a few icons on the right for managing it."
+    },
+    {
+        selector: '.mark-purchased',
+        title: 'Mark as Purchased',
+        text: "Once you've bought the gift, click here. We'll ask what you got — saved for next time, so you'll always remember."
+    },
+    {
+        selector: '.edit-reminder',
+        title: 'Edit anytime',
+        text: 'Need to change the date or details? Edit the reminder here.'
+    },
+    {
+        selector: '.delete-reminder',
+        title: 'Delete',
+        text: 'And remove a reminder entirely here, if you no longer need it.'
+    },
+    {
+        selector: '.past-gifts-toggle',
+        title: 'Past Gifts',
+        text: "Every gift you mark as purchased is saved here — a running history for each person, so nothing's ever forgotten."
+    },
+    {
+        selector: '.add-just-because-for-person',
+        title: 'Just Because',
+        text: 'Curate members can also set up gentle, recurring surprise reminders here — no fixed occasion needed.'
+    },
+    {
+        selector: '#upgradeActionCard',
+        title: 'Upgrade to Curate',
+        text: 'Unlimited reminders, SMS alerts, and Just Because — upgrade anytime from here.'
+    },
+    {
+        selector: '#mainNav a[href="settings.html"]',
+        title: 'Settings',
+        text: 'Your profile, subscription, and account details all live here.'
+    }
+];
+
+let currentTourStep = 0;
+
+function isElementUsable(el) {
+    // offsetParent is null when an element (or an ancestor) has
+    // display:none — the standard, reliable way to check real
+    // visibility without a layout-triggering getComputedStyle call.
+    return !!el && el.offsetParent !== null;
+}
+
+function startInteractiveTour() {
+    document.getElementById('tourDimmer').classList.remove('hidden');
+    document.getElementById('tourSpotlight').classList.remove('hidden');
+    document.getElementById('tourCaption').classList.remove('hidden');
+    showTourStep(0);
+}
+
+function showTourStep(index) {
+    while (index < TOUR_STEPS.length && !isElementUsable(document.querySelector(TOUR_STEPS[index].selector))) {
+        index++;
+    }
+
+    if (index >= TOUR_STEPS.length) {
+        endTour();
+        return;
+    }
+
+    currentTourStep = index;
+    const step = TOUR_STEPS[index];
+    const el = document.querySelector(step.selector);
+
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Small delay lets the smooth scroll settle before we measure
+    // the element's final position — measuring immediately would
+    // catch it mid-scroll and misplace the spotlight.
+    setTimeout(() => renderTourStep(el, step), 350);
+}
+
+function renderTourStep(el, step) {
+    const rect = el.getBoundingClientRect();
+    const padding = 8;
+    const spotlight = document.getElementById('tourSpotlight');
+
+    spotlight.style.top = (rect.top - padding) + 'px';
+    spotlight.style.left = (rect.left - padding) + 'px';
+    spotlight.style.width = (rect.width + padding * 2) + 'px';
+    spotlight.style.height = (rect.height + padding * 2) + 'px';
+
+    document.getElementById('tourStepCounter').textContent = `Step ${currentTourStep + 1} of ${TOUR_STEPS.length}`;
+    document.getElementById('tourCaptionTitle').textContent = step.title;
+    document.getElementById('tourCaptionText').textContent = step.text;
+
+    const isLastStep = currentTourStep >= lastReachableStepIndex();
+    document.getElementById('tourNextBtn').textContent = isLastStep ? 'Finish' : 'Next';
+    document.getElementById('tourBackBtn').style.visibility = currentTourStep === 0 ? 'hidden' : 'visible';
+    document.getElementById('tourWrittenGuideLink').classList.toggle('hidden', !isLastStep);
+}
+
+// Finds the index of the last step that actually has a usable
+// element, so "Next" can correctly say "Finish" on the true final
+// visible step even if later steps in the array get skipped.
+function lastReachableStepIndex() {
+    for (let i = TOUR_STEPS.length - 1; i >= 0; i--) {
+        if (isElementUsable(document.querySelector(TOUR_STEPS[i].selector))) return i;
+    }
+    return 0;
+}
+
+function tourNext() {
+    if (currentTourStep >= lastReachableStepIndex()) {
+        endTour();
+    } else {
+        showTourStep(currentTourStep + 1);
+    }
+}
+
+function tourBack() {
+    if (currentTourStep === 0) return;
+    let index = currentTourStep - 1;
+    while (index >= 0 && !isElementUsable(document.querySelector(TOUR_STEPS[index].selector))) {
+        index--;
+    }
+    if (index >= 0) showTourStep(index);
+}
+
+function endTour() {
+    document.getElementById('tourDimmer').classList.add('hidden');
+    document.getElementById('tourSpotlight').classList.add('hidden');
+    document.getElementById('tourCaption').classList.add('hidden');
+}
+
+window.addEventListener('resize', function() {
+    const dimmer = document.getElementById('tourDimmer');
+    if (dimmer && !dimmer.classList.contains('hidden')) {
+        const step = TOUR_STEPS[currentTourStep];
+        const el = document.querySelector(step.selector);
+        if (el) renderTourStep(el, step);
+    }
+});
 
 let currentUser = null;
 let currentUserTier = 'free';
@@ -139,7 +296,7 @@ let currentDateBasedCount = 0;  // Track count for limit checks
 // INITIALIZATION
 // ============================================================
 
-auth.onAuthStateChanged(function(user) {
+auth.onAuthStateChanged(async function(user) {
     if (user) {
         currentUser = user;
         const emailEl = document.getElementById('userEmail');
@@ -148,7 +305,7 @@ auth.onAuthStateChanged(function(user) {
         const displayName = user.displayName || user.email.split('@')[0];
         const firstName = displayName.split(' ')[0];
         document.getElementById('userName').textContent = firstName;
-        loadDashboard();
+        await loadDashboard();
         setupEventListeners();
         checkAndShowTutorial();
     } else {
@@ -683,8 +840,7 @@ function setupEventListeners() {
     if (howItWorksAction) {
         howItWorksAction.addEventListener('click', function(e) {
             e.preventDefault();
-            const modal = document.getElementById('tutorialModal');
-            if (modal) modal.classList.remove('hidden');
+            startInteractiveTour();
         });
     }
     
@@ -693,6 +849,31 @@ function setupEventListeners() {
         tutorialGotItBtn.addEventListener('click', function() {
             const modal = document.getElementById('tutorialModal');
             if (modal) modal.classList.add('hidden');
+        });
+    }
+    
+    const tourNextBtn = document.getElementById('tourNextBtn');
+    if (tourNextBtn) {
+        tourNextBtn.addEventListener('click', tourNext);
+    }
+    
+    const tourBackBtn = document.getElementById('tourBackBtn');
+    if (tourBackBtn) {
+        tourBackBtn.addEventListener('click', tourBack);
+    }
+    
+    const tourSkipBtn = document.getElementById('tourSkipBtn');
+    if (tourSkipBtn) {
+        tourSkipBtn.addEventListener('click', endTour);
+    }
+    
+    const tourWrittenGuideLink = document.getElementById('tourWrittenGuideLink');
+    if (tourWrittenGuideLink) {
+        tourWrittenGuideLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            endTour();
+            const modal = document.getElementById('tutorialModal');
+            if (modal) modal.classList.remove('hidden');
         });
     }
     
