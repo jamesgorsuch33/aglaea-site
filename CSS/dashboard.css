@@ -1010,3 +1010,101 @@ form {
     vertical-align: middle;
 }
 
+/* ============================================================
+   INTERACTIVE DASHBOARD TOUR
+   ============================================================ */
+
+.tour-dimmer {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 4000;
+}
+
+.tour-spotlight {
+    position: fixed;
+    z-index: 4001;
+    border: 2px solid var(--gold);
+    border-radius: var(--radius-md, 8px);
+    box-shadow: 0 0 0 4px rgba(201, 168, 112, 0.3), 0 0 24px rgba(201, 168, 112, 0.5);
+    pointer-events: none;
+    transition: top 0.35s ease, left 0.35s ease, width 0.35s ease, height 0.35s ease;
+}
+
+.tour-caption {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4002;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    padding: 1.5rem;
+    width: 90%;
+    max-width: 420px;
+}
+
+.tour-step-counter {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.tour-caption h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: var(--charcoal);
+}
+
+.tour-caption p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--charcoal);
+}
+
+.tour-written-guide-link {
+    display: inline-block;
+    font-size: 0.8rem;
+    color: var(--slate);
+    text-decoration: underline;
+    margin-top: 0.5rem;
+}
+
+.tour-caption-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1.25rem;
+    gap: 1rem;
+}
+
+.tour-caption-actions .btn-text-link {
+    background: none;
+    border: none;
+    color: var(--slate);
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 0;
+}
+
+.tour-nav-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.tour-nav-buttons .btn {
+    padding: 0.5rem 1.1rem;
+    font-size: 0.85rem;
+}
+
+@media (max-width: 480px) {
+    .tour-caption {
+        bottom: 1rem;
+        padding: 1.25rem;
+    }
+}
+
