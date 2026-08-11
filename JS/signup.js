@@ -49,11 +49,16 @@ function getChristmasDate(year) {
     return new Date(year, 11, 25);
 }
 
+function getValentinesDate(year) {
+    return new Date(year, 1, 14);
+}
+
 function getSuggestedDateForOccasion(occasionCode) {
     const calculators = {
         'mothers-day': getMothersDayUK,
         'fathers-day': getFathersDayUK,
-        'christmas': getChristmasDate
+        'christmas': getChristmasDate,
+        'valentines': getValentinesDate
     };
     const calculate = calculators[occasionCode];
     if (!calculate) return null;
