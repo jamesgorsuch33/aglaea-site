@@ -78,6 +78,14 @@
                 <div class="dashboard-card">
                     <h2>Quick Actions</h2>
                     <div class="quick-actions">
+                        <a href="#" class="action-card" id="howItWorksAction">
+                            <span class="action-icon">💡</span>
+                            <div>
+                                <h3>How It Works</h3>
+                                <p>A quick guide to your dashboard</p>
+                            </div>
+                        </a>
+                        
                         <a href="products.html" class="action-card">
                             <span class="action-icon">🎁</span>
                             <div>
@@ -356,6 +364,67 @@
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" id="renewalDismissBtn">Not Now</button>
                     <button type="button" class="btn btn-primary" id="renewalConfirmBtn">Yes, Set Up Next Year</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works / Welcome Tutorial Modal -->
+    <div id="tutorialModal" class="modal hidden">
+        <div class="modal-content tutorial-modal-content">
+            <div class="modal-header">
+                <h2>Welcome to AGLAEA</h2>
+                <button class="modal-close" data-modal="tutorialModal">&times;</button>
+            </div>
+
+            <div class="modal-body tutorial-body">
+                <p class="tutorial-intro">Here's a quick guide to everything on your dashboard — worth a read the first time, and you can always come back to it from Quick Actions.</p>
+
+                <div class="tutorial-section">
+                    <h3>➕ Adding your first reminder</h3>
+                    <p>Click <strong>"+ Add Reminder"</strong> at the top of Your Reminders. You'll be asked for the person's name, your relationship to them (optional — helps us tailor gift suggestions), the occasion, and the date. Once saved, they'll appear as a new card with their upcoming reminder.</p>
+                    <p>Already added someone? Use the <strong>➕</strong> icon on their existing card to add another occasion for the same person, rather than creating them twice.</p>
+                </div>
+
+                <div class="tutorial-section">
+                    <h3>📋 Reading a reminder card</h3>
+                    <p>Each reminder shows the occasion, the date, and a countdown ("in 12 days"). Three icons sit on the right of active reminders:</p>
+                    <ul>
+                        <li><strong>🎁 Mark as Purchased</strong> — tell us you've sorted the gift (more below)</li>
+                        <li><strong>✏️ Edit</strong> — change the date, occasion, or notes</li>
+                        <li><strong>🗑️ Delete</strong> — remove the reminder entirely</li>
+                    </ul>
+                </div>
+
+                <div class="tutorial-section">
+                    <h3>✓ Marking a gift as purchased</h3>
+                    <p>Once you've bought something, click the <strong>🎁</strong> icon on that reminder. You'll be asked what you got them — this is optional, but worth filling in, since it's saved permanently to that person's Past Gifts (see below), so you'll always know what you gave them and when.</p>
+                    <p>The card then greys out and shows a <strong>"✓ Purchased"</strong> badge, so it's clear at a glance what's still outstanding versus already sorted.</p>
+                </div>
+
+                <div class="tutorial-section">
+                    <h3>🔁 Setting up next year</h3>
+                    <p>Right after marking a gift purchased, we'll ask if you'd like the reminder set up again for next year automatically. Say yes, and the date rolls forward a year with nothing else to do — perfect for birthdays and anniversaries that repeat annually. Say no, and the reminder just stays marked as purchased until you're ready to deal with it.</p>
+                </div>
+
+                <div class="tutorial-section">
+                    <h3>📖 Past Gifts</h3>
+                    <p>Every person's card has a <strong>"Past Gifts"</strong> dropdown lower down. This is a running record of everything you've bought them through AGLAEA — the occasion, the date, and what you got them, if you noted it. Handy for avoiding repeats, or just remembering what worked well last time.</p>
+                </div>
+
+                <div class="tutorial-section">
+                    <h3>✨ Just Because reminders <span class="tutorial-tier-badge">Curate</span></h3>
+                    <p>Beyond birthdays and anniversaries, Curate members can set up <strong>Just Because</strong> reminders — gentle, recurring nudges to surprise someone for no particular reason at all. Set the frequency (every 6 weeks, every 3 months, or random through the year) via the <strong>✨</strong> icon on a person's card, and we'll prompt you when the moment feels right.</p>
+                </div>
+
+                <div class="tutorial-section">
+                    <h3>⭐ Upgrading &amp; your account</h3>
+                    <p>Discover (free) gives you up to 5 reminders with email alerts 7 and 3 days before each occasion. <strong>Curate</strong> unlocks unlimited reminders, a fuller reminder schedule, SMS alerts, and Just Because — you can upgrade anytime from Quick Actions or your account settings.</p>
+                    <p>Your profile, subscription, and account details all live under <strong>Settings</strong>, accessible from the menu at the top of the page.</p>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-primary" id="tutorialGotItBtn">Got it, thanks!</button>
                 </div>
             </div>
         </div>
