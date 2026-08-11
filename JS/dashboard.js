@@ -105,6 +105,32 @@ function getSuggestedDateForOccasion(occasionCode) {
     return `${yyyy}-${mm}-${dd}`;
 }
 
+// ============================================================
+// WELCOME TUTORIAL
+// Shows automatically once per browser for a new user (tracked via
+// localStorage, not Firestore — this is a one-time UI nicety, not
+// something that needs to sync across devices). Marks itself as
+// seen the moment it's shown, not only on explicit dismissal, so
+// closing via the × still counts and it never re-shows on its own.
+// The "How It Works" Quick Action always reopens it manually
+// regardless of this flag.
+// ============================================================
+
+const TUTORIAL_SEEN_KEY = 'aglaea_dashboard_tutorial_seen';
+
+function checkAndShowTutorial() {
+    try {
+        if (localStorage.getItem(TUTORIAL_SEEN_KEY)) return;
+        localStorage.setItem(TUTORIAL_SEEN_KEY, 'true');
+    } catch (e) {
+        // If localStorage isn't available for some reason, just skip
+        // the auto-show rather than risk showing it every load.
+        return;
+    }
+    const modal = document.getElementById('tutorialModal');
+    if (modal) modal.classList.remove('hidden');
+}
+
 let currentUser = null;
 let currentUserTier = 'free';
 let currentDateBasedCount = 0;  // Track count for limit checks
@@ -124,6 +150,7 @@ auth.onAuthStateChanged(function(user) {
         document.getElementById('userName').textContent = firstName;
         loadDashboard();
         setupEventListeners();
+        checkAndShowTutorial();
     } else {
         window.location.href = 'signin.html';
     }
@@ -649,6 +676,23 @@ function setupEventListeners() {
                 console.error('Sign out error:', error);
                 alert('Something went wrong signing out. Please try again.');
             }
+        });
+    }
+    
+    const howItWorksAction = document.getElementById('howItWorksAction');
+    if (howItWorksAction) {
+        howItWorksAction.addEventListener('click', function(e) {
+            e.preventDefault();
+            const modal = document.getElementById('tutorialModal');
+            if (modal) modal.classList.remove('hidden');
+        });
+    }
+    
+    const tutorialGotItBtn = document.getElementById('tutorialGotItBtn');
+    if (tutorialGotItBtn) {
+        tutorialGotItBtn.addEventListener('click', function() {
+            const modal = document.getElementById('tutorialModal');
+            if (modal) modal.classList.add('hidden');
         });
     }
     
