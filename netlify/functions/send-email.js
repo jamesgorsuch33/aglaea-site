@@ -274,6 +274,14 @@ const templates = {
                 </tr>
                 <tr>
                     <td class="content" style="padding: 0 32px 0 32px;">
+                        <div style="background-color: #f9f5ed; padding: 24px 28px; margin: 0 0 32px 0; border-radius: 4px; border-left: 3px solid #c9a870;">
+                            <p style="font-size: 13px; color: #c9a870; letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 10px 0; font-weight: 600;">
+                                ✦ One quick thing first
+                            </p>
+                            <p style="font-size: 15px; line-height: 1.6; color: #2a2a2a; margin: 0;">
+                                To make sure your reminders always land in your main inbox — not junk or promotions — please add <strong>${FROM_EMAIL}</strong> to your contacts. If this email landed in Gmail's Promotions tab, just drag it into Primary — that one action tells Gmail to keep future emails from us there too.
+                            </p>
+                        </div>
                         <p style="font-size: 16px; line-height: 1.7; color: #2a2a2a; margin: 0 0 20px 0;">
                             I'm so pleased you've signed up and started using your reminders.
                         </p>
