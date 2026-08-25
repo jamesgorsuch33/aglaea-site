@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>AGLAEA — Business Overview</title>
+
+    <link rel="stylesheet" href="css/ops-overview.css">
+</head>
+<body>
+
+    <div id="accessDenied" class="access-denied hidden">
+        <p>Checking access…</p>
+    </div>
+
+    <div id="opsContent" class="ops-content hidden">
+
+        <header class="ops-header">
+            <div>
+                <h1>AGLAEA — Business Overview</h1>
+                <p class="ops-subtitle" id="lastUpdated">Loading latest data…</p>
+            </div>
+            <a href="#" id="signOutLink" class="ops-signout">Sign out</a>
+        </header>
+
+        <div id="opsLoading" class="ops-loading">Loading business data…</div>
+        <div id="opsError" class="ops-error hidden">Couldn't load business data. Check the console for details.</div>
+
+        <main id="opsMain" class="hidden">
+
+            <!-- Users & Revenue -->
+            <section class="ops-section">
+                <h2>Users &amp; Revenue</h2>
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <p class="kpi-label">Total Users</p>
+                        <p class="kpi-value" id="kpiTotalUsers">–</p>
+                    </div>
+                    <div class="kpi-card">
+                        <p class="kpi-label">Discover</p>
+                        <p class="kpi-value" id="kpiDiscoverUsers">–</p>
+                    </div>
+                    <div class="kpi-card kpi-highlight">
+                        <p class="kpi-label">Curate</p>
+                        <p class="kpi-value" id="kpiCurateUsers">–</p>
+                    </div>
+                    <div class="kpi-card">
+                        <p class="kpi-label">— Monthly plan</p>
+                        <p class="kpi-value kpi-value-small" id="kpiCurateMonthly">–</p>
+                    </div>
+                    <div class="kpi-card">
+                        <p class="kpi-label">— Annual plan</p>
+                        <p class="kpi-value kpi-value-small" id="kpiCurateAnnual">–</p>
+                    </div>
+                    <div class="kpi-card kpi-highlight">
+                        <p class="kpi-label">Estimated MRR</p>
+                        <p class="kpi-value" id="kpiMRR">–</p>
+                    </div>
+                </div>
+                <p class="ops-note">Subscription income only — affiliate/partnership income is tracked separately. Annual subscribers are counted at 1/12th of their yearly price toward this figure.</p>
+            </section>
+
+            <!-- Reminders -->
+            <section class="ops-section">
+                <h2>Reminders</h2>
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <p class="kpi-label">Total Reminders</p>
+                        <p class="kpi-value" id="kpiTotalReminders">–</p>
+                    </div>
+                    <div class="kpi-card">
+                        <p class="kpi-label">Date-Based</p>
+                        <p class="kpi-value" id="kpiDateBasedReminders">–</p>
+                    </div>
+                    <div class="kpi-card kpi-highlight">
+                        <p class="kpi-label">Just Because</p>
+                        <p class="kpi-value" id="kpiJustBecauseReminders">–</p>
+                    </div>
+                    <div class="kpi-card">
+                        <p class="kpi-label">Paused</p>
+                        <p class="kpi-value" id="kpiPausedReminders">–</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Today's Send Activity -->
+            <section class="ops-section">
+                <h2>Today's Send Activity</h2>
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <p class="kpi-label">Emails Sent</p>
+                        <p class="kpi-value" id="kpiEmailsSent">–</p>
+                    </div>
+                    <div class="kpi-card">
+                        <p class="kpi-label">Emails Failed</p>
+                        <p class="kpi-value" id="kpiEmailsFailed">–</p>
+                    </div>
+                    <div class="kpi-card">
+                        <p class="kpi-label">SMS Sent</p>
+                        <p class="kpi-value" id="kpiSmsSent">–</p>
+                    </div>
+                    <div class="kpi-card">
+                        <p class="kpi-label">SMS Failed</p>
+                        <p class="kpi-value" id="kpiSmsFailed">–</p>
+                    </div>
+                    <div class="kpi-card kpi-highlight">
+                        <p class="kpi-label">SMS Cost Today</p>
+                        <p class="kpi-value" id="kpiSmsCost">–</p>
+                    </div>
+                    <div class="kpi-card">
+                        <p class="kpi-label">Just Because Sent</p>
+                        <p class="kpi-value" id="kpiJustBecauseSent">–</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Trends -->
+            <section class="ops-section">
+                <h2>Trends</h2>
+                <div class="trend-range-picker">
+                    <label for="trendRange">Show:</label>
+                    <select id="trendRange">
+                        <option value="30">Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                        <option value="9999">All available data</option>
+                    </select>
+                </div>
+
+                <div class="chart-grid">
+                    <div class="chart-card">
+                        <h3>Users Over Time</h3>
+                        <canvas id="chartUsers"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Estimated MRR Over Time</h3>
+                        <canvas id="chartMRR"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Reminders Over Time</h3>
+                        <canvas id="chartReminders"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>SMS Volume &amp; Cumulative Monthly Cost</h3>
+                        <canvas id="chartSms"></canvas>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+
+    <script src="js/ops-overview.js"></script>
+
+</body>
+</html>
