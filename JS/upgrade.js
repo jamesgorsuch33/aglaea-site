@@ -141,7 +141,8 @@ upgradeToCurateBtn.addEventListener('click', async () => {
             body: JSON.stringify({
                 userId: currentUser.uid,
                 userEmail: currentUser.email,
-                userName: userName
+                userName: userName,
+                isAnnual: isAnnual
             })
         });
         
