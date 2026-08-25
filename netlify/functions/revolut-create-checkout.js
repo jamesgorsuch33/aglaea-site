@@ -22,7 +22,7 @@ exports.handler = async (event, context) => {
 
     try {
         // Parse request body
-        const { userId, userEmail, userName } = JSON.parse(event.body);
+        const { userId, userEmail, userName, isAnnual } = JSON.parse(event.body);
 
         if (!userId || !userEmail) {
             return {
@@ -31,7 +31,7 @@ exports.handler = async (event, context) => {
             };
         }
 
-        console.log('Creating Revolut subscription for:', userEmail);
+        console.log('Creating Revolut subscription for:', userEmail, '| annual:', !!isAnnual);
 
         // Step 1: Create or find customer
         const customer = await createOrFindCustomer(userEmail, userName);
@@ -41,43 +41,18 @@ exports.handler = async (event, context) => {
         const subscription = await createSubscription(
             customer.id,
             userId,
-            userEmail
+            userEmail,
+            isAnnual
         );
 
         console.log('Subscription created:', subscription.id);
         console.log('Full response:', JSON.stringify(subscription));
 
-        // Step 2b: Retrieve the setup order to get its checkout_url
-        if (!subscription.setup_order_id) {
-            console.error('No setup_order_id in subscription response. Available fields:', Object.keys(subscription));
-            return {
-                statusCode: 500,
-                body: JSON.stringify({
-                    error: 'No setup_order_id in subscription response',
-                    availableFields: Object.keys(subscription),
-                    fullResponse: subscription
-                })
-            };
-        }
-
-        const order = await retrieveOrder(subscription.setup_order_id);
-        console.log('Order retrieved:', order.id, 'state:', order.state, 'redirect_url:', order.redirect_url);
-
-        const checkoutUrl = order.checkout_url;
-
-        if (!checkoutUrl) {
-            console.error('No checkout_url on retrieved order. Available fields:', Object.keys(order));
-            return {
-                statusCode: 500,
-                body: JSON.stringify({
-                    error: 'No checkout_url in order response',
-                    availableFields: Object.keys(order),
-                    fullResponse: order
-                })
-            };
-        }
-
-        // Save pending subscription ID to Firebase so we can check its status later
+        // Save pending subscription ID to Firebase so we can check its status later.
+        // pendingBillingInterval records which plan they actually chose at
+        // checkout — the webhook reads this at activation time and copies
+        // it into a permanent billingInterval field, since the activation
+        // event itself doesn't reliably indicate monthly vs annual.
         try {
             const admin = require('firebase-admin');
             if (!admin.apps.length) {
@@ -92,12 +67,35 @@ exports.handler = async (event, context) => {
             const db = admin.firestore();
             await db.collection('users').doc(userId).set({
                 pendingSubscriptionId: subscription.id,
+                pendingBillingInterval: isAnnual ? 'annual' : 'monthly',
                 pendingSubscriptionCreatedAt: admin.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
             console.log('Saved pending subscription ID to Firebase');
         } catch (firebaseErr) {
             console.error('Failed to save pending subscription:', firebaseErr);
             // Don't fail the whole request - checkout can still proceed
+        }
+
+        // Try multiple possible field names for the checkout URL
+        const checkoutUrl = 
+            subscription.setup_order_checkout_url ||  // Revolut Subscriptions API
+            subscription.checkout_url ||
+            subscription.payment_url ||
+            subscription.hosted_checkout_url ||
+            subscription.checkout?.url ||
+            subscription.payment?.url ||
+            subscription.public_checkout_url;
+
+        if (!checkoutUrl) {
+            console.error('No checkout URL in response. Available fields:', Object.keys(subscription));
+            return {
+                statusCode: 500,
+                body: JSON.stringify({
+                    error: 'No checkout URL in response',
+                    availableFields: Object.keys(subscription),
+                    fullResponse: subscription
+                })
+            };
         }
 
         return {
@@ -171,11 +169,15 @@ async function createOrFindCustomer(email, name) {
 // ============================================================
 // Create subscription with hosted checkout page
 // ============================================================
-async function createSubscription(customerId, userId, userEmail) {
-    const planVariationId = process.env.REVOLUT_CURATE_PLAN_ID;
-    
+async function createSubscription(customerId, userId, userEmail, isAnnual) {
+    const planVariationId = isAnnual
+        ? process.env.REVOLUT_CURATE_ANNUAL_PLAN_ID
+        : process.env.REVOLUT_CURATE_PLAN_ID;
+
+    const missingVarName = isAnnual ? 'REVOLUT_CURATE_ANNUAL_PLAN_ID' : 'REVOLUT_CURATE_PLAN_ID';
+
     if (!planVariationId) {
-        throw new Error('REVOLUT_CURATE_PLAN_ID environment variable not set');
+        throw new Error(`${missingVarName} environment variable not set`);
     }
 
     const response = await fetch(`${REVOLUT_API_URL}/subscriptions`, {
@@ -189,10 +191,11 @@ async function createSubscription(customerId, userId, userEmail) {
             plan_variation_id: planVariationId,
             customer_id: customerId,
             external_reference: userId,  // Our Firebase user ID
-            setup_order_redirect_url: `${SITE_URL}/dashboard.html?upgrade=success`,
+            redirect_url: `${SITE_URL}/dashboard.html?upgrade=success`,
             metadata: {
                 userId: userId,
                 userEmail: userEmail,
+                billingInterval: isAnnual ? 'annual' : 'monthly',
                 source: 'aglaea_upgrade_flow'
             }
         })
@@ -201,27 +204,6 @@ async function createSubscription(customerId, userId, userEmail) {
     if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Failed to create subscription: ${errorText}`);
-    }
-
-    return await response.json();
-}
-
-// ============================================================
-// Retrieve an order to get its checkout_url
-// ============================================================
-async function retrieveOrder(orderId) {
-    const response = await fetch(`${REVOLUT_API_URL}/orders/${orderId}`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${process.env.REVOLUT_SECRET_KEY}`,
-            'Revolut-Api-Version': '2026-04-20',
-            'Accept': 'application/json'
-        }
-    });
-
-    if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to retrieve order: ${errorText}`);
     }
 
     return await response.json();
