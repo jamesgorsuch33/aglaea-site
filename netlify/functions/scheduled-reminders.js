@@ -29,6 +29,125 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 const SITE_URL = process.env.SITE_URL || 'https://aglaea.co.uk';
 
+// ============================================================
+// ADMIN DASHBOARD — DAILY SNAPSHOT
+// Runs once per day (piggybacking on this function's existing
+// 7am UK gate, rather than a separate scheduled job) and writes a
+// single dated record to adminStats. Point-in-time counts (users,
+// reminders) are queried fresh each day; send-activity figures
+// (emails, SMS, etc.) reuse today's `stats` object rather than
+// recomputing anything, since this runs at the very end of the
+// same function that already produced them.
+//
+// Uses collectionGroup('reminders') to count reminders across every
+// person in one query — this works from server-side Admin SDK
+// without needing any Firestore rule for it, since the Admin SDK
+// bypasses security rules entirely (same as everything else in this
+// file). This is intentionally NOT how the admin page itself reads
+// data — the page only ever reads pre-aggregated adminStats.
+// ============================================================
+
+const CURATE_MONTHLY_PRICE = 4.99;
+const CURATE_ANNUAL_PRICE = 49.99;
+// Cost per SMS in GBP — set via the SMS_COST_PER_MESSAGE_GBP Netlify
+// environment variable, so it can be corrected without a code change
+// or redeploy. The fallback below is Twilio's listed USD rate for UK
+// mobile-number outbound SMS ($0.056), converted at a rough
+// approximate exchange rate — treat it as a placeholder only. Twilio
+// bills in USD by default regardless of destination, so the real GBP
+// figure depends on your account's actual billing currency and
+// Twilio's own exchange rate at charge time — check a real invoice
+// and set SMS_COST_PER_MESSAGE_GBP in Netlify to the true figure.
+const SMS_COST_PER_MESSAGE_GBP = parseFloat(process.env.SMS_COST_PER_MESSAGE_GBP) || 0.045;
+
+async function takeAdminSnapshot(todayStats, dateStr) {
+    try {
+        const usersSnapshot = await db.collection('users').get();
+        let totalUsers = 0;
+        let discoverUsers = 0;
+        let curateUsers = 0;
+        let curateMonthlyCount = 0;
+        let curateAnnualCount = 0;
+
+        usersSnapshot.forEach(function(doc) {
+            totalUsers++;
+            const userData = doc.data();
+            const tier = userData.tier;
+            if (tier === 'curate' || tier === 'essential') {
+                curateUsers++;
+                // billingInterval was only added when annual billing was
+                // introduced — existing Curate users from before that
+                // don't have this field set, so they default to monthly
+                // (the only plan that existed at the time they upgraded).
+                if (userData.billingInterval === 'annual') {
+                    curateAnnualCount++;
+                } else {
+                    curateMonthlyCount++;
+                }
+            } else {
+                discoverUsers++;
+            }
+        });
+
+        const remindersSnapshot = await db.collectionGroup('reminders').get();
+        let totalReminders = 0;
+        let dateBasedReminders = 0;
+        let justBecauseReminders = 0;
+        let pausedReminders = 0;
+
+        remindersSnapshot.forEach(function(doc) {
+            totalReminders++;
+            const reminder = doc.data();
+            if (reminder.reminderType === 'just-because') {
+                justBecauseReminders++;
+            } else {
+                dateBasedReminders++;
+            }
+            if (reminder.paused === true) {
+                pausedReminders++;
+            }
+        });
+
+        await db.collection('adminStats').doc(dateStr).set({
+            date: dateStr,
+            timestamp: admin.firestore.FieldValue.serverTimestamp(),
+
+            totalUsers: totalUsers,
+            discoverUsers: discoverUsers,
+            curateUsers: curateUsers,
+            curateMonthlyCount: curateMonthlyCount,
+            curateAnnualCount: curateAnnualCount,
+            // Annual subscribers contribute their price divided across 12
+            // months, not the full monthly rate — this is now an accurate
+            // MRR figure based on real billing intervals, not a flat
+            // curateUsers × monthly-price estimate.
+            estimatedMonthlyRevenue: Math.round((
+                (curateMonthlyCount * CURATE_MONTHLY_PRICE) +
+                (curateAnnualCount * CURATE_ANNUAL_PRICE / 12)
+            ) * 100) / 100,
+
+            totalReminders: totalReminders,
+            dateBasedReminders: dateBasedReminders,
+            justBecauseReminders: justBecauseReminders,
+            pausedReminders: pausedReminders,
+
+            emailsSentToday: todayStats.sent,
+            emailsFailedToday: todayStats.failed,
+            smsSentToday: todayStats.smsSent,
+            smsFailedToday: todayStats.smsFailed,
+            smsCostTodayGbp: Math.round(todayStats.smsSent * SMS_COST_PER_MESSAGE_GBP * 100) / 100,
+            justBecauseSentToday: todayStats.justBecauseSent,
+            upgradeNudgesSentToday: todayStats.nudgesSent
+        }, { merge: true });
+
+        console.log(`Admin snapshot recorded for ${dateStr}: ${totalUsers} users, ${totalReminders} reminders`);
+    } catch (snapshotError) {
+        // Never let a snapshot failure affect the actual reminder-sending
+        // result above — this is a secondary, best-effort record.
+        console.error('Admin snapshot failed (reminders were still sent normally):', snapshotError);
+    }
+}
+
 // Reminder cadences (days before occasion) → email type
 // Different cadences AND different templates for different tiers
 const CADENCES_CURATE = {
@@ -597,6 +716,9 @@ const mainHandler = async (event) => {
         console.log(`Upgrade nudges sent: ${stats.nudgesSent}`);
         console.log(`Failed: ${stats.failed}`);
         console.log(`By type:`, stats.byType);
+        
+        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        await takeAdminSnapshot(stats, todayStr);
         
         return {
             statusCode: 200,
