@@ -245,17 +245,29 @@ async function handleSubscriptionActivated(webhookEvent) {
         console.error('Could not fetch billing cycle for nextBillingDate:', cycleError);
     }
 
+    // Which plan they actually chose at checkout — read from the pending
+    // field set in revolut-create-checkout.js (existingUserDoc was
+    // already fetched above for the stale-webhook guard, so this is
+    // free — no extra read). Metadata is a fallback only, in case this
+    // is somehow an older pending record from before that field existed.
+    const existingData = existingUserDoc.exists ? existingUserDoc.data() : {};
+    const billingInterval = existingData.pendingBillingInterval
+        || subscription?.metadata?.billingInterval
+        || 'monthly';
+
     // Update Firestore - upgrade user to Curate
     await db.collection('users').doc(userId).set({
         tier: 'curate',
         revolutCustomerId: customerId,
         revolutSubscriptionId: thisSubscriptionId,
         subscriptionStatus: 'active',
+        billingInterval: billingInterval,
+        pendingBillingInterval: admin.firestore.FieldValue.delete(),
         nextBillingDate: nextBillingDate,
         upgradedAt: admin.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
-    console.log('User tier updated to Curate. Next billing date:', nextBillingDate);
+    console.log('User tier updated to Curate. Billing interval:', billingInterval, '| Next billing date:', nextBillingDate);
 
     // Send upgrade confirmation email
     try {
