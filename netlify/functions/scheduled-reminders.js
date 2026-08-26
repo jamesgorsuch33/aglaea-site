@@ -60,6 +60,103 @@ const CURATE_ANNUAL_PRICE = 49.99;
 // and set SMS_COST_PER_MESSAGE_GBP in Netlify to the true figure.
 const SMS_COST_PER_MESSAGE_GBP = parseFloat(process.env.SMS_COST_PER_MESSAGE_GBP) || 0.045;
 
+// Approximate day-interval for each Just Because frequency, used only
+// for projecting FUTURE send volume across multiple upcoming cycles —
+// the real send logic (calculateNextJBDate, further below) is what
+// actually determines send dates; this is a forecasting approximation.
+// 'random' genuinely re-randomizes 30-90 days every cycle in the real
+// send logic, so it can't be predicted precisely beyond its next known
+// date — 60 (the midpoint) is used here as a clearly-approximate
+// stand-in for cycles beyond that.
+function jbFrequencyToApproxDays(frequency) {
+    switch (frequency) {
+        case 'monthly': return 30;
+        case 'every_6_weeks': return 42;
+        case 'every_2_months': return 60;
+        case 'every_3_months': return 90;
+        case 'every_6_months': return 180;
+        case 'random': return 60;
+        default: return 60;
+    }
+}
+
+const PROJECTION_MONTHS_AHEAD = 6;
+
+// Projects upcoming email/SMS volume across the next several calendar
+// months, from reminders that already exist right now. This is a
+// forward-looking counterpart to the historical counts above — it
+// answers "how much is coming up", not "what already happened".
+//
+// Date-based reminders are projected precisely, replicating the exact
+// cadence and purchased-suppression rules from the real send logic
+// (mainHandler, further below) — same offsets, same day-of exception.
+// Just Because reminders are projected by iterating their own
+// frequency forward from nextScheduledDate — precise for fixed
+// frequencies, an approximation for 'random' beyond its first known
+// date, and email-only, since Just Because never sends SMS.
+async function computeUpcomingProjections(remindersSnapshot, personToUserId, userTierById) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const monthBuckets = {};
+    for (let i = 0; i < PROJECTION_MONTHS_AHEAD; i++) {
+        const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        monthBuckets[key] = { emails: 0, sms: 0 };
+    }
+    const windowEnd = new Date(today.getFullYear(), today.getMonth() + PROJECTION_MONTHS_AHEAD, 1);
+
+    function addToMonth(dateObj, emailCount, smsCount) {
+        if (dateObj < today) return; // past touchpoints aren't "upcoming"
+        const key = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
+        if (!monthBuckets[key]) return; // beyond the projection window
+        monthBuckets[key].emails += emailCount;
+        monthBuckets[key].sms += smsCount;
+    }
+
+    remindersSnapshot.forEach(function(doc) {
+        const reminder = doc.data();
+        if (reminder.paused === true) return;
+
+        const personId = doc.ref.parent.parent.id;
+        const userId = personToUserId[personId];
+        if (!userId) return;
+        const tier = userTierById[userId] || 'discover';
+        const isCurate = tier === 'curate' || tier === 'essential';
+
+        if (reminder.reminderType === 'just-because') {
+            if (!reminder.nextScheduledDate) return;
+            let cursor = new Date(reminder.nextScheduledDate + 'T00:00:00');
+            let iterations = 0;
+            while (cursor < windowEnd && iterations < 30) { // safety cap, not expected to be hit
+                addToMonth(cursor, 1, 0); // JB is email-only
+                const stepDays = jbFrequencyToApproxDays(reminder.frequency);
+                cursor = new Date(cursor.getTime() + stepDays * 86400000);
+                iterations++;
+            }
+        } else {
+            if (!reminder.date) return;
+            const occasionDate = new Date(reminder.date + 'T00:00:00');
+            const purchased = reminder.giftPurchased === true;
+
+            const emailOffsets = isCurate ? [21, 14, 10, 7, 3, 0] : [7, 3, 0];
+            const smsOffsets = isCurate ? [14, 7, 3, 0] : [];
+
+            emailOffsets.forEach(function(off) {
+                if (purchased && off !== 0) return; // purchased suppresses all but day-of
+                addToMonth(new Date(occasionDate.getTime() - off * 86400000), 1, 0);
+            });
+            smsOffsets.forEach(function(off) {
+                if (purchased && off !== 0) return;
+                addToMonth(new Date(occasionDate.getTime() - off * 86400000), 0, 1);
+            });
+        }
+    });
+
+    return monthBuckets;
+}
+
+
 async function takeAdminSnapshot(todayStats, dateStr) {
     try {
         const usersSnapshot = await db.collection('users').get();
@@ -68,11 +165,13 @@ async function takeAdminSnapshot(todayStats, dateStr) {
         let curateUsers = 0;
         let curateMonthlyCount = 0;
         let curateAnnualCount = 0;
+        const userTierById = {}; // reused below for projecting upcoming volume
 
         usersSnapshot.forEach(function(doc) {
             totalUsers++;
             const userData = doc.data();
             const tier = userData.tier;
+            userTierById[doc.id] = tier || 'discover';
             if (tier === 'curate' || tier === 'essential') {
                 curateUsers++;
                 // billingInterval was only added when annual billing was
@@ -108,6 +207,16 @@ async function takeAdminSnapshot(todayStats, dateStr) {
             }
         });
 
+        // personId -> userId map, needed to look up each reminder's
+        // effective tier for the upcoming-volume projection below.
+        const peopleSnapshot = await db.collection('people').get();
+        const personToUserId = {};
+        peopleSnapshot.forEach(function(doc) {
+            personToUserId[doc.id] = doc.data().userId;
+        });
+
+        const upcomingMonthly = await computeUpcomingProjections(remindersSnapshot, personToUserId, userTierById);
+
         await db.collection('adminStats').doc(dateStr).set({
             date: dateStr,
             timestamp: admin.firestore.FieldValue.serverTimestamp(),
@@ -137,7 +246,12 @@ async function takeAdminSnapshot(todayStats, dateStr) {
             smsFailedToday: todayStats.smsFailed,
             smsCostTodayGbp: Math.round(todayStats.smsSent * SMS_COST_PER_MESSAGE_GBP * 100) / 100,
             justBecauseSentToday: todayStats.justBecauseSent,
-            upgradeNudgesSentToday: todayStats.nudgesSent
+            upgradeNudgesSentToday: todayStats.nudgesSent,
+
+            // Forward-looking projection, not a historical count — see
+            // computeUpcomingProjections for exactly what this does and
+            // doesn't account for precisely.
+            upcomingMonthly: upcomingMonthly
         }, { merge: true });
 
         console.log(`Admin snapshot recorded for ${dateStr}: ${totalUsers} users, ${totalReminders} reminders`);
