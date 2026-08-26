@@ -47,6 +47,7 @@ async function loadOpsData() {
         }
 
         renderKpis(allSnapshots[allSnapshots.length - 1]);
+        renderUpcomingChart(allSnapshots[allSnapshots.length - 1]);
         renderCharts(allSnapshots);
 
         loadingEl.classList.add('hidden');
@@ -106,6 +107,48 @@ function renderKpis(latest) {
     document.getElementById('kpiSmsFailed').textContent = latest.smsFailedToday ?? 0;
     document.getElementById('kpiSmsCost').textContent = gbp(latest.smsCostTodayGbp);
     document.getElementById('kpiJustBecauseSent').textContent = latest.justBecauseSentToday ?? 0;
+}
+
+// ============================================================
+// UPCOMING PROJECTION CHART
+// Unlike the trend charts below (which show history across many
+// snapshots), this reads from a single field — upcomingMonthly —
+// on the most recent snapshot only, since it's a forward-looking
+// projection computed fresh each day, not something to track
+// historically day-by-day.
+// ============================================================
+function formatMonthLabel(monthKey) {
+    const [year, month] = monthKey.split('-').map(Number);
+    const date = new Date(year, month - 1, 1);
+    return date.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+}
+
+function renderUpcomingChart(latest) {
+    destroyChartIfExists('chartUpcoming');
+
+    const upcoming = latest.upcomingMonthly || {};
+    const monthKeys = Object.keys(upcoming).sort(); // 'YYYY-MM' sorts chronologically as a string
+
+    const ctx = document.getElementById('chartUpcoming').getContext('2d');
+    charts.chartUpcoming = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: monthKeys.map(formatMonthLabel),
+            datasets: [
+                {
+                    label: 'Emails',
+                    data: monthKeys.map(k => upcoming[k].emails ?? 0),
+                    backgroundColor: 'rgba(91, 141, 239, 0.6)'
+                },
+                {
+                    label: 'SMS',
+                    data: monthKeys.map(k => upcoming[k].sms ?? 0),
+                    backgroundColor: 'rgba(201, 168, 112, 0.6)'
+                }
+            ]
+        },
+        options: CHART_BASE_OPTIONS
+    });
 }
 
 // ============================================================
