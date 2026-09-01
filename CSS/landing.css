@@ -7,7 +7,7 @@
     --gold: #c9a870;
     --gold-light: #d9bd8a;
     --gold-pale: #f5ead4;
-    --cream: #f5f0e8;
+    --cream: #faf7f2;
     --cream-light: #f9f5ed;
     --charcoal: #2a2a2a;
     --slate: #6b6b6b;
@@ -20,7 +20,7 @@
 
 .landing-hero {
     background: linear-gradient(180deg, var(--cream) 0%, #ffffff 100%);
-    padding: 120px 0 100px;
+    padding: 120px 0 0;
     text-align: center;
     position: relative;
     overflow: hidden;
@@ -767,7 +767,7 @@
 
 @media (max-width: 768px) {
     .landing-hero {
-        padding: 80px 0 60px;
+        padding: 80px 0 0;
     }
     
     .landing-hero-title {
@@ -1096,8 +1096,8 @@
    ============================================================ */
 
 .landing-hero-screenshot-wrap {
-    max-width: 1040px;
-    margin: 64px auto 0;
+    max-width: 1280px;
+    margin: 24px auto 0;
 }
 
 .landing-hero-screenshot {
@@ -1108,19 +1108,19 @@
 
     mask-image: linear-gradient(to bottom,
         transparent 0%,
-        transparent 11%,
-        rgba(0, 0, 0, 0.15) 20%,
-        rgba(0, 0, 0, 0.4) 30%,
-        rgba(0, 0, 0, 0.75) 40%,
-        black 50%,
+        transparent 9%,
+        rgba(0, 0, 0, 0.3) 16%,
+        rgba(0, 0, 0, 0.6) 24%,
+        rgba(0, 0, 0, 0.85) 32%,
+        black 42%,
         black 100%);
     -webkit-mask-image: linear-gradient(to bottom,
         transparent 0%,
-        transparent 11%,
-        rgba(0, 0, 0, 0.15) 20%,
-        rgba(0, 0, 0, 0.4) 30%,
-        rgba(0, 0, 0, 0.75) 40%,
-        black 50%,
+        transparent 9%,
+        rgba(0, 0, 0, 0.3) 16%,
+        rgba(0, 0, 0, 0.6) 24%,
+        rgba(0, 0, 0, 0.85) 32%,
+        black 42%,
         black 100%);
     mask-size: 100% 100%;
     -webkit-mask-size: 100% 100%;
