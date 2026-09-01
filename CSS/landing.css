@@ -855,3 +855,201 @@
         padding: 80px 0;
     }
 }
+
+/* ============================================================
+   INTERACTIVE SANDBOX
+   Deliberately uses its own class names (not .brand-card etc.)
+   rather than importing products.css wholesale — this page
+   doesn't otherwise load that stylesheet, and pulling it in just
+   for three classes risked colliding with similarly-named classes
+   already used elsewhere on this page. Visually matches the real
+   product cards using the same shared variables from style.css.
+   ============================================================ */
+
+.landing-sandbox {
+    background: #ffffff;
+    padding: 120px 0;
+}
+
+.sandbox-intro {
+    text-align: center;
+    font-size: 17px;
+    color: var(--slate);
+    line-height: 1.7;
+    max-width: 560px;
+    margin: -32px auto 48px;
+    font-weight: 300;
+}
+
+.sandbox-selects {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    max-width: 700px;
+    margin: 0 auto 48px;
+    flex-wrap: wrap;
+}
+
+.sandbox-select-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 220px;
+}
+
+.sandbox-select-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--charcoal);
+    letter-spacing: 0.02em;
+}
+
+.sandbox-select-group select {
+    padding: 14px 16px;
+    border: 1px solid var(--stone);
+    border-radius: var(--radius-md, 8px);
+    background: #ffffff;
+    font-family: var(--font-body, inherit);
+    font-size: 15px;
+    color: var(--charcoal);
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.sandbox-select-group select:hover,
+.sandbox-select-group select:focus {
+    outline: none;
+    border-color: var(--gold);
+}
+
+.sandbox-loading {
+    text-align: center;
+    color: var(--slate);
+    font-size: 15px;
+    font-style: italic;
+}
+
+.sandbox-empty {
+    text-align: center;
+    color: var(--slate);
+    font-size: 15px;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.sandbox-results-heading {
+    text-align: center;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 26px;
+    color: var(--charcoal);
+    margin: 0 0 36px 0;
+}
+
+.sandbox-results-heading em {
+    color: var(--gold);
+    font-style: italic;
+}
+
+.sandbox-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.sandbox-card {
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border: 1px solid var(--stone);
+    border-radius: var(--radius-lg, 12px);
+    overflow: hidden;
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+
+    /* Fade-in — starts invisible/slightly offset, .sandbox-card-visible
+       (added via JS a moment after insertion) transitions it in. */
+    opacity: 0;
+    transform: translateY(12px);
+}
+
+.sandbox-card.sandbox-card-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.sandbox-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    border-color: var(--gold);
+}
+
+.sandbox-card.sandbox-card-visible:hover {
+    transform: translateY(-6px);
+}
+
+.sandbox-card-image {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: linear-gradient(135deg, var(--stone) 0%, var(--cream) 100%);
+    overflow: hidden;
+}
+
+.sandbox-card-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+}
+
+.sandbox-card-info {
+    padding: 1rem 1.25rem 1.25rem;
+}
+
+.sandbox-card-brand {
+    font-size: 0.78rem;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+}
+
+.sandbox-card-name {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--charcoal);
+    margin: 0 0 6px 0;
+    line-height: 1.25;
+}
+
+.sandbox-card-price {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin: 0;
+}
+
+.sandbox-full-catalogue-link {
+    text-align: center;
+    margin-top: 40px;
+}
+
+@media (max-width: 768px) {
+    .sandbox-selects {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .sandbox-select-group {
+        min-width: 0;
+    }
+    .sandbox-grid {
+        grid-template-columns: 1fr;
+    }
+}
