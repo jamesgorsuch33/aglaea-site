@@ -98,7 +98,7 @@
 
 .dashboard-card h2 {
     font-family: var(--font-display);
-    font-size: 1.75rem;
+    font-size: 1.95rem;
     font-weight: 500;
     color: var(--charcoal);
 }
@@ -280,7 +280,7 @@
 
 .person-name {
     font-family: var(--font-display);
-    font-size: 1.5rem;
+    font-size: 1.65rem;
     font-weight: 500;
     color: var(--charcoal);
 }
@@ -588,7 +588,7 @@
 
 .action-card h3 {
     font-family: var(--font-display);
-    font-size: 1.125rem;
+    font-size: 1.2rem;
     font-weight: 500;
     color: var(--charcoal);
     margin-bottom: 0.25rem;
@@ -610,7 +610,7 @@
 
 .upgrade-banner h2 {
     font-family: var(--font-display);
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: 400;
     margin-bottom: 1rem;
 }
@@ -669,7 +669,7 @@
 
 .modal-header h2 {
     font-family: var(--font-display);
-    font-size: 1.75rem;
+    font-size: 1.95rem;
     font-weight: 500;
     color: var(--charcoal);
 }
@@ -823,7 +823,7 @@ form {
 
 .upgrade-prompt h3 {
     font-family: var(--font-display);
-    font-size: 1.25rem;
+    font-size: 1.35rem;
     font-weight: 500;
     margin-bottom: 0.5rem;
 }
@@ -1107,4 +1107,3 @@ form {
         padding: 1.25rem;
     }
 }
-
