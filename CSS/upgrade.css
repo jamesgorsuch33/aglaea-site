@@ -279,6 +279,40 @@ input:checked + .toggle-slider:before {
     background: var(--cream);
 }
 
+/* Email/SMS reminder rows — deliberately more prominent than the
+   rest of the table, since this is the single most concrete,
+   quantifiable difference between tiers (not just a checkmark, but
+   an actual reminder count and schedule), and worth drawing the
+   eye to specifically. */
+.comparison-highlight-row td {
+    background: var(--cream-light, #f9f5ed);
+}
+
+.comparison-highlight-row:hover td {
+    background: var(--cream);
+}
+
+.comparison-subtext {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--slate);
+    font-weight: 400;
+    margin-top: 2px;
+}
+
+.comparison-curate-cell {
+    background: var(--gold-pale, #f5ead4) !important;
+    color: var(--charcoal);
+    font-weight: 700;
+    border-left: 2px solid var(--gold);
+    border-right: 2px solid var(--gold);
+}
+
+.comparison-curate-cell .comparison-subtext {
+    color: var(--charcoal);
+    opacity: 0.75;
+}
+
 /* FAQ Section */
 .faq-section {
     margin-bottom: var(--space-xl);
@@ -394,19 +428,6 @@ input:checked + .toggle-slider:before {
 
 .modal-close:hover {
     color: var(--charcoal);
-}
-
-/* When .modal-close is reused on an actual button (e.g. a "Cancel"
-   action) purely to hook into the close-modal click handler, it
-   shouldn't inherit the header icon's 2rem/32px sizing meant for a
-   single "×" character. This combined selector has higher specificity
-   than .modal-close alone, so it wins regardless of source order. */
-.btn.modal-close {
-    font-size: 0.938rem;
-    width: auto;
-    height: auto;
-    line-height: normal;
-    padding: 0.875rem 2rem;
 }
 
 .modal-actions {
