@@ -167,7 +167,7 @@ input:checked + .toggle-slider:before {
 }
 
 .pricing-header h2 {
-    font-size: 1.75rem;
+    font-size: 2rem;
     margin-bottom: var(--space-sm);
 }
 
@@ -469,4 +469,30 @@ input:checked + .toggle-slider:before {
 
 .hidden {
     display: none;
+}
+
+/* ============================================================
+   SCREEN-READER-ONLY TEXT
+   Visually hidden but still announced by assistive tech — used
+   in the comparison table below, where a bare ✓ or — is the
+   entire visible content of a cell and genuinely conveys real
+   data (whether a feature is included), not decoration. Hiding
+   these with aria-hidden would remove real information from
+   screen reader users rather than just tidying up noise, so
+   this is the opposite treatment from the decorative glyphs
+   fixed elsewhere on the site — the symbol stays as the visual
+   shorthand, and this adds back the actual meaning in words.
+   Standard, well-established CSS pattern for this — not a
+   custom invention.
+   ============================================================ */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
