@@ -1083,3 +1083,53 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ============================================================
+   HERO SCREENSHOT
+   A real dashboard screenshot fades in below the hero copy — the
+   top portion is masked to transparent so it blends into the
+   hero's own background rather than having a hard edge, gradually
+   revealing the full screenshot by around the halfway point. Uses
+   mask-image rather than an overlay div, since a gradient mask
+   fades the actual image content smoothly regardless of what's in
+   it, rather than approximating the effect with a solid overlay.
+   ============================================================ */
+
+.landing-hero-screenshot-wrap {
+    max-width: 1040px;
+    margin: 64px auto 0;
+}
+
+.landing-hero-screenshot {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+
+    mask-image: linear-gradient(to bottom,
+        transparent 0%,
+        transparent 11%,
+        rgba(0, 0, 0, 0.15) 20%,
+        rgba(0, 0, 0, 0.4) 30%,
+        rgba(0, 0, 0, 0.75) 40%,
+        black 50%,
+        black 100%);
+    -webkit-mask-image: linear-gradient(to bottom,
+        transparent 0%,
+        transparent 11%,
+        rgba(0, 0, 0, 0.15) 20%,
+        rgba(0, 0, 0, 0.4) 30%,
+        rgba(0, 0, 0, 0.75) 40%,
+        black 50%,
+        black 100%);
+    mask-size: 100% 100%;
+    -webkit-mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+}
+
+@media (max-width: 768px) {
+    .landing-hero-screenshot-wrap {
+        margin-top: 40px;
+    }
+}
