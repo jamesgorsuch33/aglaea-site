@@ -5,7 +5,7 @@
 .signup-section {
     min-height: calc(100vh - 80px);
     padding: var(--space-xl) 0;
-    background: var(--warm-white);
+    background: var(--cream);
 }
 
 .signup-container {
@@ -32,7 +32,7 @@
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
-    color: var(--soft-gray);
+    color: var(--slate);
 }
 
 .progress-step.active {
@@ -139,7 +139,7 @@ select:focus {
 .form-helper {
     display: block;
     font-size: 0.813rem;
-    color: var(--soft-gray);
+    color: var(--slate);
     margin-top: 0.375rem;
     font-style: italic;
 }
@@ -181,7 +181,7 @@ select:focus {
 
 .remove-reminder {
     background: transparent;
-    color: var(--soft-gray);
+    color: var(--slate);
     padding: 0.5rem;
     border-radius: 50%;
     transition: var(--transition);
@@ -190,7 +190,7 @@ select:focus {
 
 .remove-reminder:hover {
     background: rgba(192, 97, 74, 0.1);
-    color: #C0614A;
+    color: #742823;
 }
 
 .custom-occasion {
@@ -203,10 +203,10 @@ select:focus {
 
 .date-helper {
     font-size: 0.813rem;
-    color: var(--soft-gray);
+    color: var(--slate);
     margin-top: var(--space-sm);
     padding: 0.75rem;
-    background: var(--warm-white);
+    background: var(--cream);
     border-radius: var(--radius-sm);
     border-left: 3px solid var(--gold);
 }
@@ -216,7 +216,7 @@ select:focus {
 }
 
 .reminder-count {
-    color: var(--soft-gray);
+    color: var(--slate);
     font-size: 0.875rem;
 }
 
@@ -318,7 +318,7 @@ button:disabled {
 /* Error Messages */
 .error-message {
     background: #FFE5E5;
-    color: #C0614A;
+    color: #742823;
     padding: 0.875rem;
     border-radius: var(--radius-sm);
     margin-bottom: var(--space-md);
