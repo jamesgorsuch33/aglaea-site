@@ -24,7 +24,7 @@
                 <a href="dashboard.html">Dashboard</a>
                 <a href="products.html">Gifts</a>
                 <a href="upgrade.html">Upgrade</a>
-                <a href="settings.html" class="active" title="Settings">⚙️</a>
+                <a href="settings.html" class="active" title="Settings" aria-label="Settings">⚙️</a>
                 <button class="btn-nav" id="logoutBtn">Sign Out</button>
             </nav>
         </div>
@@ -73,7 +73,7 @@
                     
                     <div class="settings-actions">
                         <button type="submit" class="btn btn-primary" id="saveProfileBtn">Save Changes</button>
-                        <span id="profileSuccess" class="success-message hidden">✓ Saved successfully</span>
+                        <span id="profileSuccess" class="success-message hidden"><span aria-hidden="true">✓</span> Saved successfully</span>
                     </div>
                 </form>
             </div>
@@ -99,7 +99,7 @@
                     
                     <div class="settings-actions">
                         <button type="submit" class="btn btn-primary" id="updatePasswordBtn">Update Password</button>
-                        <span id="passwordSuccess" class="success-message hidden">✓ Password updated</span>
+                        <span id="passwordSuccess" class="success-message hidden"><span aria-hidden="true">✓</span> Password updated</span>
                     </div>
                 </form>
             </div>
@@ -147,7 +147,7 @@
             <!-- Danger Zone -->
             <div class="settings-card danger-zone">
                 <div class="settings-card-header">
-                    <h2>⚠️ Danger Zone</h2>
+                    <h2><span aria-hidden="true">⚠️</span> Danger Zone</h2>
                     <span class="settings-card-description">Irreversible actions</span>
                 </div>
                 
@@ -223,7 +223,7 @@
     <div id="deleteAccountModal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>⚠️ Delete Account?</h2>
+                <h2><span aria-hidden="true">⚠️</span> Delete Account?</h2>
                 <button class="modal-close" data-modal="deleteAccountModal">&times;</button>
             </div>
             
