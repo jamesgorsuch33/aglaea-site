@@ -106,7 +106,7 @@
 
 .post-date,
 .post-read-time {
-    color: var(--soft-gray);
+    color: var(--slate);
     font-size: 0.813rem;
 }
 
@@ -129,12 +129,12 @@
 }
 
 .post-card.featured h2 {
-    font-size: 2.25rem;
+    font-size: 2.5rem;
     font-weight: 400;
 }
 
 .post-card h3 {
-    font-size: 1.5rem;
+    font-size: 1.65rem;
     font-weight: 400;
 }
 
@@ -183,7 +183,7 @@
 
 .section-title {
     font-family: var(--font-display);
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: 400;
     text-align: center;
     margin-bottom: 3rem;
@@ -285,7 +285,7 @@
 
 .article-content h2 {
     font-family: var(--font-display);
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: 500;
     margin: 3rem 0 1.5rem;
     color: var(--charcoal);
@@ -293,7 +293,7 @@
 
 .article-content h3 {
     font-family: var(--font-display);
-    font-size: 1.5rem;
+    font-size: 1.65rem;
     font-weight: 500;
     margin: 2.5rem 0 1rem;
     color: var(--charcoal);
@@ -341,7 +341,7 @@
 
 .product-rec h4 {
     font-family: var(--font-display);
-    font-size: 1.25rem;
+    font-size: 1.35rem;
     margin-bottom: 1rem;
     color: var(--charcoal);
 }
@@ -366,7 +366,7 @@
 
 .article-cta h3 {
     font-family: var(--font-display);
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: 400;
     margin-bottom: 1rem;
 }
@@ -413,7 +413,7 @@
     }
 
     .post-card.featured h2 {
-        font-size: 1.75rem;
+        font-size: 1.9rem;
     }
 
     .post-card.featured .post-content {
