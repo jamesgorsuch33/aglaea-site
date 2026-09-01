@@ -10,7 +10,7 @@
     --cream: #faf7f2;
     --cream-light: #f9f5ed;
     --charcoal: #2a2a2a;
-    --slate: #6b6b6b;
+    --slate: #1E293B;
     --stone: #d4d0c8;
 }
 
@@ -135,7 +135,7 @@
 
 .section-heading {
     font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 52px;
+    font-size: 58px;
     font-weight: 400;
     color: var(--charcoal);
     line-height: 1.1;
@@ -224,7 +224,7 @@
 
 .how-step-title {
     font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 500;
     color: var(--charcoal);
     margin: 0 0 16px 0;
@@ -356,7 +356,7 @@
 
 .jb-card-title {
     font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 32px;
+    font-size: 36px;
     font-weight: 400;
     color: var(--charcoal);
     line-height: 1.2;
@@ -417,7 +417,7 @@
 
 .feature-content h3 {
     font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 500;
     color: var(--charcoal);
     margin: 0 0 12px 0;
@@ -494,7 +494,7 @@
 
 .pricing-name {
     font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 36px;
+    font-size: 40px;
     font-weight: 400;
     color: var(--charcoal);
     margin: 0 0 16px 0;
@@ -617,7 +617,7 @@
 .faq-item summary {
     cursor: pointer;
     font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 22px;
+    font-size: 24px;
     color: var(--charcoal);
     font-weight: 500;
     padding-right: 40px;
@@ -970,7 +970,7 @@
 .sandbox-results-heading {
     text-align: center;
     font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 26px;
+    font-size: 30px;
     color: var(--charcoal);
     margin: 0 0 36px 0;
 }
