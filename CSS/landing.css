@@ -884,7 +884,7 @@
 .sandbox-selects {
     display: flex;
     justify-content: center;
-    gap: 24px;
+    gap: 28px;
     max-width: 700px;
     margin: 0 auto 48px;
     flex-wrap: wrap;
@@ -893,33 +893,63 @@
 .sandbox-select-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    min-width: 220px;
+    gap: 10px;
+    min-width: 240px;
 }
 
 .sandbox-select-group label {
-    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
     font-weight: 600;
-    color: var(--charcoal);
-    letter-spacing: 0.02em;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
 }
 
-.sandbox-select-group select {
-    padding: 14px 16px;
-    border: 1px solid var(--stone);
-    border-radius: var(--radius-md, 8px);
-    background: #ffffff;
-    font-family: var(--font-body, inherit);
+.sandbox-label-icon {
     font-size: 15px;
+    letter-spacing: 0;
+}
+
+/* Custom select — the native appearance is stripped entirely and
+   replaced with a hand-drawn gold chevron (inline SVG, no external
+   asset needed) so it actually matches the site's look rather than
+   whatever the browser's default control style happens to be. The
+   options list itself stays native (browsers don't allow styling
+   that part), but everything visible before it opens is fully
+   custom now. */
+.sandbox-select-group select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding: 16px 46px 16px 20px;
+    border: 1.5px solid var(--stone);
+    border-radius: var(--radius-md, 8px);
+    background-color: #ffffff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23c9a870' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 18px center;
+    background-size: 12px 8px;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 18px;
+    font-weight: 500;
     color: var(--charcoal);
     cursor: pointer;
-    transition: border-color 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
-.sandbox-select-group select:hover,
+.sandbox-select-group select:hover {
+    border-color: var(--gold);
+    background-color: var(--cream-light, #f9f5ed);
+}
+
 .sandbox-select-group select:focus {
     outline: none;
     border-color: var(--gold);
+    box-shadow: 0 0 0 4px rgba(201, 168, 112, 0.15);
 }
 
 .sandbox-loading {
