@@ -43,7 +43,7 @@
 
 .settings-card-header h2 {
     font-family: var(--font-display);
-    font-size: 1.5rem;
+    font-size: 1.7rem;
     font-weight: 500;
     color: var(--charcoal);
     margin: 0 0 0.25rem 0;
@@ -88,8 +88,17 @@
     margin-top: 1rem;
 }
 
+/* Was #4CAF50 — measured at only 2.78:1 on white, well below even
+   the 4.5:1 AA minimum. #2e7d32 is already used elsewhere in this
+   codebase (dashboard.css's .purchased-badge) for the same "success"
+   meaning, so reusing it fixes the failure and keeps the same green
+   consistent site-wide, rather than introducing a third shade.
+   Lands at 5.13:1 — clears AA comfortably; doesn't quite reach the
+   stricter 7:1 AAA target, but going darker still starts to read as
+   muddy/brown rather than a recognisable "success" green, so this is
+   a deliberate trade-off, not an oversight. */
 .success-message {
-    color: #4CAF50;
+    color: #2e7d32;
     font-weight: 500;
     font-size: 0.875rem;
 }
@@ -215,7 +224,16 @@
     color: var(--slate);
 }
 
-/* Danger Zone */
+/* Danger Zone
+   The red throughout this section was #d4574c, measured at only
+   3.83-3.99:1 depending on where it's used — failing even 4.5:1 AA
+   on every one of: the "Danger Zone" heading, the white text on the
+   Delete Account button, and the Cancel Subscription button's text.
+   These are consequential, hard-to-reverse actions — exactly where
+   you don't want marginal legibility. #8f332c measures at 7.84:1 in
+   both directions (text-on-white and white-on-background), clearing
+   the 7:1 target with room to spare, while still reading clearly as
+   "danger red" rather than drifting toward brown or black. */
 .danger-zone {
     border: 2px solid #f5d6d3;
     background: #fff9f8;
@@ -226,7 +244,7 @@
 }
 
 .danger-zone .settings-card-header h2 {
-    color: #d4574c;
+    color: #8f332c;
 }
 
 .danger-section {
@@ -255,7 +273,7 @@
 
 .danger-warning {
     background: #fff9f8;
-    border-left: 4px solid #d4574c;
+    border-left: 4px solid #8f332c;
     padding: 1.25rem;
     border-radius: var(--radius-sm);
     margin-bottom: 1.5rem;
@@ -277,9 +295,9 @@
 
 /* Buttons */
 .btn-danger {
-    background: #d4574c;
+    background: #8f332c;
     color: white;
-    border: 1px solid #d4574c;
+    border: 1px solid #8f332c;
     padding: 0.75rem 1.5rem;
     border-radius: var(--radius-sm);
     cursor: pointer;
@@ -288,8 +306,8 @@
 }
 
 .btn-danger:hover:not(:disabled) {
-    background: #b8463c;
-    border-color: #b8463c;
+    background: #742823;
+    border-color: #742823;
 }
 
 .btn-danger:disabled {
@@ -299,8 +317,8 @@
 
 .btn-danger-outline {
     background: white;
-    color: #d4574c;
-    border: 1px solid #d4574c;
+    color: #8f332c;
+    border: 1px solid #8f332c;
     padding: 0.75rem 1.5rem;
     border-radius: var(--radius-sm);
     cursor: pointer;
