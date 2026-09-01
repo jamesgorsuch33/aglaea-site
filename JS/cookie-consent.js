@@ -70,9 +70,8 @@
         banner.innerHTML = `
             <div class="cookie-consent-inner">
                 <p class="cookie-consent-text">
-                    We use cookies to make AGLAEA work properly, and — only with your permission — to understand how the site is used.
-                    Essential cookies can't be turned off, as the site won't function without them.
-                    See our <a href="/cookie-policy.html">Cookie Policy</a> for details.
+                    We use cookies to run AGLAEA, and — only with permission — to understand site usage.
+                    <a href="/cookie-policy.html">Cookie Policy</a>
                 </p>
                 <div class="cookie-consent-actions">
                     <button type="button" id="cookieConsentEssential" class="cookie-consent-btn cookie-consent-btn-secondary">Essential Only</button>
@@ -90,29 +89,24 @@
         style.textContent = `
             #cookieConsentBanner {
                 position: fixed;
-                left: 0;
-                right: 0;
-                bottom: 0;
+                left: 20px;
+                bottom: 20px;
                 z-index: 3000;
+                max-width: 380px;
                 background: var(--charcoal, #2c2c2c);
                 color: var(--cream, #faf7f2);
-                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+                border-radius: 10px;
+                box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
                 font-family: var(--font-body, 'Inter', sans-serif);
             }
             .cookie-consent-inner {
-                max-width: 1200px;
-                margin: 0 auto;
-                padding: 1.25rem 1.5rem;
+                padding: 1rem 1.15rem;
                 display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 1.5rem;
-                flex-wrap: wrap;
+                flex-direction: column;
+                gap: 0.75rem;
             }
             .cookie-consent-text {
-                flex: 1;
-                min-width: 260px;
-                font-size: 0.875rem;
+                font-size: 0.8rem;
                 line-height: 1.5;
                 margin: 0;
                 color: rgba(250, 247, 242, 0.9);
@@ -120,16 +114,17 @@
             .cookie-consent-text a {
                 color: var(--gold, #c9a870);
                 text-decoration: underline;
+                white-space: nowrap;
             }
             .cookie-consent-actions {
                 display: flex;
-                gap: 0.75rem;
-                flex-shrink: 0;
+                gap: 0.6rem;
             }
             .cookie-consent-btn {
-                padding: 0.625rem 1.25rem;
+                flex: 1;
+                padding: 0.5rem 0.9rem;
                 border-radius: 4px;
-                font-size: 0.875rem;
+                font-size: 0.8rem;
                 font-weight: 500;
                 cursor: pointer;
                 border: 1px solid transparent;
@@ -152,15 +147,11 @@
                 background: rgba(250, 247, 242, 0.1);
             }
             @media (max-width: 640px) {
-                .cookie-consent-inner {
-                    flex-direction: column;
-                    align-items: stretch;
-                }
-                .cookie-consent-actions {
-                    justify-content: stretch;
-                }
-                .cookie-consent-btn {
-                    flex: 1;
+                #cookieConsentBanner {
+                    left: 12px;
+                    right: 12px;
+                    bottom: 12px;
+                    max-width: none;
                 }
             }
         `;
