@@ -40,12 +40,11 @@
             <div class="landing-hero-content">
                 <p class="landing-eyebrow">✦ Thoughtful gifting, beautifully timed</p>
                 <h1 class="landing-hero-title">
-                    Never miss<br>
-                    <em>another</em> moment.
+                    Automated gifting reminders<br>
+                    &amp; curated edits, <em>delivered right when you need them.</em>
                 </h1>
                 <p class="landing-hero-subtitle">
-                    The art of thoughtful gifting, quietly held in our care.<br>
-                    For the people you love, and the moments that matter.
+                    Never miss a birthday, anniversary, or moment that matters — with handpicked gifts from brands we trust, ready exactly when you need them.
                 </p>
                 <div class="landing-hero-ctas">
                     <a href="signup.html" class="btn btn-primary btn-large">Start free</a>
@@ -115,6 +114,66 @@
                     </p>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <section class="landing-sandbox">
+        <div class="container">
+            <p class="section-eyebrow">See it in action</p>
+            <h2 class="section-heading">
+                Try it yourself.<br>
+                <em>No sign up required.</em>
+            </h2>
+            <p class="sandbox-intro">Choose a relationship and an occasion — we'll show you exactly the kind of curated edit you'd receive.</p>
+
+            <div class="sandbox-selects">
+                <div class="sandbox-select-group">
+                    <label for="sandboxRelationship">Who's it for?</label>
+                    <select id="sandboxRelationship">
+                        <option value="">Select relationship</option>
+                        <option value="Mother">Mother</option>
+                        <option value="Father">Father</option>
+                        <option value="Sister">Sister</option>
+                        <option value="Brother">Brother</option>
+                        <option value="Daughter">Daughter</option>
+                        <option value="Son">Son</option>
+                        <option value="Partner">Partner</option>
+                        <option value="Wife">Wife</option>
+                        <option value="Husband">Husband</option>
+                        <option value="Friend">Friend</option>
+                        <option value="Best Friend">Best Friend</option>
+                        <option value="Grandmother">Grandmother</option>
+                        <option value="Grandfather">Grandfather</option>
+                        <option value="Aunt">Aunt</option>
+                        <option value="Uncle">Uncle</option>
+                        <option value="Niece">Niece</option>
+                        <option value="Nephew">Nephew</option>
+                        <option value="Cousin">Cousin</option>
+                    </select>
+                </div>
+                <div class="sandbox-select-group">
+                    <label for="sandboxOccasion">What's the occasion?</label>
+                    <select id="sandboxOccasion">
+                        <option value="">Select occasion</option>
+                        <option value="birthday">Birthday</option>
+                        <option value="anniversary">Anniversary</option>
+                        <option value="wedding">Wedding</option>
+                        <option value="mothers-day">Mother's Day</option>
+                        <option value="fathers-day">Father's Day</option>
+                        <option value="valentines">Valentine's Day</option>
+                        <option value="just-because">Just Because</option>
+                    </select>
+                </div>
+            </div>
+
+            <p class="sandbox-loading hidden" id="sandboxLoading">Curating your edit…</p>
+
+            <div class="sandbox-results hidden" id="sandboxResults">
+                <p class="sandbox-results-heading" id="sandboxResultsHeading"></p>
+                <div class="sandbox-grid" id="sandboxGrid"></div>
+            </div>
+
+            <p class="sandbox-empty hidden" id="sandboxEmpty">We couldn't find a match for that combination just yet — but our full catalogue has plenty more to explore.</p>
         </div>
     </section>
 
@@ -348,6 +407,7 @@
     <script src="js/firebase-config.js"></script>
     <script src="js/nav-auth.js"></script>
     <script src="js/mobile-menu.js"></script>
+    <script src="js/sandbox.js"></script>
 
 </body>
 </html>
