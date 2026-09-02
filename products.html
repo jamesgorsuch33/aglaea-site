@@ -96,6 +96,13 @@
                      SIDEBAR FILTERS
                      ✏️ EDIT: Add/remove brands below as you add products.
                      Each <span> must match the data-brand value on cards.
+
+                     Each filter-group below is now a native <details>
+                     element — collapsed by default, click the section
+                     title to expand it. The checkboxes inside are
+                     completely unchanged from before (still multi-select,
+                     still call filterProducts() on change) — only the
+                     show/hide wrapper around each group is new.
                 ================================================ -->
                 <aside class="filters-sidebar">
                     <div class="filters-header">
@@ -105,8 +112,8 @@
 
                     <!-- Occasion Filter — no changes needed unless adding new occasions -->
                     <!-- ✏️ NOTE: For-her / For-him are in the Recipient filter below -->
-                    <div class="filter-group">
-                        <h4>Shop by Occasion</h4>
+                    <details class="filter-group">
+                        <summary>Shop by Occasion</summary>
                         <div class="filter-options">
                             <label class="filter-checkbox">
                                 <input type="checkbox" value="anniversary" onchange="filterProducts()">
@@ -133,11 +140,11 @@
                                 <span>Wedding</span>
                             </label>
                         </div>
-                    </div>
+                    </details>
 
                     <!-- Recipient Filter -->
-                    <div class="filter-group">
-                        <h4>Shop by Recipient</h4>
+                    <details class="filter-group">
+                        <summary>Shop by Recipient</summary>
                         <div class="filter-options">
                             <label class="filter-checkbox">
                                 <input type="checkbox" value="for-her" onchange="filterProducts()">
@@ -148,12 +155,54 @@
                                 <span>For Him</span>
                             </label>
                         </div>
-                    </div>
+                    </details>
+
+                    <!-- Product Type Filter -->
+                    <!-- ✏️ EDIT: Add a new <label> block if a new product
+                         category is introduced to product-data.json that
+                         isn't one of these eight. -->
+                    <details class="filter-group">
+                        <summary>Shop by Product Type</summary>
+                        <div class="filter-options">
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="jewellery" onchange="filterProducts()">
+                                <span>Jewellery</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="fragrance" onchange="filterProducts()">
+                                <span>Fragrance</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="clothing" onchange="filterProducts()">
+                                <span>Clothing</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="shoes" onchange="filterProducts()">
+                                <span>Shoes</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="flowers" onchange="filterProducts()">
+                                <span>Flowers</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="food" onchange="filterProducts()">
+                                <span>Food</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="home" onchange="filterProducts()">
+                                <span>Home</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="card" onchange="filterProducts()">
+                                <span>Cards</span>
+                            </label>
+                        </div>
+                    </details>
 
                     <!-- Brand Filter -->
                     <!-- ✏️ EDIT: Add a new <label> block for each new brand you add -->
-                    <div class="filter-group">
-                        <h4>Shop by Brand</h4>
+                    <details class="filter-group">
+                        <summary>Shop by Brand</summary>
                         <div class="filter-options">
                             <label class="filter-checkbox">
                                 <input type="checkbox" value="anthbot" onchange="filterProducts()">
@@ -208,7 +257,7 @@
                                 <span>Wild At Heart</span>
                             </label>
                         </div>
-                    </div>
+                    </details>
                 </aside>
 
 
