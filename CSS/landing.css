@@ -386,33 +386,45 @@
 }
 
 .features-list {
-    max-width: 800px;
+    max-width: 1080px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 48px;
+    gap: 88px;
 }
 
+/* Alternating zigzag — the markup always puts the image first, then
+   the text; only the CSS `order` property flips the visual position
+   on even rows, rather than duplicating markup with a different DOM
+   order for each direction. */
 .feature-row {
     display: grid;
-    grid-template-columns: 60px 1fr;
-    gap: 32px;
-    align-items: start;
-    padding-bottom: 48px;
-    border-bottom: 1px solid rgba(201, 168, 112, 0.2);
+    grid-template-columns: 1fr 1fr;
+    gap: 56px;
+    align-items: center;
 }
 
-.feature-row:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
+.feature-row:nth-child(even) .feature-row-image {
+    order: 2;
 }
 
-.feature-icon {
-    font-size: 36px;
-    color: var(--gold);
-    text-align: center;
-    line-height: 1;
-    padding-top: 8px;
+.feature-row:nth-child(even) .feature-content {
+    order: 1;
+}
+
+.feature-row-image {
+    aspect-ratio: 4 / 3;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--stone);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+}
+
+.feature-row-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .feature-content h3 {
@@ -826,8 +838,17 @@
     
     .feature-row {
         grid-template-columns: 1fr;
-        gap: 16px;
+        gap: 20px;
         text-align: center;
+    }
+    
+    .feature-row:nth-child(even) .feature-row-image,
+    .feature-row:nth-child(even) .feature-content {
+        order: initial;
+    }
+    
+    .features-list {
+        gap: 48px;
     }
     
     .final-cta-heading {
