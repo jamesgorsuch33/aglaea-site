@@ -54,6 +54,7 @@ function buildProductCard(product) {
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
     a.setAttribute('data-brand', product.brandSlug);
+    a.setAttribute('data-category', product.category || '');
     a.setAttribute('data-occasions', (product.occasions || []).join(','));
     a.setAttribute('data-original-index', product.originalIndex);
     a.setAttribute('data-product-id', product.id);
@@ -89,12 +90,15 @@ function escapeAttr(str) {
 // URL-PARAM DEEP LINKING
 // Lets reminder emails link straight into a pre-filtered view, e.g.
 // products.html?occasion=birthday or products.html?occasion=mothers-day&recipient=for-her
+// Also supports &category=... for the new Product Type filter, e.g.
+// products.html?category=fragrance
 // Runs once after cards are rendered, before the first filterProducts() call.
 // ============================================================
 function applyUrlFilters() {
     const params = new URLSearchParams(window.location.search);
     const occasion = params.get('occasion');
     const recipient = params.get('recipient'); // 'for-her' or 'for-him'
+    const category = params.get('category'); // product type, e.g. 'fragrance'
 
     if (occasion) {
         const cb = document.querySelector(`.filter-group input[type="checkbox"][value="${CSS.escape(occasion)}"]`);
@@ -104,6 +108,18 @@ function applyUrlFilters() {
         const cb = document.querySelector(`.filter-group input[type="checkbox"][value="${CSS.escape(recipient)}"]`);
         if (cb) cb.checked = true;
     }
+    if (category) {
+        const cb = document.querySelector(`.filter-group input[type="checkbox"][value="${CSS.escape(category)}"]`);
+        if (cb) cb.checked = true;
+    }
+
+    // If a filter arrived via URL, open that section so the person can
+    // immediately see (and change) what's been pre-selected, rather than
+    // wondering why results are filtered with every section collapsed.
+    document.querySelectorAll('.filter-group input[type="checkbox"]:checked').forEach(cb => {
+        const details = cb.closest('details.filter-group');
+        if (details) details.open = true;
+    });
 }
 
 // ============================================================
@@ -149,21 +165,30 @@ function filterProducts() {
     const brandCards = document.querySelectorAll('.brand-card');
 
     // Each filter group is identified by its own checkbox values rather
-    // than DOM position, so adding/removing filter groups (e.g. Recipient)
-    // never breaks this logic.
+    // than DOM position, so adding/removing filter groups never breaks
+    // this logic. categoryValues (Product Type) is new — brandFilters
+    // now explicitly excludes it too, so a product-type checkbox can
+    // never be mistaken for a brand filter.
     const occasionValues = ['birthday', 'anniversary', 'wedding', 'mothers-day', 'fathers-day', 'just-because'];
     const recipientValues = ['for-her', 'for-him'];
+    const categoryValues = ['jewellery', 'fragrance', 'clothing', 'shoes', 'flowers', 'food', 'home', 'card'];
 
     const checkedValues = Array.from(document.querySelectorAll('.filter-group input[type="checkbox"]:checked')).map(cb => cb.value);
 
     const occasionFilters = checkedValues.filter(v => occasionValues.includes(v));
     const recipientFilters = checkedValues.filter(v => recipientValues.includes(v));
-    const brandFilters = checkedValues.filter(v => !occasionValues.includes(v) && !recipientValues.includes(v));
+    const categoryFilters = checkedValues.filter(v => categoryValues.includes(v));
+    const brandFilters = checkedValues.filter(v =>
+        !occasionValues.includes(v) &&
+        !recipientValues.includes(v) &&
+        !categoryValues.includes(v)
+    );
 
     let matchedCards = [];
 
     brandCards.forEach(card => {
         const cardBrand = card.getAttribute('data-brand');
+        const cardCategory = card.getAttribute('data-category');
         const cardOccasions = card.getAttribute('data-occasions').split(',');
 
         let showCard = true;
@@ -180,6 +205,13 @@ function filterProducts() {
         if (recipientFilters.length > 0) {
             const hasMatchingRecipient = recipientFilters.some(recipient => cardOccasions.includes(recipient));
             if (!hasMatchingRecipient) {
+                showCard = false;
+            }
+        }
+
+        // Check product-type filters
+        if (categoryFilters.length > 0) {
+            if (!categoryFilters.includes(cardCategory)) {
                 showCard = false;
             }
         }
