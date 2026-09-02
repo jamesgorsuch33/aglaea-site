@@ -78,16 +78,69 @@
     text-decoration: underline;
 }
 
+/* ------------------------------------------------------------
+   FILTER GROUPS — now <details> elements, collapsed by default.
+   list-style/marker rules hide the browser's own default
+   disclosure triangle so the custom gold +/- indicator below is
+   the only one shown, matching the same pattern already used for
+   the FAQ page's accordion.
+------------------------------------------------------------ */
 .filter-group {
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--stone);
+    padding-bottom: 1.25rem;
 }
 
-.filter-group h4 {
+.filter-group:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.filter-group summary {
     font-family: var(--font-display);
     font-size: 1.25rem;
     font-weight: 500;
     color: var(--charcoal);
-    margin-bottom: 1rem;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: color 0.2s ease;
+}
+
+.filter-group summary::-webkit-details-marker {
+    display: none;
+}
+
+.filter-group summary:hover {
+    color: var(--gold);
+}
+
+.filter-group summary:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+}
+
+/* The +/- indicator is pure CSS-generated content on the summary
+   itself, not a separate element — nothing here needs an
+   aria-hidden treatment, the same reasoning as the FAQ page. */
+.filter-group summary::after {
+    content: '+';
+    font-size: 1.35rem;
+    color: var(--gold);
+    font-weight: 300;
+    line-height: 1;
+    margin-left: 0.5rem;
+    transition: transform 0.2s ease;
+}
+
+.filter-group[open] summary::after {
+    transform: rotate(45deg);
+}
+
+.filter-group .filter-options {
+    margin-top: 1rem;
 }
 
 .filter-options {
