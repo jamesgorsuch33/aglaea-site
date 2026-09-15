@@ -340,7 +340,7 @@
 
 .brand-category {
     font-size: 0.75rem;
-    color: var(--charcoal);
+    color: var(--gold);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     font-weight: 600;
@@ -348,9 +348,10 @@
 }
 
 .brand-recipient {
-    font-size: 0.75rem;
+    font-size: 0.68rem;
     color: var(--charcoal);
     font-weight: 400;
+    font-style: italic;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -360,6 +361,7 @@
     margin-right: 0.5rem;
     color: var(--stone);
     font-weight: 400;
+    font-style: normal;
 }
 
 /* Product descriptions are hidden on the Specific Products page
