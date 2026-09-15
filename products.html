@@ -23,15 +23,30 @@
             color: var(--charcoal);
         }
 
-        /* Badge showing the brand name above product title */
+        /* Brand name — now the dominant, large gold element on the
+           card. Previously small caps; product type used to be the
+           larger gold element instead, this swaps that hierarchy. */
         .brand-badge {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--gold);
+            margin-bottom: 2px;
+            line-height: 1.2;
+        }
+
+        /* Department-store credit line — only rendered when a product
+           has retailerName set in product-data.json (e.g. a Gucci
+           item sold via Selfridges). Sits directly under the brand
+           name, small and muted so it reads as a secondary credit
+           rather than competing with the brand itself. */
+        .brand-retailer {
             font-family: 'Inter', sans-serif;
-            font-size: 0.7rem;
-            font-weight: 500;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
+            font-size: 0.75rem;
+            font-weight: 400;
             color: var(--slate);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            font-style: italic;
         }
 
         /* =============================================
@@ -239,10 +254,6 @@
                             <label class="filter-checkbox">
                                 <input type="checkbox" value="purely-diamonds" onchange="filterProducts()">
                                 <span>Purely Diamonds</span>
-                            </label>
-							<label class="filter-checkbox">
-                                <input type="checkbox" value="scarosso" onchange="filterProducts()">
-                                <span>Scarosso</span>
                             </label>
                             <label class="filter-checkbox">
                                 <input type="checkbox" value="scribbler" onchange="filterProducts()">
