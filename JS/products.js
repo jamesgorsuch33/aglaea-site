@@ -54,10 +54,33 @@ function buildProductCard(product) {
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
     a.setAttribute('data-brand', product.brandSlug);
+    a.setAttribute('data-retailer', product.retailerSlug || '');
     a.setAttribute('data-category', product.category || '');
     a.setAttribute('data-occasions', (product.occasions || []).join(','));
     a.setAttribute('data-original-index', product.originalIndex);
     a.setAttribute('data-product-id', product.id);
+
+    // Department-store items (e.g. a Gucci bag sold via Selfridges) set
+    // retailerName in product-data.json — everything else leaves it
+    // unset and this line simply doesn't render. See the note in
+    // products.css above .brand-retailer for the exact field to add.
+    const retailerLine = product.retailerName
+        ? `<p class="brand-retailer">via ${escapeHtml(product.retailerName)}</p>`
+        : '';
+
+    // For Him / For Her / For Both — derived from the occasions array
+    // that already exists on every product (it already includes
+    // 'for-her' and/or 'for-him'), so no new data field is needed here.
+    const occasions = product.occasions || [];
+    const isForHer = occasions.includes('for-her');
+    const isForHim = occasions.includes('for-him');
+    let recipientLabel = '';
+    if (isForHer && isForHim) recipientLabel = 'For Both';
+    else if (isForHer) recipientLabel = 'For Her';
+    else if (isForHim) recipientLabel = 'For Him';
+    const recipientBadge = recipientLabel
+        ? `<span class="brand-recipient">${recipientLabel}</span>`
+        : '';
 
     a.innerHTML = `
         <div class="brand-image">
@@ -65,8 +88,12 @@ function buildProductCard(product) {
         </div>
         <div class="brand-info">
             <p class="brand-badge">${escapeHtml(product.brandName)}</p>
+            ${retailerLine}
             <h3 class="brand-name">${escapeHtml(product.productName)}</h3>
-            <p class="brand-category">${escapeHtml(product.productCategory)}</p>
+            <div class="brand-meta-row">
+                <p class="brand-category">${escapeHtml(product.productCategory)}</p>
+                ${recipientBadge}
+            </div>
             <p class="brand-description">${escapeHtml(product.description)}</p>
             <p class="brand-price">${escapeHtml(product.priceText)}</p>
         </div>
@@ -188,6 +215,7 @@ function filterProducts() {
 
     brandCards.forEach(card => {
         const cardBrand = card.getAttribute('data-brand');
+        const cardRetailer = card.getAttribute('data-retailer');
         const cardCategory = card.getAttribute('data-category');
         const cardOccasions = card.getAttribute('data-occasions').split(',');
 
@@ -216,9 +244,15 @@ function filterProducts() {
             }
         }
 
-        // Check brand filters
+        // Check brand filters — matches against EITHER the actual brand
+        // (e.g. "gucci") or the retailer (e.g. "selfridges"), so a
+        // department-store checkbox correctly surfaces every brand it
+        // carries, and a direct-brand checkbox still works exactly as
+        // before for products with no retailer set.
         if (brandFilters.length > 0) {
-            if (!brandFilters.includes(cardBrand)) {
+            const matchesBrand = brandFilters.includes(cardBrand);
+            const matchesRetailer = cardRetailer && brandFilters.includes(cardRetailer);
+            if (!matchesBrand && !matchesRetailer) {
                 showCard = false;
             }
         }
