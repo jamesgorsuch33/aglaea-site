@@ -325,13 +325,41 @@
     margin-bottom: 0.25rem;
 }
 
+/* Category and the For Him/For Her/For Both badge now sit together
+   on one row — category keeps its small-caps treatment but switches
+   to the same color as the main card text (was gold before, when it
+   was the dominant element); the recipient badge is a lighter weight
+   so it reads as a secondary detail alongside it, not competing. */
+.brand-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+}
+
 .brand-category {
-    font-size: 0.875rem;
-    color: var(--gold);
+    font-size: 0.75rem;
+    color: var(--charcoal);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     font-weight: 600;
-    margin-bottom: 0.75rem;
+    margin: 0;
+}
+
+.brand-recipient {
+    font-size: 0.75rem;
+    color: var(--charcoal);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.brand-recipient::before {
+    content: '·';
+    margin-right: 0.5rem;
+    color: var(--stone);
+    font-weight: 400;
 }
 
 /* Product descriptions are hidden on the Specific Products page
