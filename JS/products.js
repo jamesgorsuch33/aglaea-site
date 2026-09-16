@@ -198,7 +198,7 @@ function filterProducts() {
     // never be mistaken for a brand filter.
     const occasionValues = ['birthday', 'anniversary', 'wedding', 'mothers-day', 'fathers-day', 'just-because'];
     const recipientValues = ['for-her', 'for-him'];
-    const categoryValues = ['jewellery', 'fragrance', 'clothing', 'shoes', 'flowers', 'food', 'home', 'card'];
+    const categoryValues = ['jewellery', 'fragrance', 'clothing', 'shoes', 'flowers', 'food', 'home', 'accessories', 'card'];
 
     const checkedValues = Array.from(document.querySelectorAll('.filter-group input[type="checkbox"]:checked')).map(cb => cb.value);
 
