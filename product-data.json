@@ -6719,57 +6719,5 @@
     ],
     "forHer": true,
     "forHim": false
-  },
-{
-    "id": "ln-cc-prada-re-nylon-cherie-mini-handbag",
-    "brandSlug": "prada",
-    "brandName": "Prada",
-    "retailerSlug": "ln-cc",
-    "retailerName": "LN-CC",
-    "productName": "Re-Nylon Chérie Mini Handbag, Brown",
-    "productCategory": "Accessories",
-    "category": "Accessories",
-    "description": "Shoulder bag in structured nylon construction with logo plaque.",
-    "priceText": "£1,170.00",
-    "priceValue": 1170.00,
-    "currency": "GBP",
-    "imageUrl": "https://www.ln-cc.com/dw/image/v2/BGDG_PRD/on/demandware.static/-/Sites-09/default/dwed7956d4/images/zoom/pra0265021_brn_00.jpg?sw=1440&sh=1980",
-    "imageAlt": "LN-CC - Prada - Re-Nylon Chérie Mini Handbag",
-    "affiliateUrl": "https://www.ln-cc.com/en-gb/women/bags/handbags/prada-re-nylon-cherie-mini-handbag-in-brown-pra0265021brn.html",
-    "occasions": [
-      "birthday",
-      "anniversary",
-      "mothers-day",
-      "wedding",
-      "just-because",
-      "for-her"
-    ],
-    "forHer": true,
-    "forHim": false
-  },
-{
-    "id": "ln-cc-prada-re-nylon-cherie-mini-handbag",
-    "brandSlug": "ln-cc",
-    "brandName": "LN-CC",
-    "productName": "Prada Re-Nylon Chérie Mini Handbag, Brown",
-    "productCategory": "Accessories",
-    "category": "Accessories",
-    "description": "Shoulder bag in structured nylon construction with logo plaque.",
-    "priceText": "£1,170.00",
-    "priceValue": 1170.00,
-    "currency": "GBP",
-    "imageUrl": "https://www.ln-cc.com/dw/image/v2/BGDG_PRD/on/demandware.static/-/Sites-09/default/dwed7956d4/images/zoom/pra0265021_brn_00.jpg?sw=1440&sh=1980",
-    "imageAlt": "LN-CC - Prada - Re-Nylon Chérie Mini Handbag",
-    "affiliateUrl": "https://www.ln-cc.com/en-gb/women/bags/handbags/prada-re-nylon-cherie-mini-handbag-in-brown-pra0265021brn.html",
-    "occasions": [
-      "birthday",
-      "anniversary",
-      "mothers-day",
-      "wedding",
-      "just-because",
-      "for-her"
-    ],
-    "forHer": true,
-    "forHim": false
   }
 ]
