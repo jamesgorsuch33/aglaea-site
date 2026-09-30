@@ -188,6 +188,69 @@
     gap: 0.75rem;
 }
 
+/* ------------------------------------------------------------
+   BRAND SEARCH + A-Z GROUPING
+   The checkbox list itself stays in whatever order it's written
+   in HTML (see the comment above the Brand filter-group) —
+   sorting into alphabetical letter groups happens entirely in
+   JS at page load, so adding a new brand never requires finding
+   the "right" spot in the file.
+------------------------------------------------------------ */
+.brand-search-wrap input[type="text"] {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--stone);
+    border-radius: var(--radius-md);
+    background: white;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--charcoal);
+    transition: all 0.3s ease;
+}
+
+.brand-search-wrap input[type="text"]:hover {
+    border-color: var(--gold);
+}
+
+.brand-search-wrap input[type="text"]:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201, 168, 112, 0.1);
+}
+
+/* Bounded height + scroll once the brand list grows past a
+   comfortable sidebar length — matches the pattern in the
+   reference screenshot rather than letting the sidebar grow
+   indefinitely as more brands are added. */
+.brand-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    max-height: 340px;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+    margin-top: 0.75rem;
+}
+
+.brand-letter-divider {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--charcoal);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding-bottom: 0.3rem;
+    margin-top: 0.4rem;
+    border-bottom: 1px solid var(--stone);
+}
+
+.brand-letter-divider:first-child {
+    margin-top: 0;
+}
+
+.brand-options .filter-checkbox.brand-hidden {
+    display: none;
+}
+
 .filter-checkbox {
     display: flex;
     align-items: center;
