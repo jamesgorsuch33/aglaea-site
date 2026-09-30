@@ -192,6 +192,12 @@
                          from the taxonomy source rather than editing
                          individual labels, to keep data-cat-path values
                          consistent with how products are tagged. -->
+                    <!-- Shop by Product — wraps all 7 category
+                         headings below in one collapsible section,
+                         matching Occasion/Recipient/Brand. -->
+                    <details class="filter-group">
+                        <summary>Shop by Product</summary>
+                        <div class="filter-options">
                     <details class="filter-group cat-heading">
                         <summary>
                             <label class="cat-summary-label" onclick="event.stopPropagation()">
@@ -856,6 +862,8 @@
                                 <input type="checkbox" data-cat-level="item" data-cat-path="home/food-and-drink" onchange="handleCategoryCheckbox(this)">
                                 <span>Food &amp; Drink</span>
                             </label>
+                        </div>
+                    </details>
                         </div>
                     </details>
 
