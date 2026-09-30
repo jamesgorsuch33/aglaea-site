@@ -47,6 +47,23 @@ async function loadAndRenderProducts() {
 // Build one .brand-card <a> element from a product-data.json entry.
 // Markup/classes match the previous hardcoded cards exactly, so all
 // existing CSS and the filter/sort logic below need no changes.
+// Joins a product's categoryPath object (per the taxonomy schema —
+// { category, subcategory, productType }, with subcategory/productType
+// only present where the tree actually goes that deep) into the same
+// slash-separated string format the filter checkboxes use as their
+// own data-cat-path, so the two can be compared directly. Products
+// that haven't been retagged with categoryPath yet (still on the old
+// flat "category" field only) return an empty string here — they'll
+// simply not match any category taxonomy filter until retagged, but
+// remain fully visible and filterable by occasion/recipient/brand/search.
+function buildCategoryPath(categoryPath) {
+    if (!categoryPath || !categoryPath.category) return '';
+    const parts = [categoryPath.category];
+    if (categoryPath.subcategory) parts.push(categoryPath.subcategory);
+    if (categoryPath.productType) parts.push(categoryPath.productType);
+    return parts.join('/');
+}
+
 function buildProductCard(product) {
     const a = document.createElement('a');
     a.href = product.affiliateUrl;
@@ -56,6 +73,7 @@ function buildProductCard(product) {
     a.setAttribute('data-brand', product.brandSlug);
     a.setAttribute('data-retailer', product.retailerSlug || '');
     a.setAttribute('data-category', product.category || '');
+    a.setAttribute('data-cat-path', buildCategoryPath(product.categoryPath));
     a.setAttribute('data-occasions', (product.occasions || []).join(','));
     a.setAttribute('data-original-index', product.originalIndex);
     a.setAttribute('data-product-id', product.id);
@@ -189,28 +207,66 @@ function toggleMobileFilters() {
 }
 
 // Filter products based on selected checkboxes
+// ============================================================
+// CATEGORY TAXONOMY: CASCADING CHECKBOXES
+// Ticking a heading or subheading ticks every checkbox beneath it
+// too (e.g. ticking "Clothing" ticks every subheading and item
+// under it). Only cascades downward — unticking one item under a
+// ticked subheading does not untick the subheading itself. Called
+// via onchange on every heading/subheading/item checkbox.
+// ============================================================
+function handleCategoryCheckbox(checkbox) {
+    const level = checkbox.getAttribute('data-cat-level');
+    if (level === 'heading' || level === 'subheading') {
+        const container = checkbox.closest('details');
+        const descendantCheckboxes = container.querySelectorAll('input[type="checkbox"][data-cat-level]');
+        descendantCheckboxes.forEach(cb => {
+            if (cb !== checkbox) cb.checked = checkbox.checked;
+        });
+    }
+    filterProducts();
+}
+
 function filterProducts() {
     const brandCards = document.querySelectorAll('.brand-card');
 
     // Each filter group is identified by its own checkbox values rather
     // than DOM position, so adding/removing filter groups never breaks
-    // this logic. categoryValues (Product Type) is new — brandFilters
-    // now explicitly excludes it too, so a product-type checkbox can
-    // never be mistaken for a brand filter.
+    // this logic. The new category taxonomy checkboxes use data-cat-path
+    // rather than a value attribute, and are handled entirely separately
+    // below (categoryCheckedPaths) — excluded here via :not([data-cat-level])
+    // so they can never be mistaken for a brand filter (a checkbox with no
+    // value attribute defaults to "on", which would otherwise contaminate
+    // brandFilters).
     const occasionValues = ['birthday', 'anniversary', 'wedding', 'mothers-day', 'fathers-day', 'just-because'];
     const recipientValues = ['for-her', 'for-him'];
-    const categoryValues = ['jewellery', 'fragrance', 'clothing', 'shoes', 'flowers', 'food', 'home', 'card'];
 
-    const checkedValues = Array.from(document.querySelectorAll('.filter-group input[type="checkbox"]:checked')).map(cb => cb.value);
+    const checkedValues = Array.from(document.querySelectorAll('.filter-group input[type="checkbox"]:not([data-cat-level]):checked')).map(cb => cb.value);
 
     const occasionFilters = checkedValues.filter(v => occasionValues.includes(v));
     const recipientFilters = checkedValues.filter(v => recipientValues.includes(v));
-    const categoryFilters = checkedValues.filter(v => categoryValues.includes(v));
     const brandFilters = checkedValues.filter(v =>
         !occasionValues.includes(v) &&
-        !recipientValues.includes(v) &&
-        !categoryValues.includes(v)
+        !recipientValues.includes(v)
     );
+
+    // Category taxonomy — collect every checked heading/subheading/item
+    // checkbox's data-cat-path. A card matches if ANY checked path is an
+    // exact match, or a prefix of, the card's own full path (e.g. checking
+    // the "Clothing" heading, path "clothing", matches a card whose path is
+    // "clothing/jackets-and-coats/puffer-coats"). Cascading (see
+    // handleCategoryCheckbox) already keeps descendant checkboxes in sync
+    // when a heading/subheading is ticked, but matching against every
+    // checked level directly here — not just leaf items — means a product
+    // tagged only at the category level (no subcategory/productType yet)
+    // still correctly matches when its top-level heading is checked.
+    const categoryCheckedPaths = Array.from(document.querySelectorAll('input[type="checkbox"][data-cat-level]:checked')).map(cb => cb.getAttribute('data-cat-path'));
+
+    function cardMatchesCategory(cardPath) {
+        if (categoryCheckedPaths.length === 0) return true;
+        if (!cardPath) return false;
+        return categoryCheckedPaths.some(checkedPath => cardPath === checkedPath || cardPath.startsWith(checkedPath + '/'));
+    }
 
     // Product-name search — combines with every filter above rather
     // than replacing them, so "candle" + a checked For Her box shows
@@ -223,7 +279,7 @@ function filterProducts() {
     brandCards.forEach(card => {
         const cardBrand = card.getAttribute('data-brand');
         const cardRetailer = card.getAttribute('data-retailer');
-        const cardCategory = card.getAttribute('data-category');
+        const cardCatPath = card.getAttribute('data-cat-path');
         const cardOccasions = card.getAttribute('data-occasions').split(',');
         const cardName = (card.getAttribute('data-product-name') || '').toLowerCase();
 
@@ -250,11 +306,9 @@ function filterProducts() {
             }
         }
 
-        // Check product-type filters
-        if (categoryFilters.length > 0) {
-            if (!categoryFilters.includes(cardCategory)) {
-                showCard = false;
-            }
+        // Check category taxonomy filters
+        if (!cardMatchesCategory(cardCatPath)) {
+            showCard = false;
         }
 
         // Check brand filters — matches against EITHER the actual brand
