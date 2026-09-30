@@ -59,6 +59,7 @@ function buildProductCard(product) {
     a.setAttribute('data-occasions', (product.occasions || []).join(','));
     a.setAttribute('data-original-index', product.originalIndex);
     a.setAttribute('data-product-id', product.id);
+    a.setAttribute('data-product-name', product.productName || '');
 
     // Department-store items (e.g. a Gucci bag sold via Selfridges) set
     // retailerName in product-data.json — everything else leaves it
@@ -198,7 +199,7 @@ function filterProducts() {
     // never be mistaken for a brand filter.
     const occasionValues = ['birthday', 'anniversary', 'wedding', 'mothers-day', 'fathers-day', 'just-because'];
     const recipientValues = ['for-her', 'for-him'];
-    const categoryValues = ['jewellery', 'fragrance', 'clothing', 'shoes', 'flowers', 'food', 'home', 'accessories', 'card'];
+    const categoryValues = ['jewellery', 'fragrance', 'clothing', 'shoes', 'flowers', 'food', 'home', 'card'];
 
     const checkedValues = Array.from(document.querySelectorAll('.filter-group input[type="checkbox"]:checked')).map(cb => cb.value);
 
@@ -211,6 +212,12 @@ function filterProducts() {
         !categoryValues.includes(v)
     );
 
+    // Product-name search — combines with every filter above rather
+    // than replacing them, so "candle" + a checked For Her box shows
+    // only For Her candles, not every candle regardless of that box.
+    const searchInput = document.getElementById('product-search');
+    const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
     let matchedCards = [];
 
     brandCards.forEach(card => {
@@ -218,8 +225,14 @@ function filterProducts() {
         const cardRetailer = card.getAttribute('data-retailer');
         const cardCategory = card.getAttribute('data-category');
         const cardOccasions = card.getAttribute('data-occasions').split(',');
+        const cardName = (card.getAttribute('data-product-name') || '').toLowerCase();
 
         let showCard = true;
+
+        // Check search term against product name
+        if (searchTerm && !cardName.includes(searchTerm)) {
+            showCard = false;
+        }
 
         // Check occasion filters
         if (occasionFilters.length > 0) {
@@ -324,6 +337,10 @@ function clearAllFilters() {
     document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
         cb.checked = false;
     });
+
+    // Clear the product-name search
+    const searchInput = document.getElementById('product-search');
+    if (searchInput) searchInput.value = '';
 
     // Reset sort to default
     document.getElementById('sort-select').value = 'default';
