@@ -31,6 +31,45 @@
     background: white;
 }
 
+/* ------------------------------------------------------------
+   PRODUCT SEARCH
+   Sits directly under the hero, right-aligned, spanning the full
+   content width (above the sidebar/grid split) rather than being
+   nested inside the toolbar next to sort.
+------------------------------------------------------------ */
+.products-search-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 2rem;
+}
+
+.products-search {
+    width: 100%;
+    max-width: 320px;
+}
+
+.products-search input[type="search"] {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    border: 1px solid var(--stone);
+    border-radius: var(--radius-md);
+    background: white;
+    font-family: var(--font-body);
+    font-size: 0.938rem;
+    color: var(--charcoal);
+    transition: all 0.3s ease;
+}
+
+.products-search input[type="search"]:hover {
+    border-color: var(--gold);
+}
+
+.products-search input[type="search"]:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201, 168, 112, 0.1);
+}
+
 .products-layout {
     display: grid;
     grid-template-columns: 280px 1fr;
@@ -441,6 +480,10 @@
     .products-layout {
         grid-template-columns: 1fr;
         gap: 0;
+    }
+    
+    .products-search {
+        max-width: none;
     }
     
     /* Hide sidebar, show mobile toggle */
