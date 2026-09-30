@@ -407,9 +407,87 @@ document.addEventListener('click', function (event) {
 });
 
 // ============================================================
+// BRAND FILTER: A-Z GROUPING + SEARCH
+// The Brand filter-group's checkboxes are written into the HTML
+// in whatever order they were added — this groups them into
+// alphabetical letter sections once at page load, so a newly
+// added brand never needs to be manually placed in the "right"
+// spot in the file; it just needs to exist anywhere in the list.
+// ============================================================
+function initBrandAlphaGrouping() {
+    const container = document.getElementById('brand-options');
+    if (!container) return;
+
+    const labels = Array.from(container.querySelectorAll('.filter-checkbox'));
+
+    // Sort alphabetically by the brand's visible text, not its
+    // slug — "BONHEUR JEWELRY" and "Bonheur Jewelry" sort the same
+    // regardless of how it's capitalised in the HTML.
+    labels.sort((a, b) => {
+        const nameA = a.querySelector('span').textContent.trim();
+        const nameB = b.querySelector('span').textContent.trim();
+        return nameA.localeCompare(nameB, undefined, { sensitivity: 'base' });
+    });
+
+    container.innerHTML = '';
+    let currentLetter = null;
+
+    labels.forEach(label => {
+        const name = label.querySelector('span').textContent.trim();
+        const firstChar = name.charAt(0).toUpperCase();
+        const letter = /[A-Z]/.test(firstChar) ? firstChar : '#';
+
+        if (letter !== currentLetter) {
+            currentLetter = letter;
+            const divider = document.createElement('div');
+            divider.className = 'brand-letter-divider';
+            divider.textContent = letter;
+            container.appendChild(divider);
+        }
+
+        container.appendChild(label);
+    });
+}
+
+// Filters the brand checkbox list as the person types — hides
+// non-matching brands, and hides a letter divider too once every
+// brand underneath it has been filtered out, so you never see a
+// bare "M" heading with nothing beneath it.
+function filterBrandList() {
+    const searchInput = document.getElementById('brand-filter-search');
+    const container = document.getElementById('brand-options');
+    if (!searchInput || !container) return;
+
+    const term = searchInput.value.trim().toLowerCase();
+    const children = Array.from(container.children);
+
+    children.forEach(child => {
+        if (child.classList.contains('filter-checkbox')) {
+            const name = child.querySelector('span').textContent.trim().toLowerCase();
+            child.classList.toggle('brand-hidden', term.length > 0 && !name.includes(term));
+        }
+    });
+
+    let i = 0;
+    while (i < children.length) {
+        if (children[i].classList.contains('brand-letter-divider')) {
+            let j = i + 1;
+            let anyVisible = false;
+            while (j < children.length && !children[j].classList.contains('brand-letter-divider')) {
+                if (!children[j].classList.contains('brand-hidden')) anyVisible = true;
+                j++;
+            }
+            children[i].style.display = anyVisible ? '' : 'none';
+        }
+        i++;
+    }
+}
+
+// ============================================================
 // INITIAL PAGE LOAD
 // ============================================================
 document.addEventListener('DOMContentLoaded', async function () {
+    initBrandAlphaGrouping();
     await loadAndRenderProducts();
     applyUrlFilters();
     filterProducts();
