@@ -182,6 +182,102 @@
     margin-top: 1rem;
 }
 
+/* ------------------------------------------------------------
+   NESTED CATEGORY TAXONOMY
+   Heading-level reuses .filter-group above unchanged. Subheadings
+   are a second, nested <details> (.cat-subgroup) with their own
+   smaller +/- indicator, and items are plain checkboxes indented
+   under whichever level they sit beneath. Every level's checkbox
+   sits inside its own <label> with onclick="event.stopPropagation()"
+   in the markup, so ticking "select everything under this" never
+   also toggles that section open/closed — verified this doesn't
+   fight the native <details> toggle before building the rest of
+   this out.
+------------------------------------------------------------ */
+.cat-summary-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    flex: 1;
+    min-width: 0;
+}
+
+.cat-summary-label input[type="checkbox"] {
+    margin-right: 0.75rem;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--gold);
+    flex-shrink: 0;
+}
+
+.cat-subtree {
+    padding-left: 0.25rem;
+}
+
+.cat-subgroup {
+    margin: 0.6rem 0;
+}
+
+.cat-subgroup summary {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--charcoal);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: color 0.2s ease;
+}
+
+.cat-subgroup summary::-webkit-details-marker {
+    display: none;
+}
+
+.cat-subgroup summary:hover {
+    color: var(--gold);
+}
+
+.cat-subgroup summary:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+}
+
+.cat-subgroup summary::after {
+    content: '+';
+    font-size: 1.1rem;
+    color: var(--gold);
+    font-weight: 300;
+    line-height: 1;
+    margin-left: 0.5rem;
+    transition: transform 0.2s ease;
+}
+
+.cat-subgroup[open] summary::after {
+    transform: rotate(45deg);
+}
+
+.cat-items {
+    margin-top: 0.6rem;
+    padding-left: 1.6rem;
+    gap: 0.6rem;
+}
+
+/* Items sitting directly under a heading (no subheading layer —
+   e.g. Dresses, Skirts under Clothing) get the same indent as
+   items nested under a subheading, so the visual depth reads
+   consistently regardless of how deep that particular branch
+   actually goes. */
+.cat-subtree > .cat-item {
+    margin-left: 1.6rem;
+}
+
+.cat-item {
+    font-size: 0.9rem;
+}
+
 .filter-options {
     display: flex;
     flex-direction: column;
