@@ -161,21 +161,26 @@
     outline-offset: 3px;
 }
 
-/* The +/- indicator is pure CSS-generated content on the summary
-   itself, not a separate element — nothing here needs an
-   aria-hidden treatment, the same reasoning as the FAQ page. */
+/* Chevron indicator — a CSS-drawn triangle rather than a font
+   character, so it renders crisply and consistently across browsers.
+   Points down when collapsed (click to reveal), rotates to point up
+   when open (click to collapse) — replaces an earlier +/× rotation
+   that read as a close button rather than an expand affordance. */
 .filter-group summary::after {
-    content: '+';
-    font-size: 1.35rem;
-    color: var(--gold);
-    font-weight: 300;
-    line-height: 1;
+    content: '';
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid var(--gold);
     margin-left: 0.5rem;
+    flex-shrink: 0;
     transition: transform 0.2s ease;
 }
 
-.filter-group[open] summary::after {
-    transform: rotate(45deg);
+.filter-group[open] > summary::after {
+    transform: rotate(180deg);
 }
 
 .filter-group .filter-options {
@@ -212,7 +217,7 @@
 }
 
 .cat-subtree {
-    padding-left: 0.25rem;
+    padding-left: 1.25rem;
 }
 
 .cat-subgroup {
@@ -222,7 +227,7 @@
 .cat-subgroup summary {
     font-family: var(--font-body);
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 400;
     color: var(--charcoal);
     cursor: pointer;
     list-style: none;
@@ -246,22 +251,25 @@
 }
 
 .cat-subgroup summary::after {
-    content: '+';
-    font-size: 1.1rem;
-    color: var(--gold);
-    font-weight: 300;
-    line-height: 1;
+    content: '';
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid var(--gold);
     margin-left: 0.5rem;
+    flex-shrink: 0;
     transition: transform 0.2s ease;
 }
 
-.cat-subgroup[open] summary::after {
-    transform: rotate(45deg);
+.cat-subgroup[open] > summary::after {
+    transform: rotate(180deg);
 }
 
 .cat-items {
     margin-top: 0.6rem;
-    padding-left: 1.6rem;
+    padding-left: 2.25rem;
     gap: 0.6rem;
 }
 
@@ -271,7 +279,7 @@
    consistently regardless of how deep that particular branch
    actually goes. */
 .cat-subtree > .cat-item {
-    margin-left: 1.6rem;
+    margin-left: 2.25rem;
 }
 
 .cat-item {
