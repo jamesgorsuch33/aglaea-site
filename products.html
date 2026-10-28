@@ -239,12 +239,24 @@
                                             <span>Blazers</span>
                                         </label>
                                         <label class="filter-checkbox cat-item">
+                                            <input type="checkbox" data-cat-level="item" data-cat-path="clothing/jackets-and-coats/cashmere-coats" onchange="handleCategoryCheckbox(this)">
+                                            <span>Cashmere Coats</span>
+                                        </label>
+                                        <label class="filter-checkbox cat-item">
                                             <input type="checkbox" data-cat-level="item" data-cat-path="clothing/jackets-and-coats/denim-jackets" onchange="handleCategoryCheckbox(this)">
                                             <span>Denim Jackets</span>
                                         </label>
                                         <label class="filter-checkbox cat-item">
+                                            <input type="checkbox" data-cat-level="item" data-cat-path="clothing/jackets-and-coats/jackets" onchange="handleCategoryCheckbox(this)">
+                                            <span>Jackets</span>
+                                        </label>
+                                        <label class="filter-checkbox cat-item">
                                             <input type="checkbox" data-cat-level="item" data-cat-path="clothing/jackets-and-coats/leather-jackets" onchange="handleCategoryCheckbox(this)">
                                             <span>Leather Jackets</span>
+                                        </label>
+                                        <label class="filter-checkbox cat-item">
+                                            <input type="checkbox" data-cat-level="item" data-cat-path="clothing/jackets-and-coats/parka-coats" onchange="handleCategoryCheckbox(this)">
+                                            <span>Parka Coats</span>
                                         </label>
                                         <label class="filter-checkbox cat-item">
                                             <input type="checkbox" data-cat-level="item" data-cat-path="clothing/jackets-and-coats/vests-and-gilets" onchange="handleCategoryCheckbox(this)">
@@ -303,6 +315,10 @@
                                             <span>Cardigans</span>
                                         </label>
                                         <label class="filter-checkbox cat-item">
+                                            <input type="checkbox" data-cat-level="item" data-cat-path="clothing/knitwear/hoodies" onchange="handleCategoryCheckbox(this)">
+                                            <span>Hoodies</span>
+                                        </label>
+                                        <label class="filter-checkbox cat-item">
                                             <input type="checkbox" data-cat-level="item" data-cat-path="clothing/knitwear/sweaters" onchange="handleCategoryCheckbox(this)">
                                             <span>Sweaters</span>
                                         </label>
@@ -335,6 +351,10 @@
                                         <label class="filter-checkbox cat-item">
                                             <input type="checkbox" data-cat-level="item" data-cat-path="clothing/tops/short-sleeve" onchange="handleCategoryCheckbox(this)">
                                             <span>Short Sleeve</span>
+                                        </label>
+                                        <label class="filter-checkbox cat-item">
+                                            <input type="checkbox" data-cat-level="item" data-cat-path="clothing/tops/sleeveless" onchange="handleCategoryCheckbox(this)">
+                                            <span>Sleeveless</span>
                                         </label>
                                         <label class="filter-checkbox cat-item">
                                             <input type="checkbox" data-cat-level="item" data-cat-path="clothing/tops/tank-tops" onchange="handleCategoryCheckbox(this)">
@@ -542,6 +562,10 @@
                                     </summary>
                                     <div class="filter-options cat-items">
                                         <label class="filter-checkbox cat-item">
+                                            <input type="checkbox" data-cat-level="item" data-cat-path="accessories/hats/baseball-hats" onchange="handleCategoryCheckbox(this)">
+                                            <span>Baseball Hats</span>
+                                        </label>
+                                        <label class="filter-checkbox cat-item">
                                             <input type="checkbox" data-cat-level="item" data-cat-path="accessories/hats/beanies" onchange="handleCategoryCheckbox(this)">
                                             <span>Beanies</span>
                                         </label>
@@ -634,6 +658,10 @@
                                 <label class="filter-checkbox cat-item">
                                     <input type="checkbox" data-cat-level="item" data-cat-path="accessories/sunglasses" onchange="handleCategoryCheckbox(this)">
                                     <span>Sunglasses</span>
+                                </label>
+                                <label class="filter-checkbox cat-item">
+                                    <input type="checkbox" data-cat-level="item" data-cat-path="accessories/tech" onchange="handleCategoryCheckbox(this)">
+                                    <span>Tech</span>
                                 </label>
                             </div>
                         </details>
@@ -906,12 +934,36 @@
                             </div>
                             <div class="brand-options" id="brand-options">
                             <label class="filter-checkbox">
+                                <input type="checkbox" value="acne-studios" onchange="filterProducts()">
+                                <span>ACNE Studios</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="aesop" onchange="filterProducts()">
+                                <span>Aesop</span>
+                            </label>
+                            <label class="filter-checkbox">
                                 <input type="checkbox" value="anthbot" onchange="filterProducts()">
                                 <span>Anthbot</span>
                             </label>
                             <label class="filter-checkbox">
+                                <input type="checkbox" value="balenciaga" onchange="filterProducts()">
+                                <span>Balenciaga</span>
+                            </label>
+                            <label class="filter-checkbox">
                                 <input type="checkbox" value="bonheur-jewelry" onchange="filterProducts()">
                                 <span>BONHEUR JEWELRY</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="bottega-veneta" onchange="filterProducts()">
+                                <span>Bottega Veneta</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="burberry" onchange="filterProducts()">
+                                <span>Burberry</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="chloe" onchange="filterProducts()">
+                                <span>Chloe</span>
                             </label>
                             <label class="filter-checkbox">
                                 <input type="checkbox" value="ctrne" onchange="filterProducts()">
@@ -921,21 +973,89 @@
                                 <input type="checkbox" value="dean-morris" onchange="filterProducts()">
                                 <span>Dean Morris Cards</span>
                             </label>
-							<label class="filter-checkbox">
+                            <label class="filter-checkbox">
                                 <input type="checkbox" value="flowers-and-plants" onchange="filterProducts()">
                                 <span>Flowers & Plants Co</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="gucci" onchange="filterProducts()">
+                                <span>Gucci</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="hoka" onchange="filterProducts()">
+                                <span>Hoka</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="jacquemus" onchange="filterProducts()">
+                                <span>Jacquemus</span>
                             </label>
                             <label class="filter-checkbox">
                                 <input type="checkbox" value="jo-loves" onchange="filterProducts()">
                                 <span>Jo Loves</span>
                             </label>
                             <label class="filter-checkbox">
+                                <input type="checkbox" value="jw-anderson" onchange="filterProducts()">
+                                <span>JW Anderson</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="lanvin" onchange="filterProducts()">
+                                <span>Lanvin</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="lemaire" onchange="filterProducts()">
+                                <span>Lemaire</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="levis" onchange="filterProducts()">
+                                <span>Levi's</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="maison-margiela" onchange="filterProducts()">
+                                <span>Maison Margiela</span>
+                            </label>
+                            <label class="filter-checkbox">
                                 <input type="checkbox" value="mappin-webb" onchange="filterProducts()">
                                 <span>Mappin & Webb</span>
                             </label>
                             <label class="filter-checkbox">
+                                <input type="checkbox" value="marni" onchange="filterProducts()">
+                                <span>Marni</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="max-mara" onchange="filterProducts()">
+                                <span>Max Mara</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="max-mara-the-cube" onchange="filterProducts()">
+                                <span>Max Mara The Cube</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="miu-miu" onchange="filterProducts()">
+                                <span>Miu Miu</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="moncler" onchange="filterProducts()">
+                                <span>Moncler</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="moncler-grenoble" onchange="filterProducts()">
+                                <span>Moncler Grenoble</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="moncler-x-saleh-bembury" onchange="filterProducts()">
+                                <span>Moncler X Saleh Bembury</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="new-balance" onchange="filterProducts()">
+                                <span>New Balance</span>
+                            </label>
+                            <label class="filter-checkbox">
                                 <input type="checkbox" value="nicchia-luxury" onchange="filterProducts()">
                                 <span>Nicchia Luxury</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" value="on-x-paf" onchange="filterProducts()">
+                                <span>On X PAF</span>
                             </label>
                             <label class="filter-checkbox">
                                 <input type="checkbox" value="purely-diamonds" onchange="filterProducts()">
@@ -953,10 +1073,11 @@
                                 <input type="checkbox" value="vilebrequin" onchange="filterProducts()">
                                 <span>Vilebrequin</span>
                             </label>
-							<label class="filter-checkbox">
+                            <label class="filter-checkbox">
                                 <input type="checkbox" value="wild-at-heart" onchange="filterProducts()">
                                 <span>Wild At Heart</span>
                             </label>
+
                             </div>
                         </div>
                     </details>
