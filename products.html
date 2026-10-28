@@ -1094,6 +1094,10 @@
                         <span class="filter-icon" aria-hidden="true">⚙</span>
                     </button>
 
+                    <!-- Active filter chips — filled in by renderActiveFilters()
+                         in products.js; hidden automatically when nothing is selected. -->
+                    <div class="active-filters" id="active-filters" aria-label="Active filters" hidden></div>
+
                     <div class="products-toolbar">
                         <!-- Count updates automatically via JS -->
                         <p class="results-count"><span id="product-count">0</span> products</p>
