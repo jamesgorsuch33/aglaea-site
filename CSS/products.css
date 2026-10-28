@@ -274,12 +274,14 @@
 }
 
 /* Items sitting directly under a heading (no subheading layer —
-   e.g. Dresses, Skirts under Clothing) get the same indent as
-   items nested under a subheading, so the visual depth reads
-   consistently regardless of how deep that particular branch
-   actually goes. */
+   e.g. Dresses, Skirts under Clothing; Flats, Heels under Footwear)
+   are styled to match the subheadings beside them (Jackets & Coats,
+   Tops, Trousers…): same left edge, same type size — just without
+   the dropdown arrow, since there's nothing beneath them to open. */
 .cat-subtree > .cat-item {
-    margin-left: 2.25rem;
+    margin-left: 0;
+    font-size: 1rem;
+    color: var(--charcoal);
 }
 
 .cat-item {
