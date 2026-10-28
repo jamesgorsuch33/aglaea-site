@@ -227,7 +227,99 @@ function handleCategoryCheckbox(checkbox) {
     filterProducts();
 }
 
+// ============================================================
+// ACTIVE FILTER CHIPS
+// Shows every currently-applied filter as its own removable box
+// above the results. Rebuilt from the live checkbox/search state
+// on every filterProducts() call, so it can never drift out of sync.
+// A ticked heading/subheading cascades onto all its children, so
+// only the highest ticked level gets a chip (one "Clothing" chip,
+// not "Clothing" plus every item inside it).
+// ============================================================
+function renderActiveFilters() {
+    const box = document.getElementById('active-filters');
+    if (!box) return;
+
+    const chips = [];
+
+    // Occasion / recipient / brand checkboxes
+    document.querySelectorAll('.filter-group input[type="checkbox"]:not([data-cat-level]):checked').forEach(cb => {
+        const span = cb.parentElement.querySelector('span');
+        chips.push({ kind: 'value', key: cb.value, label: span ? span.textContent.trim() : cb.value });
+    });
+
+    // Category taxonomy checkboxes — skip any whose ancestor is also ticked
+    const catChecked = Array.from(document.querySelectorAll('input[type="checkbox"][data-cat-level]:checked'));
+    const checkedPaths = catChecked.map(cb => cb.getAttribute('data-cat-path'));
+    catChecked.forEach(cb => {
+        const path = cb.getAttribute('data-cat-path');
+        if (checkedPaths.some(p => p !== path && path.startsWith(p + '/'))) return;
+
+        const own = cb.parentElement.querySelector('span');
+        let label = own ? own.textContent.trim() : path;
+
+        // Items under a subheading read "Trousers › Shorts" so
+        // same-named items (Shorts, Vests) stay distinguishable.
+        if (cb.getAttribute('data-cat-level') === 'item') {
+            const sub = cb.closest('details.cat-subgroup');
+            const subSpan = sub ? sub.querySelector(':scope > summary .cat-summary-label span') : null;
+            if (subSpan) label = subSpan.textContent.trim() + ' \u203A ' + label;
+        }
+        chips.push({ kind: 'cat', key: path, label });
+    });
+
+    // Product-name search
+    const searchInput = document.getElementById('product-search');
+    const term = searchInput ? searchInput.value.trim() : '';
+    if (term) chips.push({ kind: 'search', key: 'search', label: 'Search: \u201C' + term + '\u201D' });
+
+    box.innerHTML = '';
+    chips.forEach(chip => {
+        const el = document.createElement('span');
+        el.className = 'active-filter-chip';
+
+        const text = document.createElement('span');
+        text.textContent = chip.label;
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'active-filter-remove';
+        btn.setAttribute('aria-label', 'Remove filter: ' + chip.label);
+        btn.setAttribute('data-kind', chip.kind);
+        btn.setAttribute('data-key', chip.key);
+        btn.textContent = '\u00D7';
+
+        el.appendChild(text);
+        el.appendChild(btn);
+        box.appendChild(el);
+    });
+    box.hidden = chips.length === 0;
+}
+
+// One delegated listener handles every chip's "x"
+document.addEventListener('click', function (event) {
+    const btn = event.target.closest && event.target.closest('.active-filter-remove');
+    if (!btn) return;
+
+    const kind = btn.getAttribute('data-kind');
+    const key = btn.getAttribute('data-key');
+    showingAll = false;
+
+    if (kind === 'search') {
+        const input = document.getElementById('product-search');
+        if (input) input.value = '';
+        filterProducts();
+    } else if (kind === 'cat') {
+        const cb = document.querySelector('input[type="checkbox"][data-cat-level][data-cat-path="' + key + '"]');
+        if (cb) { cb.checked = false; handleCategoryCheckbox(cb); }
+    } else {
+        const cb = document.querySelector('.filter-group input[type="checkbox"]:not([data-cat-level])[value="' + key + '"]');
+        if (cb) { cb.checked = false; filterProducts(); }
+    }
+});
+
 function filterProducts() {
+    renderActiveFilters();
     const brandCards = document.querySelectorAll('.brand-card');
 
     // Each filter group is identified by its own checkbox values rather
